@@ -5,8 +5,8 @@ import json
 import os 
 
 
-
-		#information relating to HPO terms
+		#NOTE: this code might be useful for proper pheotype checking,
+		#since it stores hierarchical information relating to HPO terms
 		# hpo = obonet.read_obo(HPO_OBO_URL)
 		# assert nx.is_directed_acyclic_graph(hpo)
 		# print('Number of HPO terms: {}'.format(len(hpo)))
@@ -62,14 +62,3 @@ class VariantGraph(nx.Graph):
 
 		with open(os.path.join(directory, "processed_variant_"+constants.GRAPH_FILENAME+ ".json"), "w") as file:
 			json.dump(VG_json, file)
-
-	#for filtering out nodes that don't have evidences
-	# to_remove = []
-	# for (node, nodeData) in variant_graph.nodes.items():
-	# 	if len(nodeData["evidenceAccepted"]) == 0:
-	# 		to_remove.append(node)
-
-
-	# if not args.include_submitted:
-	# 	variant_graph.remove_nodes_from(to_remove)
-	# 	print("# of variants after unreviewed variants removed: {}".format(len(variant_graph)))
