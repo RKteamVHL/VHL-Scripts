@@ -20,7 +20,6 @@ VHL_CDS = exon1 + exon2 + exon3
 
 VHL_PROTEIN = VHL_CDS.translate()
 
-print(VHL_PROTEIN)
 
 #resources used for finding these values:
 #	https://www.ensembl.org/Homo_sapiens/Gene/Splice?db=core;g=ENSG00000134086;r=3:10141008-10152220
@@ -129,7 +128,6 @@ _DNA_REGEX =	{
 # ENST00000256474.2:c.263_265delGGCinsTT 
 
 
-#TODO: implement this
 def affected_domains(node):
 	domains_affected = []
 

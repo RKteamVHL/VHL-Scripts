@@ -8,6 +8,8 @@ import math
 import os 
 
 
+#NOTE: constants for variant analysis are declared here, but it may 
+#make more sense for these to be static attributes in VarianGraph
 
 # keys to save in the networkx structure
 VARIANT_GRAPH_KEYS = [
@@ -15,10 +17,14 @@ VARIANT_GRAPH_KEYS = [
 	"evidenceSubmitted",
 	"associatedPhenotypes",
 	"variantName",
-	"variantTypes"
+	"variantTypes",
+	"hgvsExpressions",
+	"civicId"
 
 ]
 
+# list of dicts, where each dict references a similarity function, and stores
+# keyword args for that function
 SIMILARITY_METRICS = [
 	{
 		"function": sf.score_iou,
@@ -40,6 +46,8 @@ SIMILARITY_METRICS = [
 	}
 ]
 
+# list of dicts, where each dict references a node metric function, and stores
+# keyword args for that function
 NODE_METRICS = [
 	{
 		"function": vf.affected_domains,
@@ -49,18 +57,31 @@ NODE_METRICS = [
 	}
 ]
 
-		#NOTE: this code might be useful for proper pheotype checking,
-		#since it stores hierarchical information relating to HPO terms
-		#it will need obonet
-		# hpo = obonet.read_obo(HPO_OBO_URL)
-		# assert nx.is_directed_acyclic_graph(hpo)
-		# print('Number of HPO terms: {}'.format(len(hpo)))
+DEFAULT_DRAWING_OPTIONS = {
+	'node_color': 'blue',
+	'node_size': 50,
+	'line_color': 'grey',
+	'font_size': 6
+}
+
 
 class VariantGraph(nx.Graph):
+	"""Represents a graph, with variant-specific added functionality
+
+	Attributes:
+		All attributes in the nx.Graph class 
+	"""
 
 	#TODO: cross-reference variants with other sources
 	#TODO: potentially move these attribute-setting fuctions to node_functions.py
 	def add_nodes_from_civic_by_gene(self, geneId, ignore_submitted = False):
+		"""Fetches all variants for a given gene and adds them to self nodes
+
+		Arguments:
+			geneId (int): Civic id of the gene 
+			ignore_submitted (bool): Determines whether variants with only
+				submitted, not approved, evidence statements will be included
+		"""
 		to_remove = []
 		for variant in civic.get_gene_by_id(geneId).variants:
 			self.add_node(variant.id)
@@ -117,6 +138,10 @@ class VariantGraph(nx.Graph):
 
 
 	def save_to_json_file(self, filename):
+		"""Saves the graph to a file
+		Arguments:
+			filename (string): name of the saved file
+		"""
 		VG_json = nx.readwrite.json_graph.node_link_data(self)
 
 		with open(filename, "w") as file:
@@ -125,6 +150,10 @@ class VariantGraph(nx.Graph):
 		print("# of variants saved to file: {}".format(len(self)))
 
 	def load_from_json_file(self, filename):
+		"""Loads the graph from a file
+		Arguments:
+			filename (string): name of the saved file
+		"""
 		with open(filename, "r") as file:
 			VG_json = json.load(file)
 			VG = nx.readwrite.json_graph.node_link_graph(VG_json)
@@ -132,7 +161,11 @@ class VariantGraph(nx.Graph):
 
 		print("# of variants loaded from file: {}".format(len(self)))
 
+	#TODO: it may make sense to have the metric functions and arguments
+	# inputted as arguments to this method
 	def calculate_node_attributes(self):
+		"""Calculates node metrics for each node, based on NODE_METRICS
+		"""
 		VG_nodes = list(self.nodes(data=True))
 		for i in range(0,len(VG_nodes)):
 			for metric in NODE_METRICS:
@@ -140,7 +173,12 @@ class VariantGraph(nx.Graph):
 				nId = VG_nodes[i][0]
 				self.nodes[nId][name] = score
 
+	#TODO: it may make sense to have the metric functions and arguments
+	# inputted as arguments to this method
 	def calculate_similarities(self):
+		"""Calculates similarity metrics between nodes from SIMILARITY_METRICS
+		"""
+
 		VG_nodes = list(self.nodes(data=True))
 		#assuming undirected graphs with no self connections
 		for i in range(0,len(VG_nodes)):
@@ -155,27 +193,22 @@ class VariantGraph(nx.Graph):
 				if any(has_value):
 					self.add_edge(VG_nodes[i][0], VG_nodes[j][0], **similarities)
 
-	#TODO: Implement this
-	def draw_graph(self):
-		pass
+	#TODO: this function may not be needed
+	def draw_graph(self, **options):
+		draw_options = DEFAULT_DRAWING_OPTIONS
+		for key, val in options.items():
+				draw_options[key] = val 
+
+
+
+
+		nx.draw(self, **draw_options)
+
+		plt.show()
+
 		# filt_edges = [(u,v,d) for (u,v,d) in variant_graph.edges(data=True) if d["weight"] !=0] 
 		# edge_widths = [ d["weight"]/10 for (u,v,d) in filt_edges ]	
 		# edge_colors = [[d["phenotype_weight"], d["vartype_weight"],0, 0.5] for (u,v,d) in filt_edges]
 
 
 
-		# #graph drawing
-		# options = {
-		# 	'node_color': 'blue',
-		# 	'node_size': 50,
-		# 	'line_color': 'grey',
-		# 	'font_size': 6,
-		# 	'width':edge_widths,
-		# 	'edgelist': filt_edges,
-		# 	'edge_color': edge_colors,
-		# 	'labels': nx.get_node_attributes(variant_graph, 'variantName')
-		# }
-
-		# nx.draw(variant_graph, **options)
-
-		# plt.show()

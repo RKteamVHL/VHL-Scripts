@@ -35,17 +35,26 @@ if __name__ == '__main__':
 		VG.load_from_json_file("variant_nodes.json")
 
 	VG.calculate_node_attributes()
-	VG.calculate_similarities()
-	type_dict = {}
-	for node in VG.nodes(data=True):
-		for vtype in node[1]["variantTypes"]:
-			type_dict[vtype] =  type_dict.get(vtype, 0)+1
+	VG.calculate_similarities()	
 
-	print(type_dict)
+
+	pos = nx.spring_layout(VG)  # positions for all nodes
+	labels = nx.get_node_attributes(VG, 'variantName')
+	# nodes
+	nx.draw_networkx_nodes(VG, pos, node_size=50)
+	nx.draw_networkx_labels(VG, pos, labels, font_size=8)
+	plt.show()
+
 	VG.save_to_json_file("calculated_variant_nodes.json")
 
 
+#this code is for finding a summary of al variant types
+# 	type_dict = {}
+# 	for node in VG.nodes(data=True):
+# 		for vtype in node[1]["variantTypes"]:
+# 			type_dict[vtype] =  type_dict.get(vtype, 0)+1
 
+# 	print(type_dict)
 
 # QUESTIONS:
 # - where do you find the keys each attribute type has?
