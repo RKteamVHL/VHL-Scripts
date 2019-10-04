@@ -16,10 +16,14 @@ VARIANT_GRAPH_KEYS = [
 	"evidenceAccepted",
 	"evidenceSubmitted",
 	"associatedPhenotypes",
+	# civic(string): the civic name of the variant, 
 	"variantName",
-	"variantTypes",
-	"hgvsExpressions",
-	"civicId"
+	# civic([string]): list of variant types, stored as sequence ontology names 
+	"variantTypes", 
+	# civic([string]): list of protein/chromosomal/mrna transcript ids for the variant
+	"hgvsExpressions", 
+	# civic(int): id used by civic to reference this variant
+	"civicId" 
 
 ]
 
@@ -39,9 +43,15 @@ SIMILARITY_METRICS = [
 		}
 	},
 		{
-		"function": sf.score_iou,
+		"function": sf.variant_score_domains,
 		"kwargs": {
-			"attr_name": "affected_domains"
+			"attr_name": "alpha"
+		}
+	},
+		{
+		"function": sf.variant_score_domains,
+		"kwargs": {
+			"attr_name": "beta"
 		}
 	}
 ]

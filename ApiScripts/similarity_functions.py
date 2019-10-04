@@ -22,8 +22,15 @@ def score_iou(n1, n2, attr_name):
 
 # calculates similarity between variants based on whether they affect the
 # same protein domains
-def variant_score_domains(n1, n2):
-	pass
+def variant_score_domains(n1, n2, domain):
+	score = 0
+
+	#if the inputted domain is in both variants
+	if (domain in n1) and (domain in n2):
+		score = 1
+
+
+	return ("score_"+domain, score)
 
 
 # calculates similarity between snvs based on how far (in aa) they are,
