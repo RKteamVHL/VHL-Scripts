@@ -4,8 +4,13 @@ import math
 import os
 import re
 
-
+#
+# The following code loads the VHL201 transcript, which contains sequences for:
+# utr5-exon1-exon2-exon3-utr3
+# introns are not included here
 #TODO: make this less hardcoded, and function based on fasta descriptions
+#The particular fasta file was obtained from: 
+# https://useast.ensembl.org/Homo_sapiens/Transcript/Exons?db=core;g=ENSG00000134086;r=3:10141008-10152220;t=ENST00000256474
 VHL201_FASTA = os.path.join('ApiScripts', 'files', 'Homo_sapiens_VHL_201_sequence.fa')
 
 vhl_seqs = [str(seqreq.seq) for seqreq in SeqIO.parse(VHL201_FASTA, "fasta")]
@@ -91,7 +96,10 @@ DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 	r'(?P<alt2>[ACTG]+)?', 						#alternate nt
 ))
 #these regular expressions are targeted for ensembl transcript references
-#TODO: find a library to replace the above regex. The hgvs python package currently doesn't work for windows
+#TODO: This regex was written from scratch and may be wrong. 
+# It also doesn't currently support multiple variants at once.
+# Find a library to replace the above regex. 
+# (The hgvs python package currently doesn't work for windows)
 
 
 #NOTE: these were the old regexes before the one above was written
@@ -114,7 +122,7 @@ _DNA_REGEX =	{
 	'inframe_insertion': re.compile(r'(.*):c\.([0-9]+)(?:_([0-9]*))?(?:dup)?(?:ins)?([ACTG]+)')
 }
 
-#compiled CDS examples:
+#compiled CDS examples to test DNA_REGEX:
 # ENST00000256474.2:c.1-?_642+?del
 # ENST00000256474.2:c.227_229delTCT
 # ENST00000256474.2:c.180delG

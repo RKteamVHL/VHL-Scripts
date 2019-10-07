@@ -1,5 +1,4 @@
 from .VariantGraph import VariantGraph
-from . import constants
 import math
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -11,6 +10,9 @@ import os
 
 import pprint
 
+
+# 58 corresponds to the VHL gene 
+VHL_GENE_ID =  58
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -28,7 +30,7 @@ if __name__ == '__main__':
 	#fetch/process all relevant data from all sources
 	if args.update:
 
-		VG.add_nodes_from_civic_by_gene(constants.VHL_GENE_ID, ignore_submitted=args.ignore_submitted)	
+		VG.add_nodes_from_civic_by_gene(VHL_GENE_ID, ignore_submitted=args.ignore_submitted)	
 		VG.save_to_json_file("variant_nodes.json")
 
 	else:

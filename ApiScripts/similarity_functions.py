@@ -20,13 +20,14 @@ def score_iou(n1, n2, attr_name):
 	#find better way of creating weight name
 	return ("score_iou_"+attr_name, score)
 
+
 # calculates similarity between variants based on whether they affect the
 # same protein domains
 def variant_score_domains(n1, n2, domain):
 	score = 0
 
 	#if the inputted domain is in both variants
-	if (domain in n1) and (domain in n2):
+	if (domain in n1['affected_domains']) and (domain in n2['affected_domains']):
 		score = 1
 
 

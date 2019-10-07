@@ -1,5 +1,4 @@
 from civicpy import civic
-from . import constants
 from . import similarity_functions as sf
 from . import variant_functions as vf
 import networkx as nx
@@ -7,9 +6,12 @@ import json
 import math
 import os 
 
+# url for human-phenotype-ontology
+HPO_OBO_URL = "http://purl.obolibrary.org/obo/hp.obo"
+
 
 #NOTE: constants for variant analysis are declared here, but it may 
-#make more sense for these to be static attributes in VarianGraph
+#make more sense for these to be static attributes in VariantGraph
 
 # keys to save in the networkx structure
 VARIANT_GRAPH_KEYS = [
@@ -45,13 +47,13 @@ SIMILARITY_METRICS = [
 		{
 		"function": sf.variant_score_domains,
 		"kwargs": {
-			"attr_name": "alpha"
+			"domain": "alpha"
 		}
 	},
 		{
 		"function": sf.variant_score_domains,
 		"kwargs": {
-			"attr_name": "beta"
+			"domain": "beta"
 		}
 	}
 ]
