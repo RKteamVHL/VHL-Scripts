@@ -4,15 +4,17 @@ import math
 import os
 import re
 
-# The functions here perform variant-based analysis for each individual node.
+### The functions here are related to variant-based analysis for each individual node.
 # Variant-Variant similarity functions are in similarity_functions.py
 
 
+## Transcript CDS and Protein information
 # The following code loads the VHL201 transcript, which contains sequences for:
 # utr5-exon1-exon2-exon3-utr3
 # introns are not included here
-#TODO: make this less hardcoded, and function based on fasta descriptions
-#The particular fasta file was obtained from: 
+# TODO: make this less hardcoded, and function based on fasta descriptions
+
+# The particular fasta file was obtained from: 
 # https://useast.ensembl.org/Homo_sapiens/Transcript/Exons?db=core;g=ENSG00000134086;r=3:10141008-10152220;t=ENST00000256474
 VHL201_FASTA = os.path.join('ApiScripts', 'files', 'Homo_sapiens_VHL_201_sequence.fa')
 
@@ -29,7 +31,9 @@ VHL_CDS = exon1 + exon2 + exon3
 VHL_PROTEIN = VHL_CDS.translate()
 
 
-#resources used for finding these values:
+
+## Protein Domain Information
+#	resources used for finding these values:
 #	https://www.ensembl.org/Homo_sapiens/Gene/Splice?db=core;g=ENSG00000134086;r=3:10141008-10152220
 
 # for ENSG00000134086, ensembl links to Pfam ids: 
@@ -58,8 +62,8 @@ PFAM_VHL_DOMAINS = {
 		"alpha": range(149, 205)
 	},
 
-	#Q: I couldn't find these values on pfam, only on ensembl. Did 
-	#ensembl do the mapping, or is it somewhere on pfam?
+	# Q: I couldn't find these values on pfam, only on ensembl. Did 
+	# ensembl do the mapping, or is it somewhere on pfam?
 	"ENST00000345392.2":{
 		# 63-114, inclusive
 		"beta": range(63, 115),
@@ -86,8 +90,10 @@ GENE3D_VHL_DOMAINS = {
 }
 
 
+## Extraction of Variant Amino Acid / Nucleotide Changes
+
 DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
-	r'(?P<id>.*):c\.', 							#transcript reference
+	r'(?P<id>.*):*c\.', 						#transcript reference
 	r'(?P<start>[\d?]+)',						#start nt
 	r'(?P<startNonCDS>[\+\-][\d?]+)?',			#nonCDS information
 	r'(_(?P<end>[\d?]+))?',						#end nt
@@ -98,14 +104,14 @@ DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 	r'(?P<varType2>(del)?(ins)?(dup)?(>)?)?', 	#type of variation
 	r'(?P<alt2>[ACTG]+)?', 						#alternate nt
 ))
-#these regular expressions are targeted for ensembl transcript references
-#TODO: This regex was written from scratch and may be wrong. 
+# these regular expressions are targeted for ensembl transcript references
+# TODO: This regex was written from scratch and may be wrong. 
 # It also doesn't currently support multiple variants at once.
 # Find a library to replace the above regex. 
 # (The hgvs python package currently doesn't work for windows)
 
 
-#NOTE: these were the old regexes before the one above was written
+# NOTE: these were the old regexes before the one above was written. possibly remove in the furure
 _DNA_REGEX =	{
 
 	#TODO: try make this a 'catch-all' if possible
@@ -139,7 +145,29 @@ _DNA_REGEX =	{
 # ENST00000256474.2:c.263_265delGGCinsTT 
 
 
+## Scoring functions
+
+# TODO: code these
+
+def protein_change(node):
+	pass
+
+
+def nucleotide_change(node):
+	pass
+
+def transition_translation(node):
+	pass
+
+def protein_substituion_score(node):
+	pass
+
+
 def affected_domains(node):
+	'''Finds the affected VHL domains for a variant
+	'''
+	#TODO: make this less nested
+
 	domains_affected = []
 
 	#for simple missense
@@ -162,8 +190,8 @@ def affected_domains(node):
 						affected_aa = range(start_aa, stop_aa)
 
 						for domain in GENE3D_VHL_DOMAINS[var['id']]:
-							#if theres overlap in aa's
+							#if theres overlap in aa's between the variant and each domain
 							if len(list(set(GENE3D_VHL_DOMAINS[var['id']][domain]) & set(affected_aa))) > 0:
 								domains_affected.append(domain)
 
-	return ("affected_domains", domains_affected)
+	return domains_affected

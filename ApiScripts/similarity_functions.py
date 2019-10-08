@@ -1,12 +1,19 @@
 import math
 
+### The functions here perform variant-to-variant similarity analysis for pairs of nodes.
+# Individual node analyses are in variant_functions.py
 
 ##Functions here should *only* take in n1 data, n2 data, and keyword args
 # and must return a tuple of (fn_name, fn_score)
 
-# given two nodes, finds the intersection over union for a specific attribute
-# the attributes here must be of a class type that is iterable (i.e., a list)
+
+## Scoring functions
+# Functions take in a dictionary for each node, and return a corresponding score
+
 def score_iou(n1, n2, attr_name):
+	'''Given two nodes, finds the intersection over union for a specific attribute
+	The attributes here must be of a class type that is iterable (i.e., a list)
+	'''
 	set1 = set(n1[attr_name])
 	set2 = set(n2[attr_name])
 
@@ -20,10 +27,10 @@ def score_iou(n1, n2, attr_name):
 	#find better way of creating weight name
 	return score
 
-
-# calculates similarity between variants based on whether they affect the
-# same protein domains
 def variant_score_domains(n1, n2, domain):
+	'''Calculates similarity between variants based on whether they affect the
+	same protein domains
+	'''
 	score = 0
 
 	#if the inputted domain is in both variants
@@ -34,9 +41,11 @@ def variant_score_domains(n1, n2, domain):
 	return score
 
 
-# calculates similarity between snvs based on how far (in aa) they are,
-#according to a gaussian distribution
+
 def variant_aa_distance(n1, n2, sigma=5):
+	'''Calculates similarity between snvs based on how far (in aa) they are
+	Currently uses a gaussian distribution
+	'''
 	#TODO: get these from the nodes
 	aa1 = 5
 	aa2 = 10
@@ -45,9 +54,10 @@ def variant_aa_distance(n1, n2, sigma=5):
 	return score
 
 
-# calculates similarity between snvs based on how far (in bp) they are,
-#according to a gaussian distribution
 def variant_nt_distance(n1, n2, sigma=200):
+	'''Calculates similarity between snvs based on how far (in base pairs) they are
+	Currently uses a gaussian distribution
+	'''
 	#TODO: get these from the nodes
 	nt1 = 5
 	nt2 = 10

@@ -1,7 +1,4 @@
 from .VariantGraph import VariantGraph
-from sklearn.cluster import SpectralClustering
-from snf import compute
-from snf import metrics
 import math
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -53,36 +50,9 @@ if __name__ == '__main__':
 		VG.load_from_json_file("variant_nodes.json")
 
 	VG.calculate_node_attributes()
-	VG.calculate_similarities()
+	VG.calculate_similarities()	
+	VG.calculate_snf()
 	#VG.remove_isolates()
-
-	adjmats = VG.get_adjacency_mats(dense=True)
-
-	#running SNF
-	fused_ndarray = compute.snf(adjmats)
-	clust_count1, clust_count2 = compute.get_n_clusters(fused_ndarray)
-
-
-	sc = SpectralClustering(8, affinity='precomputed', n_init=100, assign_labels='discretize')
-	sc.fit(fused_ndarray)
-
-	fused_labels = sc.labels_
-
-	silhouette = metrics.silhouette_score(fused_ndarray, fused_labels)
-
-	print("Cluster estimates: {}, {}".format(clust_count1, clust_count2))
-	print("Labels: ", fused_labels)
-
-
-	# Merging the fused edge weights back into the original graph
-	fused_graph = nx.convert_matrix.from_numpy_array(fused_ndarray)
-
-	VG.add_edges_from(fused_graph.edges(data=True))
-
-	for i in range(0, len(VG.nodes())):
-		node = VG.nodes[i]
-		node['cluster'] = fused_labels[i].item()
-
 
 
 
@@ -91,7 +61,7 @@ if __name__ == '__main__':
 		labels=nx.get_node_attributes(VG, 'variantName'), 
 		pos=nx.spring_layout(VG),
 		width=0,
-		node_color=[COLORMAP[d['cluster']] for (u,d) in VG.nodes(data=True)]
+		node_color=[COLORMAP[d['spectral_label']] for (u,d) in VG.nodes(data=True)]
 	)
 	plt.show()
 
