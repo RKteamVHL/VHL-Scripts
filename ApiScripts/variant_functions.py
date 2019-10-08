@@ -4,7 +4,10 @@ import math
 import os
 import re
 
-#
+# The functions here perform variant-based analysis for each individual node.
+# Variant-Variant similarity functions are in similarity_functions.py
+
+
 # The following code loads the VHL201 transcript, which contains sequences for:
 # utr5-exon1-exon2-exon3-utr3
 # introns are not included here

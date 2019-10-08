@@ -1,4 +1,7 @@
 from .VariantGraph import VariantGraph
+from sklearn.cluster import SpectralClustering
+from snf import compute
+from snf import metrics
 import math
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -13,6 +16,19 @@ import pprint
 
 # 58 corresponds to the VHL gene 
 VHL_GENE_ID =  58
+
+COLORMAP= {
+	0:(0,0,0,0.5), 
+	1:(0,0,1,0.5),
+	2:(0,1,0,0.5),
+	3:(0,1,1,0.5),
+	4:(0,1,0,0.5),
+	5:(0,1,1,0.5),
+	6:(1,0,0,0.5),
+	7:(1,0,1,0.5),
+
+	
+}
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -37,14 +53,46 @@ if __name__ == '__main__':
 		VG.load_from_json_file("variant_nodes.json")
 
 	VG.calculate_node_attributes()
-	VG.calculate_similarities()	
+	VG.calculate_similarities()
+	#VG.remove_isolates()
+
+	adjmats = VG.get_adjacency_mats(dense=True)
+
+	#running SNF
+	fused_ndarray = compute.snf(adjmats)
+	clust_count1, clust_count2 = compute.get_n_clusters(fused_ndarray)
 
 
-	pos = nx.spring_layout(VG)  # positions for all nodes
-	labels = nx.get_node_attributes(VG, 'variantName')
-	# nodes
-	nx.draw_networkx_nodes(VG, pos, node_size=50)
-	nx.draw_networkx_labels(VG, pos, labels, font_size=8)
+	sc = SpectralClustering(8, affinity='precomputed', n_init=100, assign_labels='discretize')
+	sc.fit(fused_ndarray)
+
+	fused_labels = sc.labels_
+
+	silhouette = metrics.silhouette_score(fused_ndarray, fused_labels)
+
+	print("Cluster estimates: {}, {}".format(clust_count1, clust_count2))
+	print("Labels: ", fused_labels)
+
+
+	# Merging the fused edge weights back into the original graph
+	fused_graph = nx.convert_matrix.from_numpy_array(fused_ndarray)
+
+	VG.add_edges_from(fused_graph.edges(data=True))
+
+	for i in range(0, len(VG.nodes())):
+		node = VG.nodes[i]
+		node['cluster'] = fused_labels[i].item()
+
+
+
+
+	nx.draw(VG, 
+		node_size=100, 
+		labels=nx.get_node_attributes(VG, 'variantName'), 
+		pos=nx.spring_layout(VG),
+		width=0,
+		node_color=[COLORMAP[d['cluster']] for (u,d) in VG.nodes(data=True)]
+	)
 	plt.show()
 
 	VG.save_to_json_file("calculated_variant_nodes.json")

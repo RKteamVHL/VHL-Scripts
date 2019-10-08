@@ -31,32 +31,32 @@ VARIANT_GRAPH_KEYS = [
 
 # list of dicts, where each dict references a similarity function, and stores
 # keyword args for that function
-SIMILARITY_METRICS = [
-	{
+SIMILARITY_METRICS = {
+	"score_iou_associatedPhenotypes": {
 		"function": sf.score_iou,
 		"kwargs": {
 			"attr_name": "associatedPhenotypes"
 		}
 	},
-	{
+	"score_iou_variantTypes": {
 		"function": sf.score_iou,
 		"kwargs": {
 			"attr_name": "variantTypes"
 		}
 	},
-		{
+	"score_domain_alpha": {
 		"function": sf.variant_score_domains,
 		"kwargs": {
 			"domain": "alpha"
 		}
 	},
-		{
+	"score_domain_beta": {
 		"function": sf.variant_score_domains,
 		"kwargs": {
 			"domain": "beta"
 		}
 	}
-]
+}
 
 # list of dicts, where each dict references a node metric function, and stores
 # keyword args for that function
@@ -96,8 +96,9 @@ class VariantGraph(nx.Graph):
 		"""
 		to_remove = []
 		for variant in civic.get_gene_by_id(geneId).variants:
-			self.add_node(variant.id)
-			variant_node = self.nodes[variant.id]
+			node_id = len(self.nodes())
+			self.add_node(node_id)
+			variant_node = self.nodes[node_id]
 
 			variant_node["civicId"] = variant.id
 			variant_node["variantName"] = variant.name
@@ -194,33 +195,43 @@ class VariantGraph(nx.Graph):
 		VG_nodes = list(self.nodes(data=True))
 		#assuming undirected graphs with no self connections
 		for i in range(0,len(VG_nodes)):
-			for j in range(i+1, len(VG_nodes)):
+			for j in range(i, len(VG_nodes)):
 
 				similarities = {}
-				for metric in SIMILARITY_METRICS:
-					(name, score) = metric["function"](VG_nodes[i][1], VG_nodes[j][1], **metric["kwargs"])
+				for name, metric in SIMILARITY_METRICS.items():
+					score = metric["function"](VG_nodes[i][1], VG_nodes[j][1], **metric["kwargs"])
 					similarities[name] = score
 
 				has_value = [ not math.isclose(v, 0, rel_tol=1e-5) for v in similarities.values()]
 				if any(has_value):
 					self.add_edge(VG_nodes[i][0], VG_nodes[j][0], **similarities)
 
-	#TODO: this function may not be needed
-	def draw_graph(self, **options):
-		draw_options = DEFAULT_DRAWING_OPTIONS
-		for key, val in options.items():
-				draw_options[key] = val 
 
 
+	# NOTE: this code probably isn't needed- remove down the line			
+	# def remove_isolates(self):
+	# 	filtered_graph = self.copy()
+	# 	filtered_graph.remove_nodes_from(list(nx.isolates(filtered_graph)))
+
+	# 	relabelled_graph = nx.convert_node_labels_to_integers(filtered_graph, label_attribute="prev_id")
+	# 	self.clear()
+	# 	self.add_nodes_from(relabelled_graph.nodes(data=True))
+	# 	self.add_edges_from(relabelled_graph.edges(data=True))
+		
 
 
-		nx.draw(self, **draw_options)
+	def get_adjacency_mats(self, dense=False):
+		mats = []
+		nodes = self.nodes()
+		for metric in SIMILARITY_METRICS.keys():
+			mat = nx.adjacency_matrix(self, weight=metric)
+			if dense:
+				mats.append(mat.todense())
+			else:
+				mats.append(mat)
 
-		plt.show()
+		return mats
 
-		# filt_edges = [(u,v,d) for (u,v,d) in variant_graph.edges(data=True) if d["weight"] !=0] 
-		# edge_widths = [ d["weight"]/10 for (u,v,d) in filt_edges ]	
-		# edge_colors = [[d["phenotype_weight"], d["vartype_weight"],0, 0.5] for (u,v,d) in filt_edges]
 
 
 

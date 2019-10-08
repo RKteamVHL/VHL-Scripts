@@ -18,7 +18,7 @@ def score_iou(n1, n2, attr_name):
 		score = intersect/union	
 
 	#find better way of creating weight name
-	return ("score_iou_"+attr_name, score)
+	return score
 
 
 # calculates similarity between variants based on whether they affect the
@@ -31,7 +31,7 @@ def variant_score_domains(n1, n2, domain):
 		score = 1
 
 
-	return ("score_"+domain, score)
+	return score
 
 
 # calculates similarity between snvs based on how far (in aa) they are,
@@ -42,7 +42,7 @@ def variant_aa_distance(n1, n2, sigma=5):
 	aa2 = 10
 
 	score = math.exp(-0.5 * (((aa1-aa2)/sigma )**2) )
-	return ("aa_distance", score)
+	return score
 
 
 # calculates similarity between snvs based on how far (in bp) they are,
@@ -53,4 +53,4 @@ def variant_nt_distance(n1, n2, sigma=200):
 	nt2 = 10
 
 	score = math.exp(-0.5 * (((nt1-nt2)/sigma )**2) )
-	return ("nt_distance", score)
+	return score
