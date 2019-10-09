@@ -111,6 +111,21 @@ DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 # (The hgvs python package currently doesn't work for windows)
 
 
+## CDNA SNP Analysis
+RING_TYPE = {
+	'A': "purine",
+	'C': "pyrimidine",
+	'T': "pyrimidine",
+	'G': "purine"
+}
+def TT_FUNCTION(ref, alt):
+	isTransition = RING_TYPE[ref] == RING_TYPE[alt]
+	isTransversion = not(RING_TYPE[ref] == RING_TYPE[alt])
+
+	assert(isTransition != isTransversion)
+
+	return "transition" if isTransition else "transversion"
+
 # NOTE: these were the old regexes before the one above was written. possibly remove in the furure
 _DNA_REGEX =	{
 

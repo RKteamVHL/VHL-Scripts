@@ -4,6 +4,8 @@ from . import variant_functions as vf
 from sklearn.cluster import SpectralClustering
 from snf import compute
 from snf import metrics
+
+import copy
 import networkx as nx
 import json
 import math
@@ -13,33 +15,81 @@ import os
 HPO_OBO_URL = "http://purl.obolibrary.org/obo/hp.obo"
 
 
-#NOTE: constants for variant analysis are declared here, but it may 
-#make more sense for these to be static attributes in VariantGraph
+# NOTE: constants for variant analysis are declared here, but it may 
+# make more sense for these to be static attributes in VariantGraph
 
-# variant node attributes
-VARIANT_GRAPH_KEYS = [
-	# civic(list(int)): the civic evidence ids that support this variant and are accepted
-	"evidenceAccepted",
+# variant node attributes BEFORE any variant functions are done on a given variant
+VARIANT_TEMPLATE = {
+	"civic": {
+		# list(int): the civic evidence ids that support this variant and are accepted
+		"evidenceAccepted": [],
 
-	# civic(list(int)): the civic evidence ids that support this variant and are not yet accepted
-	"evidenceSubmitted",
+		# list(int): the civic evidence ids that support this variant and are not yet accepted
+		"evidenceSubmitted": [],
 
-	# civic(list(string)):
-	"associatedPhenotypes",
+		# list(string): holds variants' associated phenotypes obtained from evidence items
+		"associatedPhenotypes": [],
 
-	# civic(string): the civic name of the variant, 
-	"variantName",
+		# string: the civic name of the variant, 
+		"variantName": None,
 
-	# civic(list(string)): list of variant types, stored as sequence ontology names 
-	"variantTypes", 
+		# list(string): list of variant types, stored as sequence ontology names 
+		"variantTypes": [], 
 
-	# civic(list(string)): list of protein/chromosomal/mrna transcript ids for the variant
-	"hgvsExpressions", 
+		# list(string): list of protein/chromosomal/mrna transcript ids for the variant
+		"hgvsExpressions": [], 
 
-	# civic(int): id used by civic to reference this variant
-	"civicId" 
+		# int: id used by civic to reference this variant
+		"id": None,
 
-]
+		# string: the variant cdna change
+		"cdnaChange": None,
+
+		# string: the variant aa change
+		"proteinChange": None
+
+	},
+
+	"gnomad": {
+		# string: dbSNP id for the variant
+		"rsID": None,
+
+		# list(string): list of variant types, stored as sequence ontology names 
+		"variantTypes": [],
+
+		# string: the variant cdna change
+		"cdnaChange": None,
+
+		# string: the variant aa change
+		"proteinChange": None,
+
+		# int: the variant allele count
+		"alleleCount": None,
+
+		# float: the variant allele frequency
+		"alleleFrequency": None
+
+	}
+
+	"students2019": {
+		# int: pmid of the article where variant is affirmed 
+		"pmid": None,
+
+		# list(string): holds variants' associated phenotypes obtained from article 
+		"associatedPhenotypes": [],
+
+		# list(string): list of variant types, stored as sequence ontology names 
+		"variantTypes": [],
+
+		# string: the variant cdna change
+		"cdnaChange": None,
+
+		# string: the variant aa change
+		"proteinChange": None,
+
+	}
+
+}
 
 # list of dicts, where each dict references a similarity function, and stores
 # keyword args for that function
@@ -109,7 +159,14 @@ class VariantGraph(nx.Graph):
 		to_remove = []
 		for variant in civic.get_gene_by_id(geneId).variants:
 			node_id = len(self.nodes())
-			self.add_node(node_id)
+
+			# initializing the node with empty civic template. It's important here
+			# to only include the civic dict, since it makes 
+			# merging node data easier later
+			node_template = {}
+			node_template["civic"] = copy.deepcopy(VARIANT_TEMPLATE["civic"])
+
+			self.add_node(node_id, attr_dict=node_template)
 			variant_node = self.nodes[node_id]
 
 			variant_node["civicId"] = variant.id
@@ -117,16 +174,6 @@ class VariantGraph(nx.Graph):
 
 			#finding how many evidence items exist for the variant.
 			#TODO: actually verify that evidence: supports, is germline, and is case study
-
-			# list to hold variants' accepted evidences by id
-			variant_node["evidenceAccepted"] = []
-
-			# list to hold variants' non-accepted evidences by id
-			variant_node["evidenceSubmitted"] = []
-
-			# list to hold variants' associated phenotypes,
-			#	obtained from evidence items
-			variant_node["associatedPhenotypes"] = []
 
 			for evidence in variant.evidence_items:
 				# get all phenotypes from evidences
@@ -183,6 +230,7 @@ class VariantGraph(nx.Graph):
 			VG_json = json.load(file)
 			VG = nx.readwrite.json_graph.node_link_graph(VG_json)
 			self.add_nodes_from(VG.nodes(data=True))	
+			self.add_edges_from(VG.edges(data=True))
 
 		print("# of variants loaded from file: {}".format(len(self)))
 
