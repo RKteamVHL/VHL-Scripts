@@ -14,6 +14,13 @@ import pprint
 # 58 corresponds to the VHL gene 
 VHL_GENE_ID =  58
 
+
+FILES_DIRECTORY = os.path.join('ApiScripts','files')
+
+STUDENTS_FILE = os.path.join(FILES_DIRECTORY, 'CiVIC Extracted Data (Summer 2019-Present).xlsx')
+
+GNOMAD_FILE = os.path.join(FILES_DIRECTORY, 'gnomAD_v2.1.1_ENSG00000134086_2019_10_04_17_21_52.csv')
+
 COLORMAP= {
 	0:(0,0,0,0.5), 
 	1:(0,0,1,0.5),
@@ -43,7 +50,9 @@ if __name__ == '__main__':
 	#fetch/process all relevant data from all sources
 	if args.update:
 
-		VG.add_nodes_from_civic_by_gene(VHL_GENE_ID, ignore_submitted=args.ignore_submitted)	
+		VG.add_nodes_from_civic_by_gene(VHL_GENE_ID, ignore_submitted=args.ignore_submitted)
+		VG.add_nodes_from_gnomad(GNOMAD_FILE)
+		VG.add_nodes_from_students(STUDENTS_FILE)		
 		VG.save_to_json_file("variant_nodes.json")
 
 	else:

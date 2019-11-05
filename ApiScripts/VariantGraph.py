@@ -4,12 +4,15 @@ from . import variant_functions as vf
 from sklearn.cluster import SpectralClustering
 from snf import compute
 from snf import metrics
+from openpyxl import load_workbook
 
 import copy
 import networkx as nx
+import csv
 import json
 import math
 import os 
+import re
 
 # url for human-phenotype-ontology
 HPO_OBO_URL = "http://purl.obolibrary.org/obo/hp.obo"
@@ -40,7 +43,7 @@ VARIANT_TEMPLATE = {
 		"hgvsExpressions": [], 
 
 		# int: id used by civic to reference this variant
-		"id": None,
+		"civicId": None,
 
 		# string: the variant cdna change
 		"cdnaChange": None,
@@ -69,7 +72,7 @@ VARIANT_TEMPLATE = {
 		# float: the variant allele frequency
 		"alleleFrequency": None
 
-	}
+	},
 
 	"students2019": {
 		# int: pmid of the article where variant is affirmed 
@@ -146,6 +149,48 @@ class VariantGraph(nx.Graph):
 		All attributes in the nx.Graph class 
 	"""
 
+
+	def add_nodes_from_students(self, filename):
+		wb = load_workbook(filename = filename)
+		for sheet in wb.sheetnames:
+			for row in wb[sheet].iter_rows(min_row=1):
+				if (row[3].value is not None) and (row[0].value is not None) and (not isinstance(row[0].value, str)):
+					node_id = len(self.nodes())
+
+					self.add_node(node_id, students2019=copy.deepcopy(VARIANT_TEMPLATE['students2019']))
+					variant_node = self.nodes[node_id]['students2019']
+
+					variant_node["pmid"] = int(float(row[0].value))
+
+					# TODO: fix phenotype hpo terms
+					variant_node["associatedPhenotypes"] = row[9].value
+
+					# TODO: fix variant type (possibly convert to sequence ontology)
+					variant_node["variantTypes"] = row[6].value
+
+
+					variant_node["cdnaChange"] = row[3].value
+					variant_node["proteinChange"] = row[4].value				
+		
+
+	def add_nodes_from_gnomad(self, filename):
+		with open(filename, 'r', newline='') as file:
+			reader = csv.DictReader(file)
+			for row in reader:
+				node_id = len(self.nodes())
+
+				self.add_node(node_id, gnomad=copy.deepcopy(VARIANT_TEMPLATE['gnomad']))
+				variant_node = self.nodes[node_id]['gnomad']
+
+				variant_node['rsID'] = row['rsID']
+				variant_node['variantTypes'] = [row['Annotation']]
+				variant_node['cdnaChange'] = row['Transcript Consequence']
+				variant_node['proteinChange'] = row['Protein Consequence']
+				variant_node['alleleCount'] = int(row['Allele Count'])
+				variant_node['alleleFrequency'] = float(row['Allele Frequency'])
+
+
+
 	#TODO: cross-reference variants with other sources
 	#TODO: potentially move these attribute-setting fuctions to node_functions.py
 	def add_nodes_from_civic_by_gene(self, geneId, ignore_submitted = False):
@@ -163,14 +208,13 @@ class VariantGraph(nx.Graph):
 			# initializing the node with empty civic template. It's important here
 			# to only include the civic dict, since it makes 
 			# merging node data easier later
-			node_template = {}
-			node_template["civic"] = copy.deepcopy(VARIANT_TEMPLATE["civic"])
+			self.add_node(node_id, civic=copy.deepcopy(VARIANT_TEMPLATE['civic']))
 
-			self.add_node(node_id, attr_dict=node_template)
-			variant_node = self.nodes[node_id]
+			variant_node = self.nodes[node_id]['civic']
 
-			variant_node["civicId"] = variant.id
-			variant_node["variantName"] = variant.name
+			variant_node['civicId'] = variant.id
+			variant_node['variantName'] = variant.name
+
 
 			#finding how many evidence items exist for the variant.
 			#TODO: actually verify that evidence: supports, is germline, and is case study
@@ -182,29 +226,61 @@ class VariantGraph(nx.Graph):
 				# add evidence to appropriate list, and optionally filter out evidence items
 				#	that haven't been accepted
 				if evidence.status == "submitted":
-					variant_node["evidenceSubmitted"].append(evidence.id)
+					variant_node['evidenceSubmitted'].append(evidence.id)
 					if not ignore_submitted:
-						variant_node["associatedPhenotypes"].extend(phenotypes)
+						variant_node['associatedPhenotypes'].extend(phenotypes)
 
 
 				elif evidence.status == "accepted":
-					variant_node["evidenceAccepted"].append(evidence.id)	
-					variant_node["associatedPhenotypes"].extend(phenotypes)
+					variant_node['evidenceAccepted'].append(evidence.id)	
+					variant_node['associatedPhenotypes'].extend(phenotypes)
 
-			has_accepted_evidence = len(variant_node["evidenceAccepted"])>0
+			has_accepted_evidence = len(variant_node['evidenceAccepted'])>0
 
 			#finding the types of the variant and adding it to the node
-			variant_node["variantTypes"] = []
+			variant_node['variantTypes'] = []
 			for variant_type in variant.variant_types:
-				variant_node["variantTypes"].append(variant_type.name)
+				variant_node['variantTypes'].append(variant_type.name)
 
 			#finding the HGVS expressions
-			variant_node["hgvsExpressions"] = []
+			variant_node['hgvsExpressions'] = []
 			for hgvs in variant.hgvs_expressions:
-				variant_node["hgvsExpressions"].append(hgvs)
+				variant_node['hgvsExpressions'].append(hgvs)
+
+				# EXTRACTING CDS METHOD 1: using hgvs 
+				index = hgvs.find(vf.CURRENT_VHL_TRANSCRIPT)
+				if index >-1 and variant_node['cdnaChange'] is None:
+					cds_change = hgvs[index+len(vf.CURRENT_VHL_TRANSCRIPT):]
+					variant_node['cdnaChange'] = cds_change
+
+			
+			# EXTRACTING CDS METHOD 2: using civic variant name
+			cds_change = re.compile("\((c\..*)\)").search(variant_node['variantName'])
+			if cds_change is not None:
+				variant_node['cdnaChange'] = cds_change.group(1)
+
+			# NOTE: figuring out a standard for the consequence protein change 
+			# is a bit of a headache and might not be needed
+			# # EXTRACTING PROTEIN: using civic variant name
+			# aa_letters = list(vf.AA_1TO3.keys())
+			# aa_regex = "[{}]".format(''.join(aa_letters))
+			# protein_change = re.compile('({})([0-9]+)({})'.format(aa_regex, '[a-zA-Z*]+')).search(variant_node['variantName'])
+
+			# if protein_change is not None:
+			# 	print(variant_node['variantName'])
+			# 	variant_node['proteinChange'] = 'p.{}{}{}'.format(
+			# 		vf.AA_1TO3[protein_change.group(1)],
+			# 		protein_change.group(2),
+			# 		vf.AA_1TO3[protein_change.group(3)]
+			# 	)
+
+
+
+
+
 
 			if ignore_submitted and not has_accepted_evidence:
-				to_remove.append(variant_node["civicId"])
+				to_remove.append(variant_node['civicId'])
 
 		self.remove_nodes_from(to_remove)
 
@@ -242,7 +318,7 @@ class VariantGraph(nx.Graph):
 		VG_nodes = list(self.nodes(data=True))
 		for i in range(0,len(VG_nodes)):
 			for name, metric in NODE_METRICS.items():
-				score = metric["function"](VG_nodes[i][1], **metric["kwargs"])
+				score = metric['function'](VG_nodes[i][1], **metric['kwargs'])
 				nId = VG_nodes[i][0]
 				self.nodes[nId][name] = score
 
@@ -259,7 +335,7 @@ class VariantGraph(nx.Graph):
 
 				similarities = {}
 				for name, metric in SIMILARITY_METRICS.items():
-					score = metric["function"](VG_nodes[i][1], VG_nodes[j][1], **metric["kwargs"])
+					score = metric['function'](VG_nodes[i][1], VG_nodes[j][1], **metric['kwargs'])
 					similarities[name] = score
 
 				has_value = [ not math.isclose(v, 0, rel_tol=1e-5) for v in similarities.values()]

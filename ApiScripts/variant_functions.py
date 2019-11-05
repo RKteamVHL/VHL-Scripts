@@ -1,5 +1,6 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.Data.IUPACData import protein_letters_1to3, protein_letters_3to1 
 import math
 import os
 import re
@@ -53,6 +54,8 @@ VHL_PROTEIN = VHL_CDS.translate()
 #Which one should be used? Below the most recent GRCH38.p12 are used.
 
 CURRENT_VHL_TRANSCRIPT = 'ENST00000256474.2'
+CURRENT_VHL_GENE = 'ENSG00000134086'
+
 
 PFAM_VHL_DOMAINS = {
 	"ENST00000256474.2": {
@@ -93,7 +96,7 @@ GENE3D_VHL_DOMAINS = {
 ## Extraction of Variant Amino Acid / Nucleotide Changes
 
 DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
-	r'(?P<id>.*):*c\.', 						#transcript reference
+	r'(?:(?P<id>.*):*)?c\.', 					#transcript reference
 	r'(?P<start>[\d?]+)',						#start nt
 	r'(?P<startNonCDS>[\+\-][\d?]+)?',			#nonCDS information
 	r'(_(?P<end>[\d?]+))?',						#end nt
@@ -110,6 +113,18 @@ DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 # Find a library to replace the above regex. 
 # (The hgvs python package currently doesn't work for windows)
 
+#compiled CDS examples to test DNA_REGEX:
+# ENST00000256474.2:c.1-?_642+?del
+# ENST00000256474.2:c.227_229delTCT
+# ENST00000256474.2:c.180delG
+# ENST00000256474.2:c.445delG
+# ENST00000256474.2:c.228_229insC
+# ENST00000256474.2:c.478_479delGA
+# ENST00000256474.2:c.481C>G
+# ENST00000256474.2:c.349dupT
+# ENST00000256474.2:c.516_517dupGTCAAGCCT
+# ENST00000256474.2:c.216delC
+# ENST00000256474.2:c.263_265delGGCinsTT 
 
 ## CDNA SNP Analysis
 RING_TYPE = {
@@ -126,38 +141,12 @@ def TT_FUNCTION(ref, alt):
 
 	return "transition" if isTransition else "transversion"
 
-# NOTE: these were the old regexes before the one above was written. possibly remove in the furure
-_DNA_REGEX =	{
 
-	#TODO: try make this a 'catch-all' if possible
-	'default': re.compile(r'([ACTG])>([ACTG])'),
-
-	#eg. ENST00000256474.2:c.481C>G
-	'missense_variant': re.compile(r'(.*):c\.([0-9]+)([ACTG])>([ACTG])'),
-	'stop_gained': re.compile(r'(.*):c\.([0-9]+)([ACTG])>([ACTG])'),
-
-	#eg. ENST00000256474.2:c.227_229delTCT, ENST00000256474.2:c.180delG
-	'inframe_deletion': re.compile(r'(.*):c\.([0-9]+)(?:_([0-9]+))?del([ACTG]+)'),
-
-	#eg. ENST00000256474.2:c.445delG, ENST00000256474.2:c.228_229insC, ENST00000256474.2:c.478_479delGA
-	'frameshift_truncation': re.compile(r'(.*):c\.([0-9]+)(?:_([0-9]+))?(?:del)?(?:ins)?([ACTG]+)'),
-
-	#eg. ENST00000256474.2:c.375_376insC, ENST00000256474.2:c.349dupT
-	'inframe_insertion': re.compile(r'(.*):c\.([0-9]+)(?:_([0-9]*))?(?:dup)?(?:ins)?([ACTG]+)')
-}
-
-#compiled CDS examples to test DNA_REGEX:
-# ENST00000256474.2:c.1-?_642+?del
-# ENST00000256474.2:c.227_229delTCT
-# ENST00000256474.2:c.180delG
-# ENST00000256474.2:c.445delG
-# ENST00000256474.2:c.228_229insC
-# ENST00000256474.2:c.478_479delGA
-# ENST00000256474.2:c.481C>G
-# ENST00000256474.2:c.349dupT
-# ENST00000256474.2:c.516_517dupGTCAAGCCT
-# ENST00000256474.2:c.216delC
-# ENST00000256474.2:c.263_265delGGCinsTT 
+AA_1TO3 = protein_letters_1to3
+AA_1TO3['*'] = "Ter"
+AA_1TO3['del'] = "del"
+AA_1TO3['fs'] = "fs"
+AA_1TO3['FS'] = AA_1TO3['fs']
 
 
 ## Scoring functions
@@ -178,6 +167,31 @@ def protein_substituion_score(node):
 	pass
 
 
+#TODO: figure out if this is needed; remove if not
+# def aa_change_from_cds(cds):
+# 	aa_change = None
+
+# 	match = DNA_REGEX.match(cds)
+# 		if match is not None:
+# 			var = match.groupdict()
+
+# 			#if the variant is not utr or intronic
+# 			if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
+# 				reading_frame_i = math.floor(int(var['start'])/3)
+# 				codon_i = int(var['start'])%3
+
+# 				aa1= VHL_CDS[reading_frame_i:reading_frame_i+3].translate()
+# 				aa1_i = reading_frame_i + 1
+# 				# if ins, dup, or del of length != 3, then FS 
+
+# 				start_aa_i = 
+# 				stop_aa_i = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
+
+# 				start_aa = VHL_PROTEIN[start_aa_i]
+
+
+
+
 def affected_domains(node):
 	'''Finds the affected VHL domains for a variant
 	'''
@@ -194,7 +208,7 @@ def affected_domains(node):
 			match = DNA_REGEX.match(expression)
 			if match is not None:
 				var = match.groupdict()
-				#if the transcript isn't the current one
+				#if the transcript is the current one
 				if var['id'] in GENE3D_VHL_DOMAINS:		
 
 					#if the variant is not utr or intronic
