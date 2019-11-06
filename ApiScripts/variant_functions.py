@@ -54,6 +54,7 @@ VHL_PROTEIN = VHL_CDS.translate()
 #Which one should be used? Below the most recent GRCH38.p12 are used.
 
 CURRENT_VHL_TRANSCRIPT = 'ENST00000256474.2'
+CURRENT_VHL_PROTEIN = 'NP_000542.1'
 CURRENT_VHL_GENE = 'ENSG00000134086'
 
 

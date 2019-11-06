@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
 		VG.add_nodes_from_civic_by_gene(VHL_GENE_ID, ignore_submitted=args.ignore_submitted)
 		VG.add_nodes_from_gnomad(GNOMAD_FILE)
-		VG.add_nodes_from_students(STUDENTS_FILE)		
+		VG.add_nodes_from_students(STUDENTS_FILE)	
 		VG.save_to_json_file("variant_nodes.json")
 
 	else:

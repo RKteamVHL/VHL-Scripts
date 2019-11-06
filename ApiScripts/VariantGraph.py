@@ -155,10 +155,17 @@ class VariantGraph(nx.Graph):
 		for sheet in wb.sheetnames:
 			for row in wb[sheet].iter_rows(min_row=1):
 				if (row[3].value is not None) and (row[0].value is not None) and (not isinstance(row[0].value, str)):
+					# sets the next node id incrementally
 					node_id = len(self.nodes())
 
-					self.add_node(node_id, students2019=copy.deepcopy(VARIANT_TEMPLATE['students2019']))
-					variant_node = self.nodes[node_id]['students2019']
+					# sets the next node id based on cdna change
+					#this is used to automatically merge nodes across databases
+					cdna_id = row[3].value
+
+
+					valid_id = cdna_id if cdna_id is not None else node_id
+					self.add_node(valid_id, students2019=copy.deepcopy(VARIANT_TEMPLATE['students2019']))
+					variant_node = self.nodes[valid_id]['students2019']
 
 					variant_node["pmid"] = int(float(row[0].value))
 
@@ -169,7 +176,7 @@ class VariantGraph(nx.Graph):
 					variant_node["variantTypes"] = row[6].value
 
 
-					variant_node["cdnaChange"] = row[3].value
+					variant_node["cdnaChange"] = cdna_id
 					variant_node["proteinChange"] = row[4].value				
 		
 
@@ -177,14 +184,20 @@ class VariantGraph(nx.Graph):
 		with open(filename, 'r', newline='') as file:
 			reader = csv.DictReader(file)
 			for row in reader:
+				# sets the next node id incrementally
 				node_id = len(self.nodes())
 
-				self.add_node(node_id, gnomad=copy.deepcopy(VARIANT_TEMPLATE['gnomad']))
-				variant_node = self.nodes[node_id]['gnomad']
+				# sets the next node id based on cdna change
+				#this is used to automatically merge nodes across databases
+				cdna_id = row['Transcript Consequence']
+
+				valid_id = cdna_id if cdna_id is not None else node_id
+				self.add_node(valid_id, gnomad=copy.deepcopy(VARIANT_TEMPLATE['gnomad']))
+				variant_node = self.nodes[valid_id]['gnomad']
 
 				variant_node['rsID'] = row['rsID']
 				variant_node['variantTypes'] = [row['Annotation']]
-				variant_node['cdnaChange'] = row['Transcript Consequence']
+				variant_node['cdnaChange'] = cdna_id
 				variant_node['proteinChange'] = row['Protein Consequence']
 				variant_node['alleleCount'] = int(row['Allele Count'])
 				variant_node['alleleFrequency'] = float(row['Allele Frequency'])
@@ -203,17 +216,40 @@ class VariantGraph(nx.Graph):
 		"""
 		to_remove = []
 		for variant in civic.get_gene_by_id(geneId).variants:
+			# sets the next node id incrementally
 			node_id = len(self.nodes())
+
+			# sets the next node id based on cdna change
+			#this is used to automatically merge nodes across databases
+			cdna_id = None
+
+			# EXTRACTING CDS METHOD 1: using hgvs 
+			for hgvs in variant.hgvs_expressions:
+
+				index = hgvs.find(vf.CURRENT_VHL_TRANSCRIPT)
+				if index >-1 and cdna_id is None:
+					cds_change = hgvs[1+index+len(vf.CURRENT_VHL_TRANSCRIPT):]
+					cdna_id = cds_change
+
+			
+			# EXTRACTING CDS METHOD 2: using civic variant name
+			cds_change = re.compile("\((c\..*)\)").search(variant.name)
+			if cds_change is not None:
+				cdna_id = cds_change.group(1)
+				if cdna_id is None:
+					cdna_id = cds_change.group(1)
 
 			# initializing the node with empty civic template. It's important here
 			# to only include the civic dict, since it makes 
 			# merging node data easier later
-			self.add_node(node_id, civic=copy.deepcopy(VARIANT_TEMPLATE['civic']))
+			valid_id = cdna_id if cdna_id is not None else node_id
+			self.add_node(valid_id, civic=copy.deepcopy(VARIANT_TEMPLATE['civic']))
 
-			variant_node = self.nodes[node_id]['civic']
+			variant_node = self.nodes[valid_id]['civic']
 
 			variant_node['civicId'] = variant.id
 			variant_node['variantName'] = variant.name
+			variant_node['cdnaChange'] = cdna_id
 
 
 			#finding how many evidence items exist for the variant.
@@ -245,23 +281,18 @@ class VariantGraph(nx.Graph):
 			#finding the HGVS expressions
 			variant_node['hgvsExpressions'] = []
 			for hgvs in variant.hgvs_expressions:
-				variant_node['hgvsExpressions'].append(hgvs)
+				variant_node['hgvsExpressions'].append(hgvs)		
 
-				# EXTRACTING CDS METHOD 1: using hgvs 
-				index = hgvs.find(vf.CURRENT_VHL_TRANSCRIPT)
-				if index >-1 and variant_node['cdnaChange'] is None:
-					cds_change = hgvs[index+len(vf.CURRENT_VHL_TRANSCRIPT):]
-					variant_node['cdnaChange'] = cds_change
-
-			
-			# EXTRACTING CDS METHOD 2: using civic variant name
-			cds_change = re.compile("\((c\..*)\)").search(variant_node['variantName'])
-			if cds_change is not None:
-				variant_node['cdnaChange'] = cds_change.group(1)
+				# EXTRACTING AA CHANGE METHOD 1: via hgvs
+				index = hgvs.find(vf.CURRENT_VHL_PROTEIN)
+				if index >-1 :
+					aa_change = hgvs[1+index+len(vf.CURRENT_VHL_PROTEIN):]
+					variant_node['proteinChange'] = aa_change	
 
 			# NOTE: figuring out a standard for the consequence protein change 
 			# is a bit of a headache and might not be needed
-			# # EXTRACTING PROTEIN: using civic variant name
+			# EXTRACTING PROTEIN: using civic variant name
+
 			# aa_letters = list(vf.AA_1TO3.keys())
 			# aa_regex = "[{}]".format(''.join(aa_letters))
 			# protein_change = re.compile('({})([0-9]+)({})'.format(aa_regex, '[a-zA-Z*]+')).search(variant_node['variantName'])
@@ -283,6 +314,12 @@ class VariantGraph(nx.Graph):
 				to_remove.append(variant_node['civicId'])
 
 		self.remove_nodes_from(to_remove)
+
+
+	def merge_nodes(self):
+		"""Merges nodes from all sources"""
+
+
 
 
 	def save_to_json_file(self, filename):
