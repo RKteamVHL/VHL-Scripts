@@ -15,11 +15,7 @@ import pprint
 VHL_GENE_ID =  58
 
 
-FILES_DIRECTORY = os.path.join('ApiScripts','files')
 
-STUDENTS_FILE = os.path.join(FILES_DIRECTORY, 'CiVIC Extracted Data (Summer 2019-Present).xlsx')
-
-GNOMAD_FILE = os.path.join(FILES_DIRECTORY, 'gnomAD_v2.1.1_ENSG00000134086_2019_10_04_17_21_52.csv')
 
 COLORMAP= {
 	0:(0,0,0,0.5), 
