@@ -1,7 +1,10 @@
 import urllib.request
+import urllib.parse
+#from . import variant_functions as vf
 import certifi
 import argparse
 import gzip
+import csv
 import os
 import io
 
@@ -10,12 +13,6 @@ PIPE_DELIMITER= "|"
 
 
 FILES_DIRECTORY = os.path.join('ApiScripts','files')
-
-STUDENTS_FILE = os.path.join(FILES_DIRECTORY, 'CiVIC Extracted Data (Summer 2019-Present).xlsx')
-
-GNOMAD_FILE = os.path.join(FILES_DIRECTORY, 'gnomAD_v2.1.1_ENSG00000134086_2019_10_04_17_21_52.csv')
-
-
 
 CLINVAR_NAME = 'ClinVar'
 CLINVAR_FILENAME = "variant_summary.tsv"
@@ -26,16 +23,65 @@ CLINVAR_HEADER = "AlleleID{0}Type{0}Name{0}GeneID{0}GeneSymbol{0}HGNC_ID{0}Clini
 
 STUDENTS_NAME = 'KimStudents2019'
 STUDENTS_FILENAME = 'CiVIC Extracted Data (Summer 2019-Present).tsv'
-STUDENTS_SHEETIDS = ['0', '1826130937', '763995397', '511845134', '301841530']
+STUDENTS_SHEETIDS = ['1826130937', '0', '763995397', '511845134', '301841530']
 STUDENTS_HREF = [f'https://docs.google.com/spreadsheets/d/1YYXHLM9dOtGyC1l8edjQnfcAf0IM1EuTrz8ZKbQkQGU/export?format=tsv&gid={name}' for name in STUDENTS_SHEETIDS ]
 STUDENTS_HEADER = "PMID{0}cDNA_Position{0}Multiple Mutants in Case{0}Mutation Event c.DNA.{0}Predicted Consequence Protein Change{0}variant_name{0}Mutation Type{0}Kindred Case{0}Familial/Non-familial{0}Phenotype{0}Reference{0}Age{0}Notes{0}Evidence Statements".format(
 	TAB_DELIMITER)
 
-GNOMAD_NAME = 'gnomAD_v2'
-GNOMAD_FILENAME = 'gnomAD_v2.tsv'
-GNOMAD_HREF = ''
-GNOMAD_HEADERS = "Chromosome{0}Position{0}rsID{0}Reference{0}Alternate{0}Source{0}Filters - exomes{0}Filters - genomes{0}Consequence{0}Protein Consequence{0}Transcript Consequence{0}Annotation{0}Flags{0}Allele Count{0}Allele Number{0}Allele Frequency{0}Homozygote Count{0}Hemizygote Count{0}Allele Count African{0}Allele Number African{0}Homozygote Count African{0}Hemizygote Count African{0}Allele Count Latino{0}Allele Number Latino{0}Homozygote Count Latino{0}Hemizygote Count Latino{0}Allele Count Ashkenazi Jewish{0}Allele Number Ashkenazi Jewish{0}Homozygote Count Ashkenazi Jewish{0}Hemizygote Count Ashkenazi Jewish{0}Allele Count East Asian{0}Allele Number East Asian{0}Homozygote Count East Asian{0}Hemizygote Count East Asian{0}Allele Count European (Finnish){0}Allele Number European (Finnish){0}Homozygote Count European (Finnish){0}Hemizygote Count European (Finnish){0}Allele Count European (non-Finnish){0}Allele Number European (non-Finnish){0}Homozygote Count European (non-Finnish){0}Hemizygote Count European (non-Finnish){0}Allele Count Other{0}Allele Number Other{0}Homozygote Count Other{0}Hemizygote Count Other{0}Allele Count South Asian{0}Allele Number South Asian{0}Homozygote Count South Asian{0}Hemizygote Count South Asian".format(
-	TAB_DELIMITER)
+
+GNOMAD_POST_DATA = {
+	"query": '''{
+		gene(gene_id: "ENSG00000134086", reference_genome: GRCh37) {
+			variants(dataset: gnomad_r2_1) {
+				consequence
+				flags
+				hgvs
+				hgvsc
+				hgvsp
+				lof
+				lof_filter
+				lof_flags
+				pos
+				rsid
+				variantId
+				exome {
+					ac
+					ac_hemi
+					ac_hom
+					an
+					af
+					filters
+					populations {
+						id
+						ac
+						an
+						ac_hemi
+						ac_hom
+					}
+				}
+				genome {
+					ac
+					ac_hemi
+					ac_hom
+					an
+					af
+					filters
+					populations {
+						id
+						ac
+						an
+						ac_hemi
+						ac_hom
+					}
+				}
+			}
+		}
+	}'''
+}
+
+GNOMAD_NAME = 'gnomAD_v2_1'
+GNOMAD_FILENAME = 'gnomAD_v2_1.tsv'
+GNOMAD_HREF = 'http://gnomad.broadinstitute.org/api'
 
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
@@ -61,7 +107,7 @@ class Fetcher(object):
 		 compressed: bytestream of the raw compressed data.
 		 decompressed: bytestream of data after decompression.
 		 data: the final stream of data that gets written to a file.
-			Used to fix headers of tsv/csv files, if needed
+			Used to fix files, if needed
 	"""
 
 	def __init__(self):
@@ -69,6 +115,12 @@ class Fetcher(object):
 		self.name = None
 		self.filename = None
 		self.href = None
+
+		self.rows = None
+		self.dsv_header = None
+
+		# stores any data needed for post requests
+		self.request_data = None
 
 		# stores the compressed file byte data 
 		self.compressed = []
@@ -87,22 +139,23 @@ class Fetcher(object):
 
 	def fetch(self):
 		"""Reads data from instance's href attribute."""
-		print(self.href)
+
+		# href is converted to list of 1 element if it's a string
+		if isinstance(self.href, str):
+			self.href = [self.href]
+
+
 		if isinstance(self.href, list):
 			for href in self.href:
-				with urllib.request.urlopen(href, cafile = certifi.where()) as response:
+				with urllib.request.urlopen(href, data=self.request_data, cafile=certifi.where()) as response:
+					print(response.info())
 					compressed_bytes = io.BytesIO()
 					compressed_bytes.write(response.read())
 					compressed_bytes.seek(0)
 					self.compressed.append(compressed_bytes)			
 
-		elif isinstance(self.href, str):
-			with urllib.request.urlopen(self.href, cafile = certifi.where()) as response:
-				compressed_bytes = io.BytesIO()
-				compressed_bytes.write(response.read())
-				compressed_bytes.seek(0)
-				self.compressed.append(compressed_bytes)
-		
+		print(self.href)
+
 
 				
 	def extract(self):
@@ -121,7 +174,7 @@ class Fetcher(object):
 			self.decompressed.append(decompressed_bytes)
 
 
-	def save_to_file(self, filename):
+	def save_raw_file(self, filename):
 		"""Save the data file to the given filename
 
 		Args:
@@ -129,6 +182,27 @@ class Fetcher(object):
 		"""
 		with open(filename, 'w+', encoding='utf-8') as file:
 			file.write(self.data.read())
+			self.data.seek(0)
+
+	def save_dsv_file(self, filename):
+		with open(filename, 'w', newline='', encoding='utf-8') as file:			
+			writer = csv.DictWriter(file, fieldnames=self.dsv_header, delimiter=TAB_DELIMITER)
+			writer.writeheader()
+			writer.writerows(self.rows)
+
+	def to_dict_list(self):
+		"""Creates a dict list from output"""
+
+		# find header list by reading the first line that
+		# doesn't start with #
+		header_list = filter(lambda row: not row.startswith('#'), self.data.read().splitlines())
+
+		self.rows = csv.DictReader(header_list, delimiter=TAB_DELIMITER)
+
+		self.dsv_header = list(self.rows.fieldnames)
+
+		self.data.seek(0)
+
 			
 
 	def fix_file(self):
@@ -150,10 +224,17 @@ class ClinVar(Fetcher):
 		self.href = CLINVAR_HREF
 		self.needs_extraction = True
 
-	def fix_file(self):
-		# clinvar's first character is a '#', and tossing it corrects its header 
-		self.data = io.TextIOWrapper(self.decompressed[0], encoding='utf-8')
-		self.data.read(1)
+	def to_dict_list(self):		
+		# Clinvar's header line starts with a '#'
+
+		self.dsv_header = list(self.data.readline().split(TAB_DELIMITER))	
+		self.dsv_header[0] = self.dsv_header[0].replace("#", "")	
+
+		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=TAB_DELIMITER)
+
+		self.rows = filter(lambda row: row['GeneSymbol']=='VHL', self.rows)
+
+		self.data.seek(0)
 
 class KimStudents2019(Fetcher):
 	"""Fetcher for Raymond's custom student-procured database.
@@ -185,12 +266,13 @@ class Gnomad(Fetcher):
 		self.filename = GNOMAD_FILENAME
 		self.href = GNOMAD_HREF
 		self.needs_extraction = False
+		self.request_data =  urllib.parse.urlencode(GNOMAD_POST_DATA).encode('ascii')
 
 
 FETCHING_DICT = {
 	'ClinVar': ClinVar,
 	'KimStudents2019': KimStudents2019,
-	#'Gnomad': Gnomad
+	'Gnomad': Gnomad
 }
 
 if __name__ == '__main__':
@@ -200,4 +282,6 @@ if __name__ == '__main__':
 		fetcher.fetch()
 		fetcher.extract()
 		fetcher.fix_file()
-		fetcher.save_to_file(fetcher.filename)
+		fetcher.to_dict_list()
+		fetcher.save_raw_file(fetcher.filename)
+		fetcher.save_dsv_file("dsv_"+fetcher.filename)
