@@ -4,6 +4,7 @@ import urllib.parse
 import certifi
 import argparse
 import gzip
+import json
 import csv
 import os
 import io
@@ -148,7 +149,6 @@ class Fetcher(object):
 		if isinstance(self.href, list):
 			for href in self.href:
 				with urllib.request.urlopen(href, data=self.request_data, cafile=certifi.where()) as response:
-					print(response.info())
 					compressed_bytes = io.BytesIO()
 					compressed_bytes.write(response.read())
 					compressed_bytes.seek(0)
@@ -267,6 +267,36 @@ class Gnomad(Fetcher):
 		self.href = GNOMAD_HREF
 		self.needs_extraction = False
 		self.request_data =  urllib.parse.urlencode(GNOMAD_POST_DATA).encode('ascii')
+
+	def to_dict_list(self):
+		self.rows = []		
+		gnomad_dict = json.loads(self.data.read())
+		variants = gnomad_dict['data']['gene']['variants']
+		for variant in variants:
+			new_row = variant
+
+			#combining exome and genome data
+			has_genome = new_row['genome'] is not None
+			has_exome = new_row['exome'] is not None
+			for key in ["ac", "ac_hemi", "ac_hom", "an", "af"]:
+				new_row[key] = 0
+				new_row[key] += new_row['genome'].get(key, 0) if has_genome else 0
+				new_row[key] += new_row['exome'].get(key, 0) if has_exome else 0
+			
+			new_row['filters'] = []
+			new_row['filters'].extend(new_row['genome']['filters'] if has_genome else [])
+			new_row['filters'].extend(new_row['exome']['filters'] if has_exome else [])
+
+			new_row['af'] = new_row['ac']/new_row['an']
+			new_row.pop('exome', None)
+			new_row.pop('genome', None)
+			self.dsv_header = list(new_row.keys())
+
+			# gnomad has a quality filter, eliminating variants that dont meet it
+			if len(new_row['filters']) == 0:
+				self.rows.append(new_row) 
+		self.data.seek(0)
+		
 
 
 FETCHING_DICT = {
