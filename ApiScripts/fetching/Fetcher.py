@@ -1,97 +1,16 @@
 import urllib.request
 import urllib.parse
-#from . import variant_functions as vf
+from civicpy import civic
+from .. import variant_functions as vf
+from .constants import *
 import certifi
 import argparse
 import gzip
 import json
 import csv
+import re
 import os
 import io
-
-TAB_DELIMITER= '\t'
-PIPE_DELIMITER= "|"
-
-
-FILES_DIRECTORY = os.path.join('ApiScripts','files')
-
-CLINVAR_NAME = 'ClinVar'
-CLINVAR_FILENAME = "variant_summary.tsv"
-CLINVAR_HREF = "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz"
-CLINVAR_HEADER = "AlleleID{0}Type{0}Name{0}GeneID{0}GeneSymbol{0}HGNC_ID{0}ClinicalSignificance{0}ClinSigSimple{0}LastEvaluated{0}RS# (dbSNP){0}nsv/esv (dbVar){0}RCVaccession{0}PhenotypeIDS{0}PhenotypeList{0}Origin{0}OriginSimple{0}Assembly{0}ChromosomeAccession{0}Chromosome{0}Start{0}Stop{0}ReferenceAllele{0}AlternateAllele{0}Cytogenetic{0}ReviewStatus{0}NumberSubmitters{0}Guidelines{0}TestedInGTR{0}OtherIDs{0}SubmitterCategories{0}VariationID\n".format(
-	TAB_DELIMITER)
-
-
-STUDENTS_NAME = 'KimStudents2019'
-STUDENTS_FILENAME = 'CiVIC Extracted Data (Summer 2019-Present).tsv'
-STUDENTS_SHEETIDS = ['1826130937', '0', '763995397', '511845134', '301841530']
-STUDENTS_HREF = [f'https://docs.google.com/spreadsheets/d/1YYXHLM9dOtGyC1l8edjQnfcAf0IM1EuTrz8ZKbQkQGU/export?format=tsv&gid={name}' for name in STUDENTS_SHEETIDS ]
-STUDENTS_HEADER = "PMID{0}cDNA_Position{0}Multiple Mutants in Case{0}Mutation Event c.DNA.{0}Predicted Consequence Protein Change{0}variant_name{0}Mutation Type{0}Kindred Case{0}Familial/Non-familial{0}Phenotype{0}Reference{0}Age{0}Notes{0}Evidence Statements".format(
-	TAB_DELIMITER)
-
-
-GNOMAD_POST_DATA = {
-	"query": '''{
-		gene(gene_id: "ENSG00000134086", reference_genome: GRCh37) {
-			variants(dataset: gnomad_r2_1) {
-				consequence
-				flags
-				hgvs
-				hgvsc
-				hgvsp
-				lof
-				lof_filter
-				lof_flags
-				pos
-				rsid
-				variantId
-				exome {
-					ac
-					ac_hemi
-					ac_hom
-					an
-					af
-					filters
-					populations {
-						id
-						ac
-						an
-						ac_hemi
-						ac_hom
-					}
-				}
-				genome {
-					ac
-					ac_hemi
-					ac_hom
-					an
-					af
-					filters
-					populations {
-						id
-						ac
-						an
-						ac_hemi
-						ac_hom
-					}
-				}
-			}
-		}
-	}'''
-}
-
-GNOMAD_NAME = 'gnomAD_v2_1'
-GNOMAD_FILENAME = 'gnomAD_v2_1.tsv'
-GNOMAD_HREF = 'http://gnomad.broadinstitute.org/api'
-
-SO_NAME = 'SequenceOntology'
-SO_FILENAME = 'so.obo'
-SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
-
-HPO_NAME = 'HumanPhenotypeOntology'
-SO_FILENAME = 'hp.obo'
-SO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
-
 
 class Fetcher(object):
 	"""Base class for fetching data from external sources.
@@ -185,8 +104,10 @@ class Fetcher(object):
 			self.data.seek(0)
 
 	def save_dsv_file(self, filename):
+		"""Saves the post-processed dictionary list
+		"""
 		with open(filename, 'w', newline='', encoding='utf-8') as file:			
-			writer = csv.DictWriter(file, fieldnames=self.dsv_header, delimiter=TAB_DELIMITER)
+			writer = csv.DictWriter(file, fieldnames=self.dsv_header, delimiter=ROW_DELIMITER)
 			writer.writeheader()
 			writer.writerows(self.rows)
 
@@ -197,7 +118,7 @@ class Fetcher(object):
 		# doesn't start with #
 		header_list = filter(lambda row: not row.startswith('#'), self.data.read().splitlines())
 
-		self.rows = csv.DictReader(header_list, delimiter=TAB_DELIMITER)
+		self.rows = csv.DictReader(header_list, delimiter=ROW_DELIMITER)
 
 		self.dsv_header = list(self.rows.fieldnames)
 
@@ -206,11 +127,30 @@ class Fetcher(object):
 			
 
 	def fix_file(self):
-		"""Overriden by subclass if headers need to be fixed
-		By default, only the first requested file is saved
+		"""Overriden by subclass if data needs to be fixed
+		
+		By default, only the first requested file is saved.
+		If no data is fetched into self.decompressed, this method
+		does nothing
 		"""
-		self.data = io.TextIOWrapper(self.decompressed[0], encoding='utf-8')
+		if self.decompressed:
+			self.data = io.TextIOWrapper(self.decompressed[0], encoding='utf-8')
+
+
+	def filter_rows(self):
+		"""Filters dictionary list
+		Implemented by child classes, if needed
+		"""
 		pass
+
+	def process(self):
+		"""Performs all steps for file extraction + processing
+		"""
+		self.fetch()
+		self.extract()
+		self.fix_file()
+		self.to_dict_list()
+		self.filter_rows()
 
 
 
@@ -227,14 +167,17 @@ class ClinVar(Fetcher):
 	def to_dict_list(self):		
 		# Clinvar's header line starts with a '#'
 
-		self.dsv_header = list(self.data.readline().split(TAB_DELIMITER))	
+		self.dsv_header = list(self.data.readline().split(ROW_DELIMITER))	
 		self.dsv_header[0] = self.dsv_header[0].replace("#", "")	
 
-		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=TAB_DELIMITER)
-
-		self.rows = filter(lambda row: row['GeneSymbol']=='VHL', self.rows)
+		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=ROW_DELIMITER)
 
 		self.data.seek(0)
+
+	def filter_rows(self):
+		# filter clinvar by VHL genesymbol
+		self.rows = filter(lambda row: row['GeneSymbol']=='VHL', self.rows)
+
 
 class KimStudents2019(Fetcher):
 	"""Fetcher for Raymond's custom student-procured database.
@@ -251,8 +194,14 @@ class KimStudents2019(Fetcher):
 		for decompressed in self.decompressed:
 			text_wrapper = io.TextIOWrapper(decompressed, encoding='utf-8')
 			self.data.write(text_wrapper.read())
-			self.data.write('\n')
+			self.data.write(LINE_DELIMITER)
 		
+		self.data.seek(0)
+
+
+	def filter_rows(self):
+		#make sure row has an integer PMID
+		self.rows = filter(lambda row: row['PMID'].isdigit(), self.rows)
 		self.data.seek(0)
 
 
@@ -292,26 +241,119 @@ class Gnomad(Fetcher):
 			new_row.pop('genome', None)
 			self.dsv_header = list(new_row.keys())
 
-			# gnomad has a quality filter, eliminating variants that dont meet it
-			if len(new_row['filters']) == 0:
-				self.rows.append(new_row) 
+			self.rows.append(new_row)
+
 		self.data.seek(0)
-		
+
+	def filter_rows(self):
+		# gnomad has a quality filter, eliminating variants that dont meet it
+		self.rows = filter(lambda row: len(row['filters'])==0, self.rows)
+		self.data.seek(0)
 
 
-FETCHING_DICT = {
+class Civic(Fetcher):
+	"""Fetcher for Civic database.
+	"""
+	def __init__(self):
+		super().__init__()
+		self.name = CIVIC_NAME
+		self.filename = CIVIC_FILENAME
+
+
+
+	def to_dict_list(self):
+		self.rows = []
+		for variant in civic.get_gene_by_id(CIVIC_VHL_GENE_ID).variants:
+			new_row = {}
+
+			# sets the next node id based on cdna change
+			#this is used to automatically merge nodes across databases
+			cdna_id = None
+
+			# EXTRACTING CDS METHOD 1: using hgvs 
+			for hgvs in variant.hgvs_expressions:
+
+				index = hgvs.find(vf.CURRENT_VHL_TRANSCRIPT)
+				if index >-1 and cdna_id is None:
+					cds_change = hgvs[1+index+len(vf.CURRENT_VHL_TRANSCRIPT):]
+					cdna_id = cds_change
+
+			
+			# EXTRACTING CDS METHOD 2: using civic variant name
+			cds_change = re.compile("\((c\..*)\)").search(variant.name)
+			if cds_change is not None:
+				cdna_id = cds_change.group(1)
+				if cdna_id is None:
+					cdna_id = cds_change.group(1)
+
+			new_row['civicId'] = variant.id
+			new_row['variantName'] = variant.name
+			new_row['cdnaChange'] = cdna_id
+			new_row['evidenceSubmitted'] = []
+			new_row['evidenceAccepted'] = []
+			new_row['phenotypesSubmitted'] = []
+			new_row['phenotypesAccepted'] = []
+			new_row['variantTypes'] = []
+			new_row['hgvsExpressions'] = []
+			new_row['proteinChange'] = None
+
+
+			#finding how many evidence items exist for the variant.
+			#TODO: actually verify that evidence: supports, is germline, and is case study
+			for evidence in variant.evidence_items:
+				# get all phenotypes from evidences
+				phenotypes = [phenotype.hpo_id for phenotype in evidence.phenotypes]
+
+				# add evidence to appropriate list, and optionally filter out evidence items
+				#	that haven't been accepted
+				if evidence.status == "submitted":
+					new_row['evidenceSubmitted'].append(evidence.id)
+					new_row['phenotypesSubmitted'].extend(phenotypes)
+
+
+				elif evidence.status == "accepted":
+					new_row['evidenceAccepted'].append(evidence.id)	
+					new_row['phenotypesAccepted'].extend(phenotypes)
+
+
+			#finding the types of the variant and adding it to the node
+			for variant_type in variant.variant_types:
+				new_row['variantTypes'].append(variant_type.name)
+
+			#finding the HGVS expressions
+			for hgvs in variant.hgvs_expressions:
+				new_row['hgvsExpressions'].append(hgvs)		
+
+				# EXTRACTING AA CHANGE METHOD 1: via hgvs
+				index = hgvs.find(vf.CURRENT_VHL_PROTEIN)
+				if index >-1 :
+					aa_change = hgvs[1+index+len(vf.CURRENT_VHL_PROTEIN):]
+					new_row['proteinChange'] = aa_change	
+
+			self.rows.append(new_row)
+			self.dsv_header = list(new_row.keys())
+
+
+	def filter_rows(self):
+		# it's possible variants have no submitted or accepted evidence
+		# in the case of a rejection; remove these
+		self.rows = filter(lambda row: 
+			len(row['evidenceAccepted'])>0 or len(row['evidenceSubmitted'])>0, 
+			self.rows
+		)
+
+		# optionally check if variant has ONLY accepted evidences
+		accepted_only = False
+
+		if accepted_only:
+			self.rows = filter(lambda row: len(row['evidenceAccepted'])>0, self.rows)
+	
+
+
+FETCHING_FACTORY = {
 	'ClinVar': ClinVar,
 	'KimStudents2019': KimStudents2019,
-	'Gnomad': Gnomad
+	'Gnomad': Gnomad,
+	'Civic': Civic
 }
 
-if __name__ == '__main__':
-
-	for key, value in FETCHING_DICT.items():
-		fetcher = value()
-		fetcher.fetch()
-		fetcher.extract()
-		fetcher.fix_file()
-		fetcher.to_dict_list()
-		fetcher.save_raw_file(fetcher.filename)
-		fetcher.save_dsv_file("dsv_"+fetcher.filename)

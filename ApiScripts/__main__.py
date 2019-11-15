@@ -10,13 +10,6 @@ import os
 
 import pprint
 
-
-# 58 corresponds to the VHL gene 
-VHL_GENE_ID =  58
-
-
-
-
 COLORMAP= {
 	0:(0,0,0,0.5), 
 	1:(0,0,1,0.5),
