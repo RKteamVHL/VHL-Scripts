@@ -1,5 +1,6 @@
-from . import similarity_functions as sf
-from . import variant_functions as vf
+from .. import similarity_functions as sf
+from .. import variant_functions as vf
+from ..fetching.Fetcher import FETCHING_FACTORY
 from sklearn.cluster import SpectralClustering
 from snf import compute
 from snf import metrics
@@ -13,57 +14,39 @@ import math
 import os 
 import re
 
-# url for human-phenotype-ontology
-HPO_OBO_URL = "http://purl.obolibrary.org/obo/hp.obo"
-
-
 # NOTE: constants for variant analysis are declared here, but it may 
 # make more sense for these to be static attributes in VariantGraph
 
 # variant node attributes BEFORE any variant functions are done on a given variant
+# All attributes the the 'all' template also apply to individual sources
 VARIANT_TEMPLATE = {
-	"civic": {
+	"Civic": {
 		# list(int): the civic evidence ids that support this variant and are accepted
 		"evidenceAccepted": [],
 
 		# list(int): the civic evidence ids that support this variant and are not yet accepted
 		"evidenceSubmitted": [],
 
-		# list(string): holds variants' associated phenotypes obtained from evidence items
-		"associatedPhenotypes": [],
+		# list(string): holds variants' phenotypes obtained from submitted evidence items
+		"phenotypesSubmitted": [],
+
+		# list(string): holds variants' phenotypes obtained from accepted evidence items
+		"phenotypesAccepted": [],
 
 		# string: the civic name of the variant, 
-		"variantName": None,
-
-		# list(string): list of variant types, stored as sequence ontology names 
-		"variantTypes": [], 
+		"variantName": None,		
 
 		# list(string): list of protein/chromosomal/mrna transcript ids for the variant
 		"hgvsExpressions": [], 
 
 		# int: id used by civic to reference this variant
-		"civicId": None,
-
-		# string: the variant cdna change
-		"cdnaChange": None,
-
-		# string: the variant aa change
-		"proteinChange": None
+		"civicId": None
 
 	},
 
-	"gnomad": {
+	"Gnomad": {
 		# string: dbSNP id for the variant
 		"rsID": None,
-
-		# list(string): list of variant types, stored as sequence ontology names 
-		"variantTypes": [],
-
-		# string: the variant cdna change
-		"cdnaChange": None,
-
-		# string: the variant aa change
-		"proteinChange": None,
 
 		# int: the variant allele count
 		"alleleCount": None,
@@ -73,10 +56,18 @@ VARIANT_TEMPLATE = {
 
 	},
 
-	"students2019": {
+	"KimStudents2019": {
 		# int: pmid of the article where variant is affirmed 
-		"pmid": None,
+		"pmid": None	
+	},
 
+	"ClinVar": {
+		# string: dbSNP id for the variant
+		"RS# (dbSNP)": None
+	},
+
+	# attributes here should be common to ALL data sources
+	"all":	{
 		# list(string): holds variants' associated phenotypes obtained from article 
 		"associatedPhenotypes": [],
 
@@ -86,11 +77,10 @@ VARIANT_TEMPLATE = {
 		# string: the variant cdna change
 		"cdnaChange": None,
 
-		# string: the variant aa change
-		"proteinChange": None,
+		# # string: the variant aa change
+		# "proteinChange": None,
 
 	}
-
 }
 
 # list of dicts, where each dict references a similarity function, and stores
@@ -147,6 +137,45 @@ class VariantGraph(nx.Graph):
 	Attributes:
 		All attributes in the nx.Graph class 
 	"""
+
+	def add_nodes_from_db(self, db):
+		fetcher = FETCHING_FACTORY[db]()
+		fetcher.process()
+		rows = fetcher.rows
+
+		for row in rows:
+			node_id = len(self.nodes())
+
+			# sets the next node id based on cdna change
+			#this is used to automatically merge nodes across databases
+			cdna_id = row['cdnaChange']
+
+			valid_id = cdna_id if cdna_id else node_id
+			self.add_node(valid_id, **{db: copy.deepcopy(VARIANT_TEMPLATE[db])})
+			variant_node = self.nodes[valid_id][db]
+			for key in VARIANT_TEMPLATE[db].keys():
+				variant_node[key] = row[key]
+			for key in VARIANT_TEMPLATE['all'].keys():
+				variant_node[key] = row[key]
+
+	def merge_nodes(self):
+		"""Reconciles the attributes of separate sources
+		"""
+
+		for node_i, node_d in self.nodes(data=True):
+			all_node = copy.deepcopy(VARIANT_TEMPLATE['all'])			
+
+			# TODO: the merging technique for every field here
+			# should be scrutinized and modified if needed
+			for db, db_var in node_d.items():
+				all_node['associatedPhenotypes'].extend(db_var['associatedPhenotypes'])
+				all_node['variantTypes'].extend(db_var['variantTypes'])
+
+			# trick for finding unique values
+			all_node['associatedPhenotypes'] = list(set(all_node['associatedPhenotypes']))
+			all_node['variantTypes'] = list(set(all_node['variantTypes']))
+			self.nodes[node_i]['all'] = all_node
+
 
 	def save_to_json_file(self, filename):
 		"""Saves the graph to a file
@@ -206,7 +235,6 @@ class VariantGraph(nx.Graph):
 					self.add_edge(VG_nodes[i][0], VG_nodes[j][0], **similarities)
 
 	def calculate_snf(self):
-
 		adjmats = self.get_adjacency_mats(dense=True)
 
 		#running SNF
@@ -228,10 +256,13 @@ class VariantGraph(nx.Graph):
 		# Merging the fused edge weights back into the original graph
 		fused_graph = nx.convert_matrix.from_numpy_array(fused_ndarray)
 
+		print(len(self))
 		self.add_edges_from(fused_graph.edges(data=True))
 
-		for i in range(0, len(self.nodes())):
-			node = self.nodes[i]
+
+
+		for i in range(0, len(self)):
+			node = list(self.nodes(data=True))[i][1]
 			node['spectral_label'] = fused_labels[i].item()
 
 	def get_adjacency_mats(self, dense=False):

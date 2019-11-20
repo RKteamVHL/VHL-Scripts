@@ -73,7 +73,7 @@ class Fetcher(object):
 					compressed_bytes.seek(0)
 					self.compressed.append(compressed_bytes)			
 
-		print(self.href)
+		print(self.name)
 
 
 				
@@ -122,8 +122,6 @@ class Fetcher(object):
 
 		self.dsv_header = list(self.rows.fieldnames)
 
-		self.data.seek(0)
-
 			
 
 	def fix_file(self):
@@ -137,6 +135,9 @@ class Fetcher(object):
 			self.data = io.TextIOWrapper(self.decompressed[0], encoding='utf-8')
 
 
+	# TODO: currently in the subclasses, this method is being used for 
+	# additional functionality that may not belong (namely, cdnaChange)
+	# This should be changed in the future
 	def filter_rows(self):
 		"""Filters dictionary list
 		Implemented by child classes, if needed
@@ -150,7 +151,6 @@ class Fetcher(object):
 		self.extract()
 		self.fix_file()
 		self.to_dict_list()
-		self.filter_rows()
 
 
 
@@ -168,15 +168,29 @@ class ClinVar(Fetcher):
 		# Clinvar's header line starts with a '#'
 
 		self.dsv_header = list(self.data.readline().split(ROW_DELIMITER))	
-		self.dsv_header[0] = self.dsv_header[0].replace("#", "")	
+		self.dsv_header[0] = self.dsv_header[0].replace("#", "")
+		self.dsv_header.append('cdnaChange')
 
 		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=ROW_DELIMITER)
 
-		self.data.seek(0)
+		self.filter_rows()
+
+		for row in self.rows:
+			row['cdnaChange'] = vf.get_valid_cdna(row['Name'], check_version=True)
+			all_ids = re.split(';,', row['PhenotypeIDS'])
+			hpo_re = re.compile('Human Phenotype Ontology:(?P<hpo>HP:[0-9]+)')
+
+			hpo_full = filter(lambda aid: hpo_re.search(aid) is not None, all_ids)
+
+			row['associatedPhenotypes'] = [hpo_re.search(hpoid).groupdict()['hpo'] for hpoid in hpo_full]
+
+			row['variantTypes'] = [row['Type'].replace(' ', '_')]
 
 	def filter_rows(self):
 		# filter clinvar by VHL genesymbol
-		self.rows = filter(lambda row: row['GeneSymbol']=='VHL', self.rows)
+		self.rows = list(filter(lambda row: row['GeneSymbol']=='VHL', self.rows))
+
+		# we might also want to filter by reviewer status, no conflicts 
 
 
 class KimStudents2019(Fetcher):
@@ -198,11 +212,18 @@ class KimStudents2019(Fetcher):
 		
 		self.data.seek(0)
 
+	def to_dict_list(self):
+		super().to_dict_list()
+		self.dsv_header.append('cdnaChange')
+
+		self.filter_rows()	
+		for row in self.rows:
+			row['cdnaChange'] = vf.get_valid_cdna(row['Mutation Event c.DNA.'])
+
 
 	def filter_rows(self):
 		#make sure row has an integer PMID
-		self.rows = filter(lambda row: row['PMID'].isdigit(), self.rows)
-		self.data.seek(0)
+		self.rows = list(filter(lambda row: row['PMID'].isdigit(), self.rows))
 
 
 class Gnomad(Fetcher):
@@ -239,7 +260,11 @@ class Gnomad(Fetcher):
 			new_row['af'] = new_row['ac']/new_row['an']
 			new_row.pop('exome', None)
 			new_row.pop('genome', None)
+
+			new_row['cdnaChange'] = vf.get_valid_cdna(new_row['hgvsc'])
+
 			self.dsv_header = list(new_row.keys())
+			self.dsv_header.append('cdnaChange')	
 
 			self.rows.append(new_row)
 
@@ -247,8 +272,9 @@ class Gnomad(Fetcher):
 
 	def filter_rows(self):
 		# gnomad has a quality filter, eliminating variants that dont meet it
-		self.rows = filter(lambda row: len(row['filters'])==0, self.rows)
-		self.data.seek(0)
+		self.rows = list(filter(lambda row: len(row['filters'])==0, self.rows))		
+
+			
 
 
 class Civic(Fetcher):
@@ -270,13 +296,10 @@ class Civic(Fetcher):
 			#this is used to automatically merge nodes across databases
 			cdna_id = None
 
-			# EXTRACTING CDS METHOD 1: using hgvs 
+			# EXTRACTING CDS METHOD 1: using hgvs
+			# TODO: cross-validate different hgvs' instead of overwrite 
 			for hgvs in variant.hgvs_expressions:
-
-				index = hgvs.find(vf.CURRENT_VHL_TRANSCRIPT)
-				if index >-1 and cdna_id is None:
-					cds_change = hgvs[1+index+len(vf.CURRENT_VHL_TRANSCRIPT):]
-					cdna_id = cds_change
+				cdna_id = vf.get_valid_cdna(hgvs, check_version=True)
 
 			
 			# EXTRACTING CDS METHOD 2: using civic variant name
@@ -293,6 +316,7 @@ class Civic(Fetcher):
 			new_row['evidenceAccepted'] = []
 			new_row['phenotypesSubmitted'] = []
 			new_row['phenotypesAccepted'] = []
+			new_row['associatedPhenotypes'] = []
 			new_row['variantTypes'] = []
 			new_row['hgvsExpressions'] = []
 			new_row['proteinChange'] = None
@@ -304,8 +328,7 @@ class Civic(Fetcher):
 				# get all phenotypes from evidences
 				phenotypes = [phenotype.hpo_id for phenotype in evidence.phenotypes]
 
-				# add evidence to appropriate list, and optionally filter out evidence items
-				#	that haven't been accepted
+				# add evidence to appropriate list
 				if evidence.status == "submitted":
 					new_row['evidenceSubmitted'].append(evidence.id)
 					new_row['phenotypesSubmitted'].extend(phenotypes)
@@ -334,19 +357,25 @@ class Civic(Fetcher):
 			self.dsv_header = list(new_row.keys())
 
 
-	def filter_rows(self):
+	def filter_rows(self, accepted_only=False):
 		# it's possible variants have no submitted or accepted evidence
 		# in the case of a rejection; remove these
-		self.rows = filter(lambda row: 
+		self.rows = list(filter(lambda row: 
 			len(row['evidenceAccepted'])>0 or len(row['evidenceSubmitted'])>0, 
 			self.rows
-		)
+		))
 
-		# optionally check if variant has ONLY accepted evidences
-		accepted_only = False
-
+		# filter rows based on optional parameter
 		if accepted_only:
 			self.rows = filter(lambda row: len(row['evidenceAccepted'])>0, self.rows)
+
+		for row in self.rows:
+			row['associatedPhenotypes'].extend(row['phenotypesAccepted'])
+			if not accepted_only:
+				row['associatedPhenotypes'].extend(row['phenotypesSubmitted'])
+
+
+
 	
 
 

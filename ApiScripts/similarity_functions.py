@@ -4,7 +4,7 @@ import math
 # Individual node analyses are in variant_functions.py
 
 ##Functions here should *only* take in n1 data, n2 data, and keyword args
-# and must return a tuple of (fn_name, fn_score)
+# and must return a single numerical score
 
 
 ## Scoring functions
@@ -14,8 +14,8 @@ def score_iou(n1, n2, attr_name):
 	'''Given two nodes, finds the intersection over union for a specific attribute
 	The attributes here must be of a class type that is iterable (i.e., a list)
 	'''
-	set1 = set(n1[attr_name])
-	set2 = set(n2[attr_name])
+	set1 = set(n1['all'][attr_name])
+	set2 = set(n2['all'][attr_name])
 
 	intersect = len(set1.intersection(set2))
 	union = len(set1.union(set2))

@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
 
 	parser.add_argument('-d', '--directory', help = '''Local directory to save graph''', default="")
-	parser.add_argument('-u', '--update', help = '''Update the local graph cache''', action="store_true")
+	parser.add_argument('-c', '--cache', help = '''Use the local graph cache''', action="store_true")
 
 	parser.add_argument('-is', '--ignore_submitted', help = '''If set, ignores unreviewed variants (civic)''', action="store_true")
 
@@ -37,11 +37,13 @@ if __name__ == '__main__':
 	VG = VariantGraph()
 
 	#fetch/process all relevant data from all sources
-	if args.update:
+	if not args.cache:
 
-		VG.add_nodes_from_civic_by_gene(VHL_GENE_ID, ignore_submitted=args.ignore_submitted)
-		VG.add_nodes_from_gnomad(GNOMAD_FILE)
-		VG.add_nodes_from_students(STUDENTS_FILE)	
+		# VG.add_nodes_from('Civic')
+		# VG.add_nodes_from('KimStudents2019')
+		# VG.add_nodes_from('Gnomad')
+		VG.add_nodes_from('ClinVar')
+		VG.merge_nodes()
 		VG.save_to_json_file("variant_nodes.json")
 
 	else:

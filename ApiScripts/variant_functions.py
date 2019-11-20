@@ -53,7 +53,10 @@ VHL_PROTEIN = VHL_CDS.translate()
 #they have  different domains for the alpha/beta regions.
 #Which one should be used? Below the most recent GRCH38.p12 are used.
 
-CURRENT_VHL_TRANSCRIPT = 'ENST00000256474.2'
+CURRENT_VHL_TRANSCRIPT = {
+	'ensembl': 'ENST00000256474.2',
+	'ncbi': 'NM_000551.3'
+}
 CURRENT_VHL_PROTEIN = 'NP_000542.1'
 CURRENT_VHL_GENE = 'ENSG00000134086'
 
@@ -96,6 +99,9 @@ GENE3D_VHL_DOMAINS = {
 
 ## Extraction of Variant Amino Acid / Nucleotide Changes
 
+# this regex doesn't get detailed variant info
+CDNA_REGEX = re.compile('(?P<id>.*?)?(?P<gene>\(.+\))?[\:]?(?P<cdna>c\.[a-zA-Z0-9\+\-\_\>\?\*]+)')
+
 DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 	r'(?:(?P<id>.*):*)?c\.', 					#transcript reference
 	r'(?P<start>[\d?]+)',						#start nt
@@ -127,6 +133,10 @@ DNA_REGEX = re.compile('{}{}{}{}{}{}{}{}{}{}'.format(
 # ENST00000256474.2:c.216delC
 # ENST00000256474.2:c.263_265delGGCinsTT 
 
+# Q: from clinvar, what is the following variant?
+# NM_000551.3(VHL):c.*2854G>T
+
+
 ## CDNA SNP Analysis
 RING_TYPE = {
 	'A': "purine",
@@ -148,6 +158,30 @@ AA_1TO3['*'] = "Ter"
 AA_1TO3['del'] = "del"
 AA_1TO3['fs'] = "fs"
 AA_1TO3['FS'] = AA_1TO3['fs']
+
+
+
+def get_valid_cdna(cdna_str, check_version=False):
+	return_cdna = None
+
+	match = CDNA_REGEX.match(cdna_str)
+	if match is not None:
+		var = match.groupdict()
+
+		cdna = var.get('cdna', None)
+		# if there is some cdna change
+		if cdna is not None and cdna != '':
+			return_cdna = cdna
+
+		# revert cdna to invalid if transcript version is wrong
+		if check_version:
+			t_id = var.get('id', '')
+			# if the transcript ref is blank or not current
+			if t_id == '' or (not t_id in CURRENT_VHL_TRANSCRIPT.values()):
+				return_cdna = None
+
+	return return_cdna
+
 
 
 ## Scoring functions
@@ -201,27 +235,29 @@ def affected_domains(node):
 	domains_affected = []
 
 	#for simple missense
-	for expression in node['hgvsExpressions']:
-		if expression.find(CURRENT_VHL_TRANSCRIPT)>-1:
+	# TODO: include ncbi reference
+	if node['all'].get('cdnaChange', None) is not None:
+		for expression in node['all']['cdnaChange']:
+			if expression.find(CURRENT_VHL_TRANSCRIPT['ensembl'])>-1:
 
-			#there was a typo in Civic for VARIANT L89R(c.266T>G)
-			# ENST00000256474.2:.266T>G
-			match = DNA_REGEX.match(expression)
-			if match is not None:
-				var = match.groupdict()
-				#if the transcript is the current one
-				if var['id'] in GENE3D_VHL_DOMAINS:		
+				#there was a typo in Civic for VARIANT L89R(c.266T>G)
+				# ENST00000256474.2:.266T>G
+				match = DNA_REGEX.match(expression)
+				if match is not None:
+					var = match.groupdict()
+					#if the transcript is the current one
+					if var['id'] in GENE3D_VHL_DOMAINS:		
 
-					#if the variant is not utr or intronic
-					if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
-						start_aa = math.floor(int(var['start'])/3)
-						stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
+						#if the variant is not utr or intronic
+						if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
+							start_aa = math.floor(int(var['start'])/3)
+							stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
 
-						affected_aa = range(start_aa, stop_aa)
+							affected_aa = range(start_aa, stop_aa)
 
-						for domain in GENE3D_VHL_DOMAINS[var['id']]:
-							#if theres overlap in aa's between the variant and each domain
-							if len(list(set(GENE3D_VHL_DOMAINS[var['id']][domain]) & set(affected_aa))) > 0:
-								domains_affected.append(domain)
+							for domain in GENE3D_VHL_DOMAINS[var['id']]:
+								#if theres overlap in aa's between the variant and each domain
+								if len(list(set(GENE3D_VHL_DOMAINS[var['id']][domain]) & set(affected_aa))) > 0:
+									domains_affected.append(domain)
 
 	return domains_affected
