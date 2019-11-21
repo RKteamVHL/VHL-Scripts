@@ -226,6 +226,7 @@ class KimStudents2019(Fetcher):
 			row['cdnaChange'] = vf.get_valid_cdna(row['Mutation Event c.DNA.'])
 
 			row['associatedPhenotypes']  = re.split(';,', row['Phenotype'])
+			row['variantTypes']  = re.split(';,', row['Mutation Type'])
 			
 
 
@@ -249,7 +250,7 @@ class Gnomad(Fetcher):
 	def to_dict_list(self):
 		self.rows = []		
 		gnomad_dict = json.loads(self.data.read())
-		variants = gnomad_dict['data']['gene']['variants']
+		variants = gnomad_dict['data']['transcript']['variants']
 		for variant in variants:
 			new_row = variant
 
@@ -270,15 +271,15 @@ class Gnomad(Fetcher):
 			new_row.pop('genome', None)
 
 			new_row['cdnaChange'] = vf.get_valid_cdna(new_row['hgvsc'])
+			new_row['associatedPhenotypes'] = []
+			new_row['variantTypes'] =[new_row['consequence']]
 
 			self.dsv_header = list(new_row.keys())
-			self.dsv_header.append('cdnaChange')
 			self.dsv_header.append('associatedPhenotypes')
 			self.dsv_header.append('variantTypes')	
 
 			self.rows.append(new_row)
 
-		self.data.seek(0)
 
 	def filter_rows(self):
 		# gnomad has a quality filter, eliminating variants that dont meet it

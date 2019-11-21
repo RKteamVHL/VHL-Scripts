@@ -17,7 +17,7 @@ import re
 
 # The particular fasta file was obtained from: 
 # https://useast.ensembl.org/Homo_sapiens/Transcript/Exons?db=core;g=ENSG00000134086;r=3:10141008-10152220;t=ENST00000256474
-VHL201_FASTA = os.path.join('ApiScripts', 'files', 'Homo_sapiens_VHL_201_sequence.fa')
+VHL201_FASTA = os.path.join('Analysis', 'files', 'Homo_sapiens_VHL_201_sequence.fa')
 
 vhl_seqs = [str(seqreq.seq) for seqreq in SeqIO.parse(VHL201_FASTA, "fasta")]
 
