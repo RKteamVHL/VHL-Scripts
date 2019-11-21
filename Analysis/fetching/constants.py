@@ -23,7 +23,7 @@ STUDENTS_HEADER = "PMID{0}cDNA_Position{0}Multiple Mutants in Case{0}Mutation Ev
 
 GNOMAD_POST_DATA = {
 	"query": '''{
-		gene(gene_id: "ENSG00000134086", reference_genome: GRCh37) {
+		transcript(transcript_id: "ENST00000256474", reference_genome: GRCh37){
 			variants(dataset: gnomad_r2_1) {
 				consequence
 				flags

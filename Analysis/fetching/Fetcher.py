@@ -170,6 +170,8 @@ class ClinVar(Fetcher):
 		self.dsv_header = list(self.data.readline().split(ROW_DELIMITER))	
 		self.dsv_header[0] = self.dsv_header[0].replace("#", "")
 		self.dsv_header.append('cdnaChange')
+		self.dsv_header.append('associatedPhenotypes')
+		self.dsv_header.append('variantTypes')
 
 		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=ROW_DELIMITER)
 
@@ -215,10 +217,16 @@ class KimStudents2019(Fetcher):
 	def to_dict_list(self):
 		super().to_dict_list()
 		self.dsv_header.append('cdnaChange')
+		self.dsv_header.append('associatedPhenotypes')
+		self.dsv_header.append('variantTypes')
+
 
 		self.filter_rows()	
 		for row in self.rows:
 			row['cdnaChange'] = vf.get_valid_cdna(row['Mutation Event c.DNA.'])
+
+			row['associatedPhenotypes']  = re.split(';,', row['Phenotype'])
+			
 
 
 	def filter_rows(self):
@@ -264,7 +272,9 @@ class Gnomad(Fetcher):
 			new_row['cdnaChange'] = vf.get_valid_cdna(new_row['hgvsc'])
 
 			self.dsv_header = list(new_row.keys())
-			self.dsv_header.append('cdnaChange')	
+			self.dsv_header.append('cdnaChange')
+			self.dsv_header.append('associatedPhenotypes')
+			self.dsv_header.append('variantTypes')	
 
 			self.rows.append(new_row)
 
