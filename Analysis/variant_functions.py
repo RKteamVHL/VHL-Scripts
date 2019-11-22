@@ -2,6 +2,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Data.IUPACData import protein_letters_1to3, protein_letters_3to1 
 import math
+import obonet
 import os
 import re
 
@@ -182,6 +183,63 @@ def get_valid_cdna(cdna_str, check_version=False):
 
 	return return_cdna
 
+## Phenotype and Sequency Ontology Utilities
+SO_NAME = 'SequenceOntology'
+SO_FILENAME = 'so.obo'
+SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
+SONET = obonet.read_obo(SO_HREF)
+
+HPO_NAME = 'HumanPhenotypeOntology'
+HPO_FILENAME = 'hp.obo'
+HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
+HPONET = obonet.read_obo(HPO_HREF)
+
+
+def get_valid_obo(term_or_id,  base_obo, return_type='id'):
+	"""Given a general obo file, find a node in that file
+	Checks for exact ID's case-insensitive terms, and 
+	case-insensitive synonyms
+	"""
+	valid_id = None
+	return_dict = {}
+
+	if term_or_id in base_obo.node:
+		# the parameter is already an id; do nothing to it
+		valid_id = term_or_id
+	
+	else:
+		#we have to iterate through the nodes to find a matching term
+		for n, d in base_obo.nodes.items():
+			print(n, d)
+			query_term = term_or_id.strip().casefold()
+			obo_term = d['name'].casefold()
+
+			# if the query term matches the net term
+			if query_term == obo_term:			
+				valid_id = n
+				break
+			# else, look through all synonyms as well
+			else:
+				print(obo_term, query_term)
+				if not 'synonym' in d:
+					break
+				for net_sym in d['synonym']:
+					if net_sym.casefold().find(query_term)>-1:
+						valid_id = n
+						break
+
+	if valid_id is not None:
+		return_dict['id'] = valid_id
+		return_dict['term'] = base_obo.node[valid_id]['name']
+
+	return return_dict.get(return_type, None)
+
+def get_valid_hpo(term_or_id, return_type='id'):
+	return get_valid_obo(term_or_id, HPONET, return_type=return_type)
+
+
+def get_valid_so(term_or_id, return_type='id'):
+	return get_valid_obo(term_or_id, SONET, return_type=return_type)
 
 
 ## Scoring functions

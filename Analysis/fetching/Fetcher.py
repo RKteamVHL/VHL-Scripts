@@ -179,13 +179,14 @@ class ClinVar(Fetcher):
 
 		for row in self.rows:
 			row['cdnaChange'] = vf.get_valid_cdna(row['Name'], check_version=True)
-			all_ids = re.split(';,', row['PhenotypeIDS'])
+			all_ids = re.split('[;,]', row['PhenotypeIDS'])
 			hpo_re = re.compile('Human Phenotype Ontology:(?P<hpo>HP:[0-9]+)')
 
 			hpo_full = filter(lambda aid: hpo_re.search(aid) is not None, all_ids)
 
-			row['associatedPhenotypes'] = [hpo_re.search(hpoid).groupdict()['hpo'] for hpoid in hpo_full]
+			hpo_list = [hpo_re.search(hpoid).groupdict()['hpo'] for hpoid in hpo_full]
 
+			row['associatedPhenotypes'] = [vf.get_valid_hpo(term) for term in hpo_list]
 			row['variantTypes'] = [row['Type'].replace(' ', '_')]
 
 	def filter_rows(self):
@@ -225,7 +226,9 @@ class KimStudents2019(Fetcher):
 		for row in self.rows:
 			row['cdnaChange'] = vf.get_valid_cdna(row['Mutation Event c.DNA.'])
 
-			row['associatedPhenotypes']  = re.split(';,', row['Phenotype'])
+			hpo_list  = re.split('[;,]', row['Phenotype'])
+			row['associatedPhenotypes'] = [vf.get_valid_hpo(term) for term in hpo_list]
+
 			row['variantTypes']  = re.split(';,', row['Mutation Type'])
 			
 
@@ -270,7 +273,10 @@ class Gnomad(Fetcher):
 			new_row.pop('exome', None)
 			new_row.pop('genome', None)
 
+			new_row['alleleCount'] = new_row.pop('ac', 0)
+			new_row['alleleFrequency'] = new_row.pop('af', 0)
 			new_row['cdnaChange'] = vf.get_valid_cdna(new_row['hgvsc'])
+			# gnomad doesnt have phenotypes
 			new_row['associatedPhenotypes'] = []
 			new_row['variantTypes'] =[new_row['consequence']]
 
@@ -279,6 +285,9 @@ class Gnomad(Fetcher):
 			self.dsv_header.append('variantTypes')	
 
 			self.rows.append(new_row)
+
+		self.filter_rows()	
+
 
 
 	def filter_rows(self):
@@ -366,6 +375,7 @@ class Civic(Fetcher):
 
 			self.rows.append(new_row)
 			self.dsv_header = list(new_row.keys())
+		self.filter_rows()
 
 
 	def filter_rows(self, accepted_only=False):
@@ -381,9 +391,11 @@ class Civic(Fetcher):
 			self.rows = filter(lambda row: len(row['evidenceAccepted'])>0, self.rows)
 
 		for row in self.rows:
-			row['associatedPhenotypes'].extend(row['phenotypesAccepted'])
+			valid_accepted = [vf.get_valid_hpo(term) for term in row['phenotypesAccepted']]
+			row['associatedPhenotypes'].extend(valid_accepted)
 			if not accepted_only:
-				row['associatedPhenotypes'].extend(row['phenotypesSubmitted'])
+				valid_submitted = [vf.get_valid_hpo(term) for term in row['phenotypesSubmitted']]
+				row['associatedPhenotypes'].extend(valid_submitted)
 
 
 

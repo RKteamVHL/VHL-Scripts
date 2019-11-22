@@ -79,14 +79,3 @@ GNOMAD_HREF = 'http://gnomad.broadinstitute.org/api'
 CIVIC_VHL_GENE_ID =  58
 CIVIC_NAME = 'CIViC'
 CIVIC_FILENAME = "CIViC.tsv"
-
-
-
-
-SO_NAME = 'SequenceOntology'
-SO_FILENAME = 'so.obo'
-SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
-
-HPO_NAME = 'HumanPhenotypeOntology'
-HPO_FILENAME = 'hp.obo'
-HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'

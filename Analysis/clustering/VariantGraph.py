@@ -4,7 +4,6 @@ from ..fetching.Fetcher import FETCHING_FACTORY
 from sklearn.cluster import SpectralClustering
 from snf import compute
 from snf import metrics
-from openpyxl import load_workbook
 
 import copy
 import networkx as nx
@@ -46,7 +45,7 @@ VARIANT_TEMPLATE = {
 
 	"Gnomad": {
 		# string: dbSNP id for the variant
-		"rsID": None,
+		"rsid": None,
 
 		# int: the variant allele count
 		"alleleCount": None,
@@ -58,7 +57,7 @@ VARIANT_TEMPLATE = {
 
 	"KimStudents2019": {
 		# int: pmid of the article where variant is affirmed 
-		"pmid": None	
+		"PMID": None	
 	},
 
 	"ClinVar": {
@@ -86,16 +85,30 @@ VARIANT_TEMPLATE = {
 # list of dicts, where each dict references a similarity function, and stores
 # keyword args for that function
 SIMILARITY_METRICS = {
-	"score_iou_associatedPhenotypes": {
-		"function": sf.score_iou,
-		"kwargs": {
-			"attr_name": "associatedPhenotypes"
+	# "score_iou_associatedPhenotypes": {
+	# 	"function": sf.score_iou,
+	# 	"kwargs": {
+	# 		"attr_name": "associatedPhenotypes"
+	# 	}
+	# },
+	# "score_iou_variantTypes": {
+	# 	"function": sf.score_iou,
+	# 	"kwargs": {
+	# 		"attr_name": "variantTypes"
+	# 	}
+	# },
+
+	"score_hpo": {
+		"function": sf.variant_hpo_distance,
+		"kwargs":{
+
 		}
 	},
-	"score_iou_variantTypes": {
-		"function": sf.score_iou,
-		"kwargs": {
-			"attr_name": "variantTypes"
+
+	"score_so": {
+		"function": sf.variant_so_distance,
+		"kwargs":{
+
 		}
 	},
 	"score_domain_alpha": {
@@ -142,7 +155,6 @@ class VariantGraph(nx.Graph):
 		fetcher = FETCHING_FACTORY[db]()
 		fetcher.process()
 		rows = fetcher.rows
-
 		for row in rows:
 			node_id = len(self.nodes())
 

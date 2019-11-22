@@ -39,10 +39,10 @@ if __name__ == '__main__':
 	#fetch/process all relevant data from all sources
 	if not args.cache:
 
-		# VG.add_nodes_from('Civic')
-		# VG.add_nodes_from('KimStudents2019')
-		# VG.add_nodes_from('Gnomad')
-		VG.add_nodes_from('ClinVar')
+		# VG.add_nodes_from_db('Civic')
+		VG.add_nodes_from_db('KimStudents2019')
+		VG.add_nodes_from_db('Gnomad')
+		VG.add_nodes_from_db('ClinVar')
 		VG.merge_nodes()
 		VG.save_to_json_file("variant_nodes.json")
 
