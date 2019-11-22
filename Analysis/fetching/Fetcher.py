@@ -5,6 +5,7 @@ from .. import variant_functions as vf
 from .constants import *
 import certifi
 import argparse
+import logging
 import gzip
 import json
 import csv
@@ -100,6 +101,7 @@ class Fetcher(object):
 			filename: filename (str) to save data
 		"""
 		with open(filename, 'w+', encoding='utf-8') as file:
+			self.data.seek(0)
 			file.write(self.data.read())
 			self.data.seek(0)
 
@@ -163,6 +165,7 @@ class ClinVar(Fetcher):
 		self.filename = CLINVAR_FILENAME
 		self.href = CLINVAR_HREF
 		self.needs_extraction = True
+		self.logger = logging.getLogger(self.name)
 
 	def to_dict_list(self):		
 		# Clinvar's header line starts with a '#'
@@ -185,9 +188,25 @@ class ClinVar(Fetcher):
 			hpo_full = filter(lambda aid: hpo_re.search(aid) is not None, all_ids)
 
 			hpo_list = [hpo_re.search(hpoid).groupdict()['hpo'] for hpoid in hpo_full]
+			so_list = [row['Type'].replace(' ', '_')]
 
-			row['associatedPhenotypes'] = [vf.get_valid_hpo(term) for term in hpo_list]
-			row['variantTypes'] = [row['Type'].replace(' ', '_')]
+
+			row['associatedPhenotypes'] = []
+			for term in hpo_list:
+				try:
+					var_hpo = vf.get_valid_hpo(term.strip())
+					row['associatedPhenotypes'].append(var_hpo)
+				except ValueError as e:
+					self.logger.warning(repr(e))
+
+			row['variantTypes']  = []
+			for term in so_list:
+				try:
+					var_so = vf.get_valid_so(term)
+					row['variantTypes'].append(var_so)
+				except ValueError as e:
+					self.logger.warning(repr(e))
+
 
 	def filter_rows(self):
 		# filter clinvar by VHL genesymbol
@@ -205,6 +224,7 @@ class KimStudents2019(Fetcher):
 		self.filename = STUDENTS_FILENAME
 		self.href = STUDENTS_HREF
 		self.needs_extraction = False
+		self.logger = logging.getLogger(self.name)
 
 	def fix_file(self):
 		# combining all sheets together
@@ -227,10 +247,24 @@ class KimStudents2019(Fetcher):
 			row['cdnaChange'] = vf.get_valid_cdna(row['Mutation Event c.DNA.'])
 
 			hpo_list  = re.split('[;,]', row['Phenotype'])
-			row['associatedPhenotypes'] = [vf.get_valid_hpo(term) for term in hpo_list]
+			so_list = re.split('[;,]', row['Mutation Type'])
 
-			row['variantTypes']  = re.split(';,', row['Mutation Type'])
-			
+			row['associatedPhenotypes'] = []
+			for term in hpo_list:
+				try:
+					var_hpo = vf.get_valid_hpo(term.strip())
+					row['associatedPhenotypes'].append(var_hpo)
+				except ValueError as e:
+					self.logger.warning(repr(e))
+
+			row['variantTypes']  = []
+			for term in so_list:
+				try:
+					var_so = vf.get_valid_so(term)
+					row['variantTypes'].append(var_so)
+				except ValueError as e:
+					self.logger.warning(repr(e))
+	
 
 
 	def filter_rows(self):
@@ -249,6 +283,7 @@ class Gnomad(Fetcher):
 		self.href = GNOMAD_HREF
 		self.needs_extraction = False
 		self.request_data =  urllib.parse.urlencode(GNOMAD_POST_DATA).encode('ascii')
+		self.logger = logging.getLogger(self.name)
 
 	def to_dict_list(self):
 		self.rows = []		
@@ -278,7 +313,17 @@ class Gnomad(Fetcher):
 			new_row['cdnaChange'] = vf.get_valid_cdna(new_row['hgvsc'])
 			# gnomad doesnt have phenotypes
 			new_row['associatedPhenotypes'] = []
-			new_row['variantTypes'] =[new_row['consequence']]
+
+			so_list = [new_row['consequence']]
+			
+			new_row['variantTypes']  = []
+			for term in so_list:
+				try:
+					var_so = vf.get_valid_so(term)
+					new_row['variantTypes'].append(var_so)
+				except ValueError as e:
+					self.logger.warning(repr(e))
+
 
 			self.dsv_header = list(new_row.keys())
 			self.dsv_header.append('associatedPhenotypes')
@@ -304,6 +349,7 @@ class Civic(Fetcher):
 		super().__init__()
 		self.name = CIVIC_NAME
 		self.filename = CIVIC_FILENAME
+		self.logger = logging.getLogger(self.name)
 
 
 
@@ -361,7 +407,11 @@ class Civic(Fetcher):
 
 			#finding the types of the variant and adding it to the node
 			for variant_type in variant.variant_types:
-				new_row['variantTypes'].append(variant_type.name)
+				try:
+					var_so = vf.get_valid_so(variant_type.name)
+					new_row['variantTypes'].append(var_so)
+				except ValueError as e:
+					self.logger.warning(repr(e))
 
 			#finding the HGVS expressions
 			for hgvs in variant.hgvs_expressions:
@@ -375,6 +425,8 @@ class Civic(Fetcher):
 
 			self.rows.append(new_row)
 			self.dsv_header = list(new_row.keys())
+
+		self.data.write(json.dumps(self.rows))
 		self.filter_rows()
 
 

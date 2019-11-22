@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	#fetch/process all relevant data from all sources
 	if not args.cache:
 
-		# VG.add_nodes_from_db('Civic')
+		VG.add_nodes_from_db('Civic')
 		VG.add_nodes_from_db('KimStudents2019')
 		VG.add_nodes_from_db('Gnomad')
 		VG.add_nodes_from_db('ClinVar')
@@ -49,9 +49,15 @@ if __name__ == '__main__':
 	else:
 		VG.load_from_json_file("variant_nodes.json")
 
-	VG.calculate_node_attributes()
-	VG.calculate_similarities()	
-	VG.calculate_snf()
+	PG = VariantGraph()
+	for n, d in VG.nodes(data=True):
+		if d['all']['associatedPhenotypes']:
+			PG.add_node(n, **d)
+	PG.save_to_json_file("pheno_variant_nodes.json")
+	PG.calculate_node_attributes()
+	PG.calculate_similarities()
+	PG.save_to_json_file("calculated_variant_nodes.json")	
+	PG.calculate_snf()
 	#VG.remove_isolates()
 
 
@@ -65,7 +71,7 @@ if __name__ == '__main__':
 	)
 	plt.show()
 
-	VG.save_to_json_file("calculated_variant_nodes.json")
+	
 
 
 #this code is for finding a summary of al variant types

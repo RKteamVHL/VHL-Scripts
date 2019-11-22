@@ -1,5 +1,6 @@
 import math
 import networkx as nx
+import numpy as np
 from . import variant_functions as vf
 ### The functions here perform variant-to-variant similarity analysis for pairs of nodes.
 # Individual node analyses are in variant_functions.py
@@ -72,25 +73,39 @@ def graph_distance(id1,id2, obo):
 		distance = 0
 	
 	else:
-		common = nx.lowest_common_ancestor(obo, id1, id2)
-		if common is not None:
-			distance = nx.shortest_path_length(obo, source=id1, target=common) 
-			distance += nx.shortest_path_length(obo, source=id2, target=common)
+		try:
+			distance = nx.shortest_path_length(obo, source=id1, target=id2)
+		except nx.exception.NetworkXNoPath:
+			pass
 
-	return distance
+	if isinstance(distance, int):
+		distance += 1
+
+	return distance 
 
 def variant_obo_distance(ids1, ids2, obo, sigma = 1 ):
 	score = 0
-	total_distance = None
-	for id1 in ids1:
-		for id2 in ids2:
-			distance = graph_distance(id1, id2, obo)
-			if total_distance is None:
-				total_distance = 0
-			total_distance += distance
+	all_distances = []
+	geo_mean = 0
+
+	longer_list = ids1 if len(ids1) >= len(ids2) else ids2
+	shorter_list = ids1 if len(ids1) < len(ids2) else ids2
+	for id1 in longer_list:
+		distances = []
+		for id2 in shorter_list:
+			d = graph_distance(id1, id2, obo)
+			if d is not None:
+				distances.append(d)
+
+		if len(distances) > 0:
+			all_distances.append(min(distances))
 
 
-	return score
+	if len(all_distances) > 0:
+		a = np.log(all_distances)
+		geo_mean = np.exp(a.sum()/len(a))			
+
+	return geo_mean
 
 def variant_hpo_distance(n1, n2, sigma = 1):
 	list1 = n1['all']['associatedPhenotypes']

@@ -3,6 +3,7 @@ from Bio.Seq import Seq
 from Bio.Data.IUPACData import protein_letters_1to3, protein_letters_3to1 
 import math
 import obonet
+import networkx as nx
 import os
 import re
 
@@ -187,12 +188,12 @@ def get_valid_cdna(cdna_str, check_version=False):
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
 SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
-SONET = obonet.read_obo(SO_HREF)
+SONET = nx.Graph(obonet.read_obo(SO_HREF))
 
 HPO_NAME = 'HumanPhenotypeOntology'
 HPO_FILENAME = 'hp.obo'
 HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
-HPONET = obonet.read_obo(HPO_HREF)
+HPONET = nx.Graph(obonet.read_obo(HPO_HREF))
 
 
 def get_valid_obo(term_or_id,  base_obo, return_type='id'):
@@ -209,8 +210,7 @@ def get_valid_obo(term_or_id,  base_obo, return_type='id'):
 	
 	else:
 		#we have to iterate through the nodes to find a matching term
-		for n, d in base_obo.nodes.items():
-			print(n, d)
+		for n, d in base_obo.nodes(data=True):			
 			query_term = term_or_id.strip().casefold()
 			obo_term = d['name'].casefold()
 
@@ -220,17 +220,17 @@ def get_valid_obo(term_or_id,  base_obo, return_type='id'):
 				break
 			# else, look through all synonyms as well
 			else:
-				print(obo_term, query_term)
-				if not 'synonym' in d:
-					break
-				for net_sym in d['synonym']:
-					if net_sym.casefold().find(query_term)>-1:
-						valid_id = n
-						break
+				if 'synonym' in d:
+					for net_sym in d['synonym']:
+						if net_sym.casefold().find(query_term)>-1:
+							valid_id = n
+						
 
 	if valid_id is not None:
 		return_dict['id'] = valid_id
 		return_dict['term'] = base_obo.node[valid_id]['name']
+	else:
+		raise ValueError(f"Could not find an OBO node for {term_or_id}")
 
 	return return_dict.get(return_type, None)
 
@@ -293,29 +293,25 @@ def affected_domains(node):
 	domains_affected = []
 
 	#for simple missense
-	# TODO: include ncbi reference
-	if node['all'].get('cdnaChange', None) is not None:
-		for expression in node['all']['cdnaChange']:
-			if expression.find(CURRENT_VHL_TRANSCRIPT['ensembl'])>-1:
+	# TODO: check ncbi and ensembl reference
+	hgvs = node['all'].get('cdnaChange', None)
+	if hgvs is not None:
 
-				#there was a typo in Civic for VARIANT L89R(c.266T>G)
-				# ENST00000256474.2:.266T>G
-				match = DNA_REGEX.match(expression)
-				if match is not None:
-					var = match.groupdict()
-					#if the transcript is the current one
-					if var['id'] in GENE3D_VHL_DOMAINS:		
+		#there was a typo in Civic for VARIANT L89R(c.266T>G)
+		# ENST00000256474.2:.266T>G
+		match = DNA_REGEX.match(hgvs)
+		if match is not None:
+			var = match.groupdict()
+			#if the variant is not utr or intronic
+			if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
+				start_aa = math.floor(int(var['start'])/3)
+				stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
 
-						#if the variant is not utr or intronic
-						if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
-							start_aa = math.floor(int(var['start'])/3)
-							stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
+				affected_aa = range(start_aa, stop_aa)
 
-							affected_aa = range(start_aa, stop_aa)
-
-							for domain in GENE3D_VHL_DOMAINS[var['id']]:
-								#if theres overlap in aa's between the variant and each domain
-								if len(list(set(GENE3D_VHL_DOMAINS[var['id']][domain]) & set(affected_aa))) > 0:
-									domains_affected.append(domain)
+				for domain in GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]:
+					#if theres overlap in aa's between the variant and each domain
+					if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(affected_aa))) > 0:
+						domains_affected.append(domain)
 
 	return domains_affected

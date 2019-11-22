@@ -73,8 +73,9 @@ VARIANT_TEMPLATE = {
 		# list(string): list of variant types, stored as sequence ontology names 
 		"variantTypes": [],
 
-		# string: the variant cdna change
-		"cdnaChange": None,
+		# string: the variant cdna change. this may not be needed, since
+		#cdna change is encoded into node variant ids
+		# "cdnaChange": None,
 
 		# # string: the variant aa change
 		# "proteinChange": None,
@@ -186,6 +187,8 @@ class VariantGraph(nx.Graph):
 			# trick for finding unique values
 			all_node['associatedPhenotypes'] = list(set(all_node['associatedPhenotypes']))
 			all_node['variantTypes'] = list(set(all_node['variantTypes']))
+			if isinstance(node_i, str):
+				all_node['cdnaChange'] = node_i 
 			self.nodes[node_i]['all'] = all_node
 
 
@@ -199,7 +202,7 @@ class VariantGraph(nx.Graph):
 		with open(filename, "w") as file:
 			json.dump(VG_json, file)
 
-		print("# of variants saved to file: {}".format(len(self)))
+		print(f"# of variants saved to {filename}: {len(self)}")
 
 	def load_from_json_file(self, filename):
 		"""Loads the graph from a file
@@ -212,7 +215,7 @@ class VariantGraph(nx.Graph):
 			self.add_nodes_from(VG.nodes(data=True))	
 			self.add_edges_from(VG.edges(data=True))
 
-		print("# of variants loaded from file: {}".format(len(self)))
+		print(f"# of variants loaded from {filename}: {len(self)}")
 
 	#NOTE: it may make sense to have the metric functions and arguments
 	# inputted as arguments to this method
