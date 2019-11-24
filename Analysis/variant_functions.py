@@ -188,58 +188,39 @@ def get_valid_cdna(cdna_str, check_version=False):
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
 SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
-SONET = nx.Graph(obonet.read_obo(SO_HREF))
 
 HPO_NAME = 'HumanPhenotypeOntology'
 HPO_FILENAME = 'hp.obo'
 HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
-HPONET = nx.Graph(obonet.read_obo(HPO_HREF))
 
 
-def get_valid_obo(term_or_id,  base_obo, return_type='id'):
-	"""Given a general obo file, find a node in that file
-	Checks for exact ID's case-insensitive terms, and 
-	case-insensitive synonyms
-	"""
-	valid_id = None
-	return_dict = {}
+#gather HPO and SO into an netork- node keys: id
+_g = nx.compose(obonet.read_obo(SO_HREF), obonet.read_obo(HPO_HREF))
 
-	if term_or_id in base_obo.node:
-		# the parameter is already an id; do nothing to it
-		valid_id = term_or_id
-	
+# add the id to the node attributes
+for n, d in _g.nodes(data=True):
+	d['id'] = n.casefold().strip()
+	d['name'] = d['name'].casefold().strip()
+
+#make a copy of merged network- node keys: term
+_h = nx.relabel_nodes(_g, {n: d['name'] for n, d in _g.nodes(data=True)})
+#combine together OBO network so that node keys: id or term 
+_f = nx.compose(_g, _h)
+#casefold and strip the keys, so the result is an agglomeration of nodes:
+# SO(term) + SO(id) + HPO(term) + HPO(id), all lowercase and stripped
+
+# Note: an undirected graph is needed here for distance calculations
+OBONET = nx.Graph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.nodes()}))
+
+
+def get_valid_obo(term_or_id, obo_type='name'):
+	tid = term_or_id.strip().casefold()
+	if tid in OBONET:
+		return OBONET.node[tid][obo_type]
 	else:
-		#we have to iterate through the nodes to find a matching term
-		for n, d in base_obo.nodes(data=True):			
-			query_term = term_or_id.strip().casefold()
-			obo_term = d['name'].casefold()
-
-			# if the query term matches the net term
-			if query_term == obo_term:			
-				valid_id = n
-				break
-			# else, look through all synonyms as well
-			else:
-				if 'synonym' in d:
-					for net_sym in d['synonym']:
-						if net_sym.casefold().find(query_term)>-1:
-							valid_id = n
-						
-
-	if valid_id is not None:
-		return_dict['id'] = valid_id
-		return_dict['term'] = base_obo.node[valid_id]['name']
-	else:
-		raise ValueError(f"Could not find an OBO node for {term_or_id}")
-
-	return return_dict.get(return_type, None)
-
-def get_valid_hpo(term_or_id, return_type='id'):
-	return get_valid_obo(term_or_id, HPONET, return_type=return_type)
+		raise ValueError(f"Could not find an OBO node for {tid}")
 
 
-def get_valid_so(term_or_id, return_type='id'):
-	return get_valid_obo(term_or_id, SONET, return_type=return_type)
 
 
 ## Scoring functions

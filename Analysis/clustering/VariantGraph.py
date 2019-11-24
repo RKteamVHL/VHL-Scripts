@@ -7,6 +7,7 @@ from snf import metrics
 
 import copy
 import networkx as nx
+import numpy as np
 import csv
 import json
 import math
@@ -75,7 +76,7 @@ VARIANT_TEMPLATE = {
 
 		# string: the variant cdna change. this may not be needed, since
 		#cdna change is encoded into node variant ids
-		# "cdnaChange": None,
+		"cdnaChange": None,
 
 		# # string: the variant aa change
 		# "proteinChange": None,
@@ -86,19 +87,6 @@ VARIANT_TEMPLATE = {
 # list of dicts, where each dict references a similarity function, and stores
 # keyword args for that function
 SIMILARITY_METRICS = {
-	# "score_iou_associatedPhenotypes": {
-	# 	"function": sf.score_iou,
-	# 	"kwargs": {
-	# 		"attr_name": "associatedPhenotypes"
-	# 	}
-	# },
-	# "score_iou_variantTypes": {
-	# 	"function": sf.score_iou,
-	# 	"kwargs": {
-	# 		"attr_name": "variantTypes"
-	# 	}
-	# },
-
 	"score_hpo": {
 		"function": sf.variant_hpo_distance,
 		"kwargs":{
@@ -143,6 +131,8 @@ DEFAULT_DRAWING_OPTIONS = {
 	'line_color': 'grey',
 	'font_size': 6
 }
+
+SCORE_THRESHOLD = 1e-2
 
 
 class VariantGraph(nx.Graph):
@@ -192,19 +182,24 @@ class VariantGraph(nx.Graph):
 			self.nodes[node_i]['all'] = all_node
 
 
-	def save_to_json_file(self, filename):
+	def save_to_json_file(self, filename, nodes_only=False):
 		"""Saves the graph to a file
 		Arguments:
 			filename (string): name of the saved file
 		"""
-		VG_json = nx.readwrite.json_graph.node_link_data(self)
+		G = self
+		if nodes_only:
+			G = nx.Graph()
+			G.add_nodes_from(self.nodes(data=True))
+
+		VG_json = nx.readwrite.json_graph.node_link_data(G)
 
 		with open(filename, "w") as file:
 			json.dump(VG_json, file)
 
 		print(f"# of variants saved to {filename}: {len(self)}")
 
-	def load_from_json_file(self, filename):
+	def load_from_json_file(self, filename, nodes_only=False):
 		"""Loads the graph from a file
 		Arguments:
 			filename (string): name of the saved file
@@ -213,7 +208,8 @@ class VariantGraph(nx.Graph):
 			VG_json = json.load(file)
 			VG = nx.readwrite.json_graph.node_link_graph(VG_json)
 			self.add_nodes_from(VG.nodes(data=True))	
-			self.add_edges_from(VG.edges(data=True))
+			if not nodes_only:
+				self.add_edges_from(VG.edges(data=True))
 
 		print(f"# of variants loaded from {filename}: {len(self)}")
 
@@ -233,62 +229,72 @@ class VariantGraph(nx.Graph):
 	# inputted as arguments to this method
 	def calculate_similarities(self):
 		"""Calculates similarity metrics between nodes from SIMILARITY_METRICS
+
+		This method also now calculates SNF metrics
 		"""
 
 		VG_nodes = list(self.nodes(data=True))
 		#assuming undirected graphs with no self connections
 		for i in range(0,len(VG_nodes)):
-			for j in range(i, len(VG_nodes)):
+			for j in range(i+1, len(VG_nodes)):
 
 				similarities = {}
 				for name, metric in SIMILARITY_METRICS.items():
 					score = metric['function'](VG_nodes[i][1], VG_nodes[j][1], **metric['kwargs'])
 					similarities[name] = score
 
-				has_value = [ not math.isclose(v, 0, rel_tol=1e-5) for v in similarities.values()]
+				has_value = [ not math.isclose(v, 0, abs_tol=SCORE_THRESHOLD) for v in similarities.values()]
 				if any(has_value):
 					self.add_edge(VG_nodes[i][0], VG_nodes[j][0], **similarities)
 
-	def calculate_snf(self):
-		adjmats = self.get_adjacency_mats(dense=True)
+		adjmats = self.get_adjacency_mats(types=SIMILARITY_METRICS.keys())
+
+		node_list = list(self.nodes())
 
 		#running SNF
 		fused_ndarray = compute.snf(adjmats)
-		clust_count1, clust_count2 = compute.get_n_clusters(fused_ndarray)
+		
+		it = np.nditer(fused_ndarray, flags=['multi_index'])
+		while not it.finished:
+			# if the similarity is not 0
+			if not math.isclose(it[0].item(), 0, abs_tol=SCORE_THRESHOLD):
+				n1 = node_list[it.multi_index[0]]
+				n2 = node_list[it.multi_index[1]]
+				self.add_edge(n1, n2, fused_similarity=it[0].item())
+			it.iternext()
+
+	def cluster_by(self, affinity_type, num_clusters):
+
+		adj_mat = self.get_adjacency_mats(types=[affinity_type])
 
 
-		sc = SpectralClustering(clust_count1, affinity='precomputed', n_init=100, assign_labels='discretize')
-		sc.fit(fused_ndarray)
+		sc = SpectralClustering(num_clusters, affinity='precomputed', n_init=100, assign_labels='discretize')		
+		sc.fit(adj_mat[0])
 
 		fused_labels = sc.labels_
 
-		silhouette = metrics.silhouette_score(fused_ndarray, fused_labels)
+		silhouette = metrics.silhouette_score(adj_mat[0], fused_labels)
 
-		print("Cluster estimates: {}, {}".format(clust_count1, clust_count2))
 		print("Labels: ", fused_labels)
 
+		node_list = list(self.nodes())
+		it = np.nditer(fused_labels, flags=['multi_index'])
+		while not it.finished:
+			feature_label = f'{affinity_type}_label'
+			n1 = node_list[it.multi_index[0]]
+			self.nodes[n1][feature_label] = it[0].item()
+			it.iternext()
 
-		# Merging the fused edge weights back into the original graph
-		fused_graph = nx.convert_matrix.from_numpy_array(fused_ndarray)
-
-		print(len(self))
-		self.add_edges_from(fused_graph.edges(data=True))
 
 
 
-		for i in range(0, len(self)):
-			node = list(self.nodes(data=True))[i][1]
-			node['spectral_label'] = fused_labels[i].item()
-
-	def get_adjacency_mats(self, dense=False):
+	def get_adjacency_mats(self, types):
+		assert not isinstance(types, str)
 		mats = []
 		nodes = self.nodes()
-		for metric in SIMILARITY_METRICS.keys():
-			mat = nx.adjacency_matrix(self, weight=metric)
-			if dense:
-				mats.append(mat.todense())
-			else:
-				mats.append(mat)
+		for metric in types:
+			mat = nx.to_numpy_array(self, weight=metric)
+			mats.append(mat)
 
 		return mats
 

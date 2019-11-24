@@ -194,7 +194,7 @@ class ClinVar(Fetcher):
 			row['associatedPhenotypes'] = []
 			for term in hpo_list:
 				try:
-					var_hpo = vf.get_valid_hpo(term.strip())
+					var_hpo = vf.get_valid_obo(term.strip())
 					row['associatedPhenotypes'].append(var_hpo)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -202,7 +202,7 @@ class ClinVar(Fetcher):
 			row['variantTypes']  = []
 			for term in so_list:
 				try:
-					var_so = vf.get_valid_so(term)
+					var_so = vf.get_valid_obo(term)
 					row['variantTypes'].append(var_so)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -252,7 +252,7 @@ class KimStudents2019(Fetcher):
 			row['associatedPhenotypes'] = []
 			for term in hpo_list:
 				try:
-					var_hpo = vf.get_valid_hpo(term.strip())
+					var_hpo = vf.get_valid_obo(term.strip())
 					row['associatedPhenotypes'].append(var_hpo)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -260,7 +260,7 @@ class KimStudents2019(Fetcher):
 			row['variantTypes']  = []
 			for term in so_list:
 				try:
-					var_so = vf.get_valid_so(term)
+					var_so = vf.get_valid_obo(term)
 					row['variantTypes'].append(var_so)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -319,7 +319,7 @@ class Gnomad(Fetcher):
 			new_row['variantTypes']  = []
 			for term in so_list:
 				try:
-					var_so = vf.get_valid_so(term)
+					var_so = vf.get_valid_obo(term)
 					new_row['variantTypes'].append(var_so)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -408,7 +408,7 @@ class Civic(Fetcher):
 			#finding the types of the variant and adding it to the node
 			for variant_type in variant.variant_types:
 				try:
-					var_so = vf.get_valid_so(variant_type.name)
+					var_so = vf.get_valid_obo(variant_type.name)
 					new_row['variantTypes'].append(var_so)
 				except ValueError as e:
 					self.logger.warning(repr(e))
@@ -443,10 +443,10 @@ class Civic(Fetcher):
 			self.rows = filter(lambda row: len(row['evidenceAccepted'])>0, self.rows)
 
 		for row in self.rows:
-			valid_accepted = [vf.get_valid_hpo(term) for term in row['phenotypesAccepted']]
+			valid_accepted = [vf.get_valid_obo(term) for term in row['phenotypesAccepted']]
 			row['associatedPhenotypes'].extend(valid_accepted)
 			if not accepted_only:
-				valid_submitted = [vf.get_valid_hpo(term) for term in row['phenotypesSubmitted']]
+				valid_submitted = [vf.get_valid_obo(term) for term in row['phenotypesSubmitted']]
 				row['associatedPhenotypes'].extend(valid_submitted)
 
 

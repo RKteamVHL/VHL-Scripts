@@ -68,6 +68,8 @@ def variant_nt_distance(n1, n2, sigma=200):
 	return score
 
 def graph_distance(id1,id2, obo):
+	"""Given two node ids and an obo, find their shortes distance
+	"""
 	distance = None
 	if id1 == id2:
 		distance = 0
@@ -75,9 +77,9 @@ def graph_distance(id1,id2, obo):
 	else:
 		try:
 			distance = nx.shortest_path_length(obo, source=id1, target=id2)
-		except nx.exception.NetworkXNoPath:
+		except nx.exception.NetworkXNoPath as e:
+			# print(repr(e))
 			pass
-
 	if isinstance(distance, int):
 		distance += 1
 
@@ -86,7 +88,7 @@ def graph_distance(id1,id2, obo):
 def variant_obo_distance(ids1, ids2, obo, sigma = 1 ):
 	score = 0
 	all_distances = []
-	geo_mean = 0
+	geo_mean = None
 
 	longer_list = ids1 if len(ids1) >= len(ids2) else ids2
 	shorter_list = ids1 if len(ids1) < len(ids2) else ids2
@@ -103,17 +105,20 @@ def variant_obo_distance(ids1, ids2, obo, sigma = 1 ):
 
 	if len(all_distances) > 0:
 		a = np.log(all_distances)
-		geo_mean = np.exp(a.sum()/len(a))			
+		geo_mean = np.exp(a.sum()/len(a))	
+	
+	if geo_mean is not None:
+		score = math.exp(-0.5 * (((geo_mean-1)/sigma )**2) )
 
-	return geo_mean
+	return score
 
 def variant_hpo_distance(n1, n2, sigma = 1):
 	list1 = n1['all']['associatedPhenotypes']
 	list2 = n2['all']['associatedPhenotypes']
-	return variant_obo_distance(list1, list2, vf.HPONET, sigma = 1)
+	return variant_obo_distance(list1, list2, vf.OBONET, sigma = 1)
 
 def variant_so_distance(n1, n2, sigma = 1):
 	list1 = n1['all']['variantTypes']
 	list2 = n2['all']['variantTypes']
-	return variant_obo_distance(list1, list2, vf.SONET, sigma = 1)
+	return variant_obo_distance(list1, list2, vf.OBONET, sigma = 1)
 	

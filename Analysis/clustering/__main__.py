@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import networkx as nx
 import argparse
+from snf import compute
 import time
 import json
 import csv
@@ -26,10 +27,10 @@ COLORMAP= {
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 
-
+	parser.add_argument('similarity_type', help = '''The type of similarity to base clustering on''')
 	parser.add_argument('-d', '--directory', help = '''Local directory to save graph''', default="")
-	parser.add_argument('-c', '--cache', help = '''Use the local graph cache''', action="store_true")
-
+	parser.add_argument('-rc', '--pre_cache', help = '''Use the local graph raw node cache''', action="store_true")
+	parser.add_argument('-oc', '--post_cache', help = '''Use the local graph calulated node cache''', action="store_true")
 	parser.add_argument('-is', '--ignore_submitted', help = '''If set, ignores unreviewed variants (civic)''', action="store_true")
 
 	args = parser.parse_args()
@@ -37,7 +38,7 @@ if __name__ == '__main__':
 	VG = VariantGraph()
 
 	#fetch/process all relevant data from all sources
-	if not args.cache:
+	if not args.pre_cache:
 
 		VG.add_nodes_from_db('Civic')
 		VG.add_nodes_from_db('KimStudents2019')
@@ -50,24 +51,36 @@ if __name__ == '__main__':
 		VG.load_from_json_file("variant_nodes.json")
 
 	PG = VariantGraph()
-	for n, d in VG.nodes(data=True):
-		if d['all']['associatedPhenotypes']:
-			PG.add_node(n, **d)
+	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']])
+	PG.add_edges_from([(n1, n2, d) for n1, n2, d in VG.edges(data=True) if n1 in PG and n2 in PG])
+
+
 	PG.save_to_json_file("pheno_variant_nodes.json")
-	PG.calculate_node_attributes()
-	PG.calculate_similarities()
-	PG.save_to_json_file("calculated_variant_nodes.json")	
-	PG.calculate_snf()
+
+	if not args.post_cache:
+		PG.calculate_node_attributes()
+		PG.calculate_similarities()
+		PG.save_to_json_file("calculated_variant_nodes.json")	
+	else:
+		PG.load_from_json_file("calculated_variant_nodes.json")
+
+	adj_mat = PG.get_adjacency_mats(types=[args.similarity_type])
+
+	clust_count1, clust_count2 = compute.get_n_clusters(adj_mat[0])
+	print("Cluster estimates: {}, {}".format(clust_count1, clust_count2))
+
+	PG.cluster_by(args.similarity_type, num_clusters=4)
+	PG.save_to_json_file("labeled_variant_nodes.json", nodes_only=True)
 	#VG.remove_isolates()
 
 
 
-	nx.draw(VG, 
+	nx.draw(PG, 
 		node_size=100, 
-		labels=nx.get_node_attributes(VG, 'variantName'), 
-		pos=nx.spring_layout(VG),
-		width=0,
-		node_color=[COLORMAP[d['spectral_label']] for (u,d) in VG.nodes(data=True)]
+		with_labels=True,		
+		pos=nx.spring_layout(PG),
+		width=0.001,
+		node_color=[COLORMAP[d[f'{args.similarity_type}_label']] for (u,d) in PG.nodes(data=True)]
 	)
 	plt.show()
 
