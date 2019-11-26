@@ -50,12 +50,19 @@ if __name__ == '__main__':
 	else:
 		VG.load_from_json_file("variant_nodes.json")
 
+
+	# NOTE: these  lines for making new graph PG are temporary,
+	# and should only be used for phenotype analysis
 	PG = VariantGraph()
-	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']])
+	# PG = VG # use everything
+	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
+	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['variantTypes']]) #needs var type
+
+	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
 	PG.add_edges_from([(n1, n2, d) for n1, n2, d in VG.edges(data=True) if n1 in PG and n2 in PG])
 
 
-	PG.save_to_json_file("pheno_variant_nodes.json")
+	PG.save_to_json_file("filtered_variant_nodes.json")
 
 	if not args.post_cache:
 		PG.calculate_node_attributes()
@@ -68,32 +75,31 @@ if __name__ == '__main__':
 
 	clust_count1, clust_count2 = compute.get_n_clusters(adj_mat[0])
 	print("Cluster estimates: {}, {}".format(clust_count1, clust_count2))
-
-	PG.cluster_by(args.similarity_type, num_clusters=4)
-	PG.save_to_json_file("labeled_variant_nodes.json", nodes_only=True)
-	#VG.remove_isolates()
-
-
-
-	nx.draw(PG, 
-		node_size=100, 
-		with_labels=True,		
-		pos=nx.spring_layout(PG),
-		width=0.001,
-		node_color=[COLORMAP[d[f'{args.similarity_type}_label']] for (u,d) in PG.nodes(data=True)]
-	)
-	plt.show()
-
 	
 
 
-#this code is for finding a summary of al variant types
-# 	type_dict = {}
-# 	for node in VG.nodes(data=True):
-# 		for vtype in node[1]["variantTypes"]:
-# 			type_dict[vtype] =  type_dict.get(vtype, 0)+1
+	PG.cluster_by(args.similarity_type, num_clusters=6)
+	PG.aggregate_cluster(args.similarity_type)
+	PG.save_to_json_file("labeled_variant_nodes.json", nodes_only=True)
+	# Get newly sorted adjmat
+	sorted_adj_mat = PG.get_adjacency_mats(types=[args.similarity_type])
+	plt.matshow(sorted_adj_mat[0])
+	plt.savefig(f'{args.similarity_type}_heatmap')
+	plt.show()
 
-# 	print(type_dict)
+
+
+
+	# plotting the network isn't too informative
+	# nx.draw(PG, 
+	# 	node_size=100, 
+	# 	with_labels=True,		
+	# 	pos=nx.spring_layout(PG),
+	# 	width=0.001,
+	# 	node_color=[COLORMAP[d[f'{args.similarity_type}_label']] for (u,d) in PG.nodes(data=True)]
+	# )
+	# plt.show()
+
 
 # QUESTIONS:
 # - where do you find the keys each attribute type has?

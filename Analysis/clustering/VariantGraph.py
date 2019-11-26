@@ -189,7 +189,7 @@ class VariantGraph(nx.Graph):
 		"""
 		G = self
 		if nodes_only:
-			G = nx.Graph()
+			G = nx.Graph(**self.graph)
 			G.add_nodes_from(self.nodes(data=True))
 
 		VG_json = nx.readwrite.json_graph.node_link_data(G)
@@ -265,9 +265,10 @@ class VariantGraph(nx.Graph):
 
 	def cluster_by(self, affinity_type, num_clusters):
 
+		# get the desired affinity matrix
 		adj_mat = self.get_adjacency_mats(types=[affinity_type])
 
-
+		# cluster based on given adjmat and # clusters
 		sc = SpectralClustering(num_clusters, affinity='precomputed', n_init=100, assign_labels='discretize')		
 		sc.fit(adj_mat[0])
 
@@ -277,16 +278,54 @@ class VariantGraph(nx.Graph):
 
 		print("Labels: ", fused_labels)
 
+		feature_label = f'{affinity_type}_label'
+		
+		#assign each node its appropriate label
 		node_list = list(self.nodes())
 		it = np.nditer(fused_labels, flags=['multi_index'])
 		while not it.finished:
-			feature_label = f'{affinity_type}_label'
+			label_i = it[0].item()
 			n1 = node_list[it.multi_index[0]]
-			self.nodes[n1][feature_label] = it[0].item()
+			self.nodes[n1][feature_label] = label_i
+				 
 			it.iternext()
 
 
 
+
+
+
+		sorted_nodes = sorted(list(self.nodes(data=True)), key=lambda n: n[1][feature_label])
+		# for n in sorted_nodes:
+		# 	print(n[1][feature_label])
+		G = nx.Graph()
+
+		G.add_nodes_from(sorted_nodes)
+		G.add_edges_from(self.edges(data=True))
+
+		self.clear()
+		self.add_nodes_from(G.nodes(data=True))
+		self.add_edges_from(G.edges(data=True))
+			
+	#TODO: make this function not hardcoded		
+	def aggregate_cluster(self, affinity_type):
+		feature_label = f'{affinity_type}_label'
+		self.graph[feature_label] = {}
+		for n, d in self.nodes(data=True):
+			node_label = d[feature_label]
+			n_d = {
+				'associatedPhenotypes': d['all']['associatedPhenotypes'],
+				'variantTypes': d['all']['variantTypes'],
+				'cdnaChange': [n]
+			}
+			self.graph[feature_label][node_label] = self.graph[feature_label].get(node_label, {"count": 0})
+			agg_dict = self.graph[feature_label][node_label]
+			agg_dict["count"] += 1 
+			for k, v in n_d.items():
+				agg_dict[k] = agg_dict.get(k, {})
+				for ele in v:
+					agg_dict[k][ele] =agg_dict[k].get(ele, {"count": 0})
+					agg_dict[k][ele]["count"] +=1
 
 	def get_adjacency_mats(self, types):
 		assert not isinstance(types, str)
