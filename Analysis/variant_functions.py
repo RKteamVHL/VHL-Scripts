@@ -209,9 +209,9 @@ _f = nx.compose(_g, _h)
 #casefold and strip the keys, so the result is an agglomeration of nodes:
 # SO(term) + SO(id) + HPO(term) + HPO(id), all lowercase and stripped
 
-# Note: an undirected graph is needed here for distance calculations
-OBONET = nx.Graph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.nodes()}))
 
+OBONET = nx.DiGraph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.nodes()}))
+OBONET_UD = OBONET.to_undirected()
 
 def get_valid_obo(term_or_id, obo_type='name'):
 	tid = term_or_id.strip().casefold()
@@ -224,6 +224,35 @@ def get_valid_obo(term_or_id, obo_type='name'):
 
 
 ## Scoring functions
+# Q: hpo has a confusing hierarchy for neurendocrine neoplasms relating to the pancreas
+# (namely, Pancreatic endocrine tumor vs neoplasms and cysts of the pancreas )
+
+
+ 
+
+
+
+
+
+GENERAL_HPO_TERMS = [
+	'neuroendocrine neoplasm', 					# Pheochromocytoma + Paraganglioma + Pancreatic endocrine tumor + Pancreatic islet cell adenoma
+	'renal neoplasm', 							# Renal cell carcinoma + Clear cell renal cell carcinoma
+	'neoplasm of the central nervous system', 	# Cerebellar hemangioblastoma + Spinal hemangioblastoma
+	'vascular neoplasm', 						# Retinal capillary hemangioma
+	'neoplasm of the inner ear', 				# Endolymphatic sac tumor
+	'neoplasm of the pancreas'					# Neoplasm of the pancreas 
+	'abnormal pancreas morphology'				# Pancreatic cysts
+	'abnormal renal morphology'					# Renal cysts + Multiple Renal cysts
+	'abnormality of the epididymis'				# Epididymal cyst
+]
+def generalized_vhl_phenotypes(node):
+	'''Given a node, find its general disease type
+	'''
+
+	# for pheno in node['all']['associatedPhenotypes']:
+	# 	if pheno in GENERAL_HPO:
+			
+	pass
 
 # TODO: code these
 
@@ -239,6 +268,7 @@ def transition_translation(node):
 
 def protein_substituion_score(node):
 	pass
+
 
 
 #TODO: figure out if this is needed; remove if not

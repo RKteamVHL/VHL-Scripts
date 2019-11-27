@@ -87,6 +87,7 @@ def graph_distance(id1,id2, obo):
 
 	return distance 
 
+# Note: an undirected graph is needed here for distance calculations
 def variant_obo_distance(ids1, ids2, obo, sigma = 1 ):
 	score = 0
 	all_distances = []
@@ -117,10 +118,10 @@ def variant_obo_distance(ids1, ids2, obo, sigma = 1 ):
 def variant_hpo_distance(n1, n2, sigma = 1):
 	list1 = n1['all']['associatedPhenotypes']
 	list2 = n2['all']['associatedPhenotypes']
-	return variant_obo_distance(list1, list2, vf.OBONET, sigma = 1)
+	return variant_obo_distance(list1, list2, vf.OBONET_UD, sigma = 1)
 
 def variant_so_distance(n1, n2, sigma = 1):
 	list1 = n1['all']['variantTypes']
 	list2 = n2['all']['variantTypes']
-	return variant_obo_distance(list1, list2, vf.OBONET, sigma = 1)
+	return variant_obo_distance(list1, list2, vf.OBONET_UD, sigma = 1)
 	
