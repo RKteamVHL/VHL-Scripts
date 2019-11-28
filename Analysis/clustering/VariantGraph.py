@@ -94,6 +94,13 @@ SIMILARITY_METRICS = {
 		}
 	},
 
+	"score_iou_vhl_pheno": {
+		"function": sf.score_iou,
+		"kwargs":{
+			"attr_name": "generalized_vhl_phenotypes"
+		}
+	},
+
 	"score_so": {
 		"function": sf.variant_so_distance,
 		"kwargs":{
@@ -122,6 +129,12 @@ NODE_METRICS = {
 		"kwargs":{
 
 		}	
+	},
+	"generalized_vhl_phenotypes":{
+		"function": vf.generalized_vhl_phenotypes,
+		"kwargs": {
+
+		}
 	}
 }
 
@@ -223,7 +236,7 @@ class VariantGraph(nx.Graph):
 			for name, metric in NODE_METRICS.items():
 				score = metric['function'](VG_nodes[i][1], **metric['kwargs'])
 				nId = VG_nodes[i][0]
-				self.nodes[nId][name] = score
+				self.nodes[nId]['all'][name] = score
 
 	#NOTE: it may make sense to have the metric functions and arguments
 	# inputted as arguments to this method
@@ -315,6 +328,7 @@ class VariantGraph(nx.Graph):
 			node_label = d[feature_label]
 			n_d = {
 				'associatedPhenotypes': d['all']['associatedPhenotypes'],
+				'generalized_vhl_phenotypes': d['all']['generalized_vhl_phenotypes'],
 				'variantTypes': d['all']['variantTypes'],
 				'cdnaChange': [n]
 			}

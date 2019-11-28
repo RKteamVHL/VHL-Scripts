@@ -240,19 +240,28 @@ GENERAL_HPO_TERMS = [
 	'neoplasm of the central nervous system', 	# Cerebellar hemangioblastoma + Spinal hemangioblastoma
 	'vascular neoplasm', 						# Retinal capillary hemangioma
 	'neoplasm of the inner ear', 				# Endolymphatic sac tumor
-	'neoplasm of the pancreas'					# Neoplasm of the pancreas 
-	'abnormal pancreas morphology'				# Pancreatic cysts
-	'abnormal renal morphology'					# Renal cysts + Multiple Renal cysts
+	'neoplasm of the pancreas',					# Neoplasm of the pancreas 
+	'abnormal pancreas morphology',				# Pancreatic cysts
+	'abnormal renal morphology',				# Renal cysts + Multiple Renal cysts
 	'abnormality of the epididymis'				# Epididymal cyst
 ]
+
+GENERAL_HPO_NODES = [ get_valid_obo(term) for term in GENERAL_HPO_TERMS]
 def generalized_vhl_phenotypes(node):
 	'''Given a node, find its general disease type
 	'''
-
-	# for pheno in node['all']['associatedPhenotypes']:
-	# 	if pheno in GENERAL_HPO:
+	general_phenos = []
+	for pheno in node['all']['associatedPhenotypes']:
+		valid_hpo = get_valid_obo(pheno)
+		for successor in nx.bfs_successors(OBONET,valid_hpo):
+			try:
+				i = GENERAL_HPO_NODES.index(successor[0])
+				general_phenos.append(GENERAL_HPO_NODES[i])
+				break	
+			except ValueError as e:
+				pass
 			
-	pass
+	return list(set(general_phenos))
 
 # TODO: code these
 
