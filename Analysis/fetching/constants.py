@@ -73,7 +73,7 @@ GNOMAD_POST_DATA = {
 
 GNOMAD_NAME = 'gnomAD_v2_1'
 GNOMAD_FILENAME = 'gnomAD_v2_1.txt'
-GNOMAD_HREF = 'http://gnomad.broadinstitute.org/api'
+GNOMAD_HREF = 'https://gnomad.broadinstitute.org/api'
 
 # 58 corresponds to the VHL gene 
 CIVIC_VHL_GENE_ID =  58

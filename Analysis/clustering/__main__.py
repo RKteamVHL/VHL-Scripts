@@ -55,10 +55,10 @@ if __name__ == '__main__':
 	# and should only be used for phenotype analysis
 	PG = VariantGraph()
 	# PG = VG # use everything
-	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
+	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
 	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['variantTypes']]) #needs var type
 
-	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
+	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
 	PG.add_edges_from([(n1, n2, d) for n1, n2, d in VG.edges(data=True) if n1 in PG and n2 in PG])
 
 
