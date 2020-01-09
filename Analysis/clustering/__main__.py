@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
 
 	PG.save_to_json_file("filtered_variant_nodes.json")
-
+	PG.save_to_text_file("variant_names.tsv")
 	if not args.post_cache:
 		PG.calculate_node_attributes()
 		PG.calculate_similarities()
