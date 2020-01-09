@@ -55,15 +55,15 @@ if __name__ == '__main__':
 	# and should only be used for phenotype analysis
 	PG = VariantGraph()
 	# PG = VG # use everything
-	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
+	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
 	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['variantTypes']]) #needs var type
 
-	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
+	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
 	PG.add_edges_from([(n1, n2, d) for n1, n2, d in VG.edges(data=True) if n1 in PG and n2 in PG])
 
 
 	PG.save_to_json_file("filtered_variant_nodes.json")
-
+	PG.save_to_text_file("variant_names.tsv")
 	if not args.post_cache:
 		PG.calculate_node_attributes()
 		PG.calculate_similarities()

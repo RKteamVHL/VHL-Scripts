@@ -62,19 +62,20 @@ class Fetcher(object):
 		"""Reads data from instance's href attribute."""
 
 		# href is converted to list of 1 element if it's a string
+		print(self.name)
 		if isinstance(self.href, str):
 			self.href = [self.href]
 
 
 		if isinstance(self.href, list):
 			for href in self.href:
+				print(href)
 				with urllib.request.urlopen(href, data=self.request_data, cafile=certifi.where()) as response:
 					compressed_bytes = io.BytesIO()
 					compressed_bytes.write(response.read())
 					compressed_bytes.seek(0)
 					self.compressed.append(compressed_bytes)			
 
-		print(self.name)
 
 
 				

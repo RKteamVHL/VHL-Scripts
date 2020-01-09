@@ -212,6 +212,26 @@ class VariantGraph(nx.Graph):
 
 		print(f"# of variants saved to {filename}: {len(self)}")
 
+	def save_to_text_file(self, filename, nodes_only=False):
+		"""Saves the graph to a file
+		Arguments:
+			filename (string): name of the saved file
+		"""
+		G = self
+		if nodes_only:
+			G = nx.Graph(**self.graph)
+			G.add_nodes_from(self.nodes(data=True))
+
+		node_ids = list(self.nodes())
+
+
+		with open(filename, "w") as file:
+			file.write("nodes\n")
+			for nid in node_ids:
+				file.write(f'{nid}\n')
+
+		print(f"# of variants saved to {filename}: {len(self)}")
+
 	def load_from_json_file(self, filename, nodes_only=False):
 		"""Loads the graph from a file
 		Arguments:
