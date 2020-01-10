@@ -308,30 +308,34 @@ def protein_substituion_score(node):
 def affected_domains(node):
 	'''Finds the affected VHL domains for a variant
 	'''
-	#TODO: make this less nested
+	# TODO: make this less nested
 
 	domains_affected = []
 
-	#for simple missense
+	# for simple missense
 	# TODO: check ncbi and ensembl reference
 	hgvs = node['all'].get('cdnaChange', None)
 	if hgvs is not None:
 
-		#there was a typo in Civic for VARIANT L89R(c.266T>G)
+		# there was a typo in Civic for VARIANT L89R(c.266T>G)
 		# ENST00000256474.2:.266T>G
 		match = DNA_REGEX.match(hgvs)
 		if match is not None:
 			var = match.groupdict()
-			#if the variant is not utr or intronic
-			if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
-				start_aa = math.floor(int(var['start'])/3)
-				stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
+			# if the variant is not utr or intronic
+			if var['startNonCDS'] is None and var['stopNonCDS'] is None:
+				try:
+					start_aa = math.floor(int(var['start'])/3)
+					stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
 
-				affected_aa = range(start_aa, stop_aa)
+					affected_aa = range(start_aa, stop_aa)
 
-				for domain in GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]:
-					#if theres overlap in aa's between the variant and each domain
-					if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(affected_aa))) > 0:
-						domains_affected.append(domain)
+					for domain in GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]:
+						# if theres overlap in aa's between the variant and each domain
+						if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(affected_aa))) > 0:
+							domains_affected.append(domain)
+				# couldnt cast start or end to integer
+				except ValueError as e:
+					pass
 
 	return domains_affected

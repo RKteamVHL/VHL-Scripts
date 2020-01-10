@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
 	parser.add_argument('similarity_type', help = '''The type of similarity to base clustering on''')
 	parser.add_argument('-d', '--directory', help = '''Local directory to save graph''', default="")
+	parser.add_argument('-f', '--filter', help='''Removes nodes that don't have values for the filter key''')
 	parser.add_argument('-rc', '--pre_cache', help = '''Use the local graph raw node cache''', action="store_true")
 	parser.add_argument('-oc', '--post_cache', help = '''Use the local graph calulated node cache''', action="store_true")
 	parser.add_argument('-is', '--ignore_submitted', help = '''If set, ignores unreviewed variants (civic)''', action="store_true")
@@ -51,14 +52,17 @@ if __name__ == '__main__':
 		VG.load_from_json_file("variant_nodes.json")
 
 
-	# NOTE: these  lines for making new graph PG are temporary,
-	# and should only be used for phenotype analysis
+	# NOTE: these lines for making new graph PG are temporary,
+	# and should only be used for filtering the nodes
 	PG = VariantGraph()
-	# PG = VG # use everything
+
 	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['associatedPhenotypes']]) # needs pheno
 	# PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all']['variantTypes']]) #needs var type
+	if args.filter:
+		PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if d['all'][args.filter]]) # needs filter
+	else:
+		PG = VG # use everything
 
-	PG.add_nodes_from([(n, d) for n, d in VG.nodes(data=True) if isinstance(n, str)]) # needs cdna
 	PG.add_edges_from([(n1, n2, d) for n1, n2, d in VG.edges(data=True) if n1 in PG and n2 in PG])
 
 

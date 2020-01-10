@@ -9,6 +9,7 @@ import copy
 import networkx as nx
 import numpy as np
 import csv
+import logging
 import json
 import math
 import os 
@@ -40,7 +41,10 @@ VARIANT_TEMPLATE = {
 		"hgvsExpressions": [], 
 
 		# int: id used by civic to reference this variant
-		"civicId": None
+		"civicId": None,
+
+		# string: pmid list for the variant
+		"PMID": []
 
 	},
 
@@ -58,12 +62,14 @@ VARIANT_TEMPLATE = {
 
 	"KimStudents2019": {
 		# int: pmid of the article where variant is affirmed 
-		"PMID": None	
+		"PMID": []
 	},
 
 	"ClinVar": {
 		# string: dbSNP id for the variant
-		"RS# (dbSNP)": None
+		"RS# (dbSNP)": None,
+		# string: pmid list for the variant
+		"PMID": []
 	},
 
 	# attributes here should be common to ALL data sources
@@ -75,8 +81,11 @@ VARIANT_TEMPLATE = {
 		"variantTypes": [],
 
 		# string: the variant cdna change. this may not be needed, since
-		#cdna change is encoded into node variant ids
+		# cdna change is encoded into node variant ids
 		"cdnaChange": None,
+
+		# list(string): holds variants' associated article pmids
+		"PMID": [],
 
 		# # string: the variant aa change
 		# "proteinChange": None,
@@ -154,6 +163,10 @@ class VariantGraph(nx.Graph):
 	Attributes:
 		All attributes in the nx.Graph class 
 	"""
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.name = "VariantGraph"
+		self.logger = logging.getLogger(self.name)
 
 	def add_nodes_from_db(self, db):
 		fetcher = FETCHING_FACTORY[db]()
@@ -163,7 +176,7 @@ class VariantGraph(nx.Graph):
 			node_id = len(self.nodes())
 
 			# sets the next node id based on cdna change
-			#this is used to automatically merge nodes across databases
+			# this is used to automatically merge nodes across databases
 			cdna_id = row['cdnaChange']
 
 			valid_id = cdna_id if cdna_id else node_id
@@ -172,7 +185,8 @@ class VariantGraph(nx.Graph):
 			for key in VARIANT_TEMPLATE[db].keys():
 				variant_node[key] = row[key]
 			for key in VARIANT_TEMPLATE['all'].keys():
-				variant_node[key] = row[key]
+				if key in row:
+					variant_node[key] = row[key]
 
 	def merge_nodes(self):
 		"""Reconciles the attributes of separate sources
@@ -184,12 +198,14 @@ class VariantGraph(nx.Graph):
 			# TODO: the merging technique for every field here
 			# should be scrutinized and modified if needed
 			for db, db_var in node_d.items():
-				all_node['associatedPhenotypes'].extend(db_var['associatedPhenotypes'])
-				all_node['variantTypes'].extend(db_var['variantTypes'])
+				for common_key in ['associatedPhenotypes', 'variantTypes', 'PMID']:
+					if common_key in db_var:
+						all_node[common_key].extend(db_var[common_key])
 
-			# trick for finding unique values
-			all_node['associatedPhenotypes'] = list(set(all_node['associatedPhenotypes']))
-			all_node['variantTypes'] = list(set(all_node['variantTypes']))
+			for common_key in ['associatedPhenotypes', 'variantTypes', 'PMID']:
+				# trick for finding unique values
+				all_node[common_key] = list(set(all_node[common_key]))
+
 			if isinstance(node_i, str):
 				all_node['cdnaChange'] = node_i 
 			self.nodes[node_i]['all'] = all_node
@@ -212,7 +228,7 @@ class VariantGraph(nx.Graph):
 
 		print(f"# of variants saved to {filename}: {len(self)}")
 
-	def save_to_text_file(self, filename, nodes_only=False):
+	def save_to_text_file(self, filename, nodes_only = False):
 		"""Saves the graph to a file
 		Arguments:
 			filename (string): name of the saved file
@@ -222,17 +238,27 @@ class VariantGraph(nx.Graph):
 			G = nx.Graph(**self.graph)
 			G.add_nodes_from(self.nodes(data=True))
 
-		node_ids = list(self.nodes())
+		nodes = list(self.nodes(data=True))
 
-
+	# TODO: dont hardcode this
 		with open(filename, "w") as file:
-			file.write("nodes\n")
-			for nid in node_ids:
-				file.write(f'{nid}\n')
+			file.write("variants\tsources\tphenotypes\tPMIDs\n")
+			for node in nodes:
+				file.write(f'{node[0]}\t')
+				for key in node[1].keys():
+					if key not in ["all", "id"]:
+						file.write(f'{key},')
+				file.write('\t')
+				for pheno in node[1]['all']['associatedPhenotypes']:
+					file.write(f'{pheno},')
+				file.write('\t')
+				for pmid in node[1]['all']['PMID']:
+					file.write(f'{pmid},')
+				file.write('\n')
 
 		print(f"# of variants saved to {filename}: {len(self)}")
 
-	def load_from_json_file(self, filename, nodes_only=False):
+	def load_from_json_file(self, filename, nodes_only = False):
 		"""Loads the graph from a file
 		Arguments:
 			filename (string): name of the saved file
@@ -246,7 +272,7 @@ class VariantGraph(nx.Graph):
 
 		print(f"# of variants loaded from {filename}: {len(self)}")
 
-	#NOTE: it may make sense to have the metric functions and arguments
+	# NOTE: it may make sense to have the metric functions and arguments
 	# inputted as arguments to this method
 	def calculate_node_attributes(self):
 		"""Calculates node metrics for each node, based on NODE_METRICS
@@ -254,11 +280,14 @@ class VariantGraph(nx.Graph):
 		VG_nodes = list(self.nodes(data=True))
 		for i in range(0,len(VG_nodes)):
 			for name, metric in NODE_METRICS.items():
-				score = metric['function'](VG_nodes[i][1], **metric['kwargs'])
-				nId = VG_nodes[i][0]
-				self.nodes[nId]['all'][name] = score
+				try:
+					score = metric['function'](VG_nodes[i][1], **metric['kwargs'])
+					nId = VG_nodes[i][0]
+					self.nodes[nId]['all'][name] = score
+				except ValueError as e:
+					self.logger.warning(repr(e))
 
-	#NOTE: it may make sense to have the metric functions and arguments
+	# NOTE: it may make sense to have the metric functions and arguments
 	# inputted as arguments to this method
 	def calculate_similarities(self):
 		"""Calculates similarity metrics between nodes from SIMILARITY_METRICS
@@ -267,7 +296,7 @@ class VariantGraph(nx.Graph):
 		"""
 
 		VG_nodes = list(self.nodes(data=True))
-		#assuming undirected graphs with no self connections
+		# assuming undirected graphs with no self connections
 		for i in range(0,len(VG_nodes)):
 			for j in range(i+1, len(VG_nodes)):
 
@@ -324,10 +353,6 @@ class VariantGraph(nx.Graph):
 			it.iternext()
 
 
-
-
-
-
 		sorted_nodes = sorted(list(self.nodes(data=True)), key=lambda n: n[1][feature_label])
 		# for n in sorted_nodes:
 		# 	print(n[1][feature_label])
@@ -340,7 +365,7 @@ class VariantGraph(nx.Graph):
 		self.add_nodes_from(G.nodes(data=True))
 		self.add_edges_from(G.edges(data=True))
 			
-	#TODO: make this function not hardcoded		
+	# TODO: make this function not hardcoded
 	def aggregate_cluster(self, affinity_type):
 		feature_label = f'{affinity_type}_label'
 		self.graph[feature_label] = {}

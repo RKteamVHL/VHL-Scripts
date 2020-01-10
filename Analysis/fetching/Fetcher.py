@@ -4,14 +4,13 @@ from civicpy import civic
 from .. import variant_functions as vf
 from .constants import *
 import certifi
-import argparse
 import logging
 import gzip
 import json
 import csv
 import re
-import os
 import io
+
 
 class Fetcher(object):
 	"""Base class for fetching data from external sources.
@@ -156,15 +155,36 @@ class Fetcher(object):
 		self.to_dict_list()
 
 
+class ClinVarSubmissions(Fetcher):
+	def __init__(self):
+		super().__init__()
+		self.name = CLINVAR_SUBMISSIONS_SUBMISSIONS_NAME
+		self.href = CLINVAR_SUBMISSIONS_HREF
+		self.needs_extraction = False
+		self.logger = logging.getLogger(self.name)
 
-class ClinVar(Fetcher):
+	def to_dict_list(self):
+		# Clinvar's header line starts with a '#'
+
+		self.dsv_header = list(self.data.readline().split(ROW_DELIMITER))
+		self.dsv_header[0] = self.dsv_header[0].replace("#", "")
+
+		self.rows = csv.DictReader(self.data, fieldnames=self.dsv_header, delimiter=ROW_DELIMITER)
+		self.filter_rows()
+
+	def filter_rows(self):
+		self.rows = list(filter(lambda row: row['citation_source'] == "PubMed", self.rows))
+		for row in self.rows:
+			row['citation_id'] = row['citation_id\n']
+			row.pop('citation_id\n')
+
+class ClinVarVariants(Fetcher):
 	"""Fetcher for ClinVar database.
 	"""
 	def __init__(self):
 		super().__init__()
-		self.name = CLINVAR_NAME
-		self.filename = CLINVAR_FILENAME
-		self.href = CLINVAR_HREF
+		self.name = CLINVAR_VARIANTS_NAME
+		self.href = CLINVAR_VARIANTS_HREF
 		self.needs_extraction = True
 		self.logger = logging.getLogger(self.name)
 
@@ -208,12 +228,42 @@ class ClinVar(Fetcher):
 				except ValueError as e:
 					self.logger.warning(repr(e))
 
-
 	def filter_rows(self):
 		# filter clinvar by VHL genesymbol
 		self.rows = list(filter(lambda row: row['GeneSymbol']=='VHL', self.rows))
 
 		# we might also want to filter by reviewer status, no conflicts 
+
+
+class ClinVar(Fetcher):
+	def __init__(self):
+		super().__init__()
+		self.name = CLINVAR_NAME
+		self.filename = CLINVAR_FILENAME
+		self.href = CLINVAR_VARIANTS_HREF
+		self.needs_extraction = True
+		self.logger = logging.getLogger(self.name)
+
+	def save_raw_file(self, filename):
+		# the raw data consists of tsvs with different columns
+		pass
+
+	def process(self):
+		cv_var = ClinVarVariants()
+		cv_var.process()
+		cv_sub = ClinVarSubmissions()
+		cv_sub.process()
+
+		self.dsv_header = list(set(cv_var.dsv_header).union(cv_sub.dsv_header))
+		self.dsv_header.append('PMID')
+		for row in cv_var.rows:
+			allele_id = row['AlleleID']
+			row['PMID'] = []
+			row['PMID'].extend([sub_row['citation_id'] for sub_row in cv_sub.rows if sub_row['AlleleID']==allele_id])
+
+		self.rows = cv_var.rows
+
+
 
 
 class KimStudents2019(Fetcher):
@@ -258,6 +308,7 @@ class KimStudents2019(Fetcher):
 				except ValueError as e:
 					self.logger.warning(repr(e))
 
+			row['PMID'] = [row['PMID']]
 			row['variantTypes']  = []
 			for term in so_list:
 				try:
@@ -358,7 +409,6 @@ class Civic(Fetcher):
 		self.rows = []
 		for variant in civic.get_gene_by_id(CIVIC_VHL_GENE_ID).variants:
 			new_row = {}
-
 			# sets the next node id based on cdna change
 			#this is used to automatically merge nodes across databases
 			cdna_id = None
@@ -385,6 +435,7 @@ class Civic(Fetcher):
 			new_row['phenotypesAccepted'] = []
 			new_row['associatedPhenotypes'] = []
 			new_row['variantTypes'] = []
+			new_row['PMID'] = []
 			new_row['hgvsExpressions'] = []
 			new_row['proteinChange'] = None
 
@@ -394,7 +445,7 @@ class Civic(Fetcher):
 			for evidence in variant.evidence_items:
 				# get all phenotypes from evidences
 				phenotypes = [phenotype.hpo_id for phenotype in evidence.phenotypes]
-
+				new_row['PMID'].append(evidence.source.citation_id)
 				# add evidence to appropriate list
 				if evidence.status == "submitted":
 					new_row['evidenceSubmitted'].append(evidence.id)

@@ -8,9 +8,14 @@ FILES_DIRECTORY = os.path.join('ApiScripts','files')
 
 CLINVAR_NAME = 'ClinVar'
 CLINVAR_FILENAME = "ClinVar.txt"
-CLINVAR_HREF = "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz"
-CLINVAR_HEADER = "AlleleID{0}Type{0}Name{0}GeneID{0}GeneSymbol{0}HGNC_ID{0}ClinicalSignificance{0}ClinSigSimple{0}LastEvaluated{0}RS# (dbSNP){0}nsv/esv (dbVar){0}RCVaccession{0}PhenotypeIDS{0}PhenotypeList{0}Origin{0}OriginSimple{0}Assembly{0}ChromosomeAccession{0}Chromosome{0}Start{0}Stop{0}ReferenceAllele{0}AlternateAllele{0}Cytogenetic{0}ReviewStatus{0}NumberSubmitters{0}Guidelines{0}TestedInGTR{0}OtherIDs{0}SubmitterCategories{0}VariationID\n".format(
-	ROW_DELIMITER)
+
+CLINVAR_VARIANTS_NAME = 'ClinVarVariants'
+CLINVAR_VARIANTS_HREF = "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz"
+
+
+CLINVAR_SUBMISSIONS_SUBMISSIONS_NAME = 'ClinVarSubmissions'
+CLINVAR_SUBMISSIONS_HREF = "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/var_citations.txt"
+
 
 
 STUDENTS_NAME = 'KimStudents2019'
