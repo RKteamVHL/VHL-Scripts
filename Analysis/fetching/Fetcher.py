@@ -439,21 +439,25 @@ class Civic(Fetcher):
 			new_row['hgvsExpressions'] = []
 			new_row['proteinChange'] = None
 
-
 			#finding how many evidence items exist for the variant.
 			#TODO: actually verify that evidence: supports, is germline, and is case study
 			for evidence in variant.evidence_items:
 				# get all phenotypes from evidences
 				phenotypes = [phenotype.hpo_id for phenotype in evidence.phenotypes]
-				new_row['PMID'].append(evidence.source.citation_id)
+
+
+
+				pmid = evidence.source.citation_id
+				new_row['PMID'].append(pmid)
+
 				# add evidence to appropriate list
 				if evidence.status == "submitted":
-					new_row['evidenceSubmitted'].append(evidence.id)
+					new_row['evidenceSubmitted'].append(pmid)
 					new_row['phenotypesSubmitted'].extend(phenotypes)
 
 
 				elif evidence.status == "accepted":
-					new_row['evidenceAccepted'].append(evidence.id)	
+					new_row['evidenceAccepted'].append(pmid)
 					new_row['phenotypesAccepted'].extend(phenotypes)
 
 
