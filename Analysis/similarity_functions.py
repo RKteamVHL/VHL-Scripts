@@ -39,8 +39,8 @@ def variant_score_domains(n1, n2, domain):
 	if (domain in n1['all']['affected_domains']) and (domain in n2['all']['affected_domains']):
 		score = 1
 	#if the domain is in neither variant
-	elif not ((domain in n1['all']['affected_domains']) or (domain in n2['all']['affected_domains'])):
-		score = 0.1
+	# elif not ((domain in n1['all']['affected_domains']) or (domain in n2['all']['affected_domains'])):
+	# 	score = 0.1
 
 	return score
 
