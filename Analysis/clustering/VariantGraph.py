@@ -331,7 +331,7 @@ class VariantGraph(nx.Graph):
 		adj_mat = self.get_adjacency_mats(types=[affinity_type])
 
 		# cluster based on given adjmat and # clusters
-		sc = SpectralClustering(num_clusters, affinity='precomputed', n_init=100, assign_labels='discretize')		
+		sc = SpectralClustering(num_clusters, affinity='precomputed', n_init=1000)
 		sc.fit(adj_mat[0])
 
 		fused_labels = sc.labels_
