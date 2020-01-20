@@ -2,11 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/clustering/__main__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/plotting/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/similarity_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/similarity_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/variant_nodes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/variant_nodes_with_similarities.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/variant_nodes_with_similarities.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prelim/score_hpo_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prelim/score_iou_vhl_pheno_heatmap.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/score_domain_alpha_heatmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_domain_alpha_heatmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/score_domain_alpha_variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_domain_alpha_variant_nodes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_heatmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_iou_vhl_pheno_heatmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_iou_vhl_pheno_variant_nodes.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,12 +23,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Analysis/clustering/__main__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
-              <caret line="75" column="41" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
+            <state relative-caret-position="1513">
+              <caret line="89" column="31" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -28,11 +36,44 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/fetching/Fetcher.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="102">
+              <caret line="183" column="20" selection-start-line="183" selection-start-column="20" selection-end-line="183" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2805">
+              <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" column="12" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="158" lean-forward="true" selection-start-line="158" selection-end-line="158" />
+            <state relative-caret-position="-3162">
+              <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -43,8 +84,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="588">
-              <caret line="40" column="40" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="40" />
+            <state relative-caret-position="51">
+              <caret line="3" column="37" selection-start-line="3" selection-start-column="37" selection-end-line="3" selection-end-column="37" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -55,11 +96,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/sklearn/manifold/spectral_embedding_.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
+            <state relative-caret-position="3213">
               <caret line="202" column="14" selection-start-line="202" selection-start-column="14" selection-end-line="202" selection-end-column="14" />
-              <folding>
-                <element signature="e#8#48#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -70,8 +108,15 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Setup Script" />
+        <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>fused</find>
+      <find>affected_domains</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -80,19 +125,11 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" />
-        <option value="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" />
         <option value="$PROJECT_DIR$/Analysis/clustering/__main__.py" />
+        <option value="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" />
+        <option value="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" />
         <option value="$PROJECT_DIR$/Analysis/similarity_functions.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/VHL-Scripts.iml" />
-        <option value="$PROJECT_DIR$/.idea/misc.xml" />
-        <option value="$PROJECT_DIR$/.idea/modules.xml" />
-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
+        <option value="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" />
       </list>
     </option>
   </component>
@@ -102,12 +139,15 @@
     <option name="width" value="1400" />
     <option name="height" value="1000" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -120,17 +160,10 @@
               <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
               <item name="Analysis" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
-              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
-              <item name="clustering" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -150,8 +183,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Analysis.clustering domain beta">
-    <configuration name="Analysis.clustering domain alpha" type="PythonConfigurationType" factoryName="Python">
+  <component name="RunManager" selected="Python.Analysis.clustering domain ">
+    <configuration name="Analysis.clustering domain " type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -164,28 +197,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="Analysis.clustering" />
-      <option name="PARAMETERS" value="-oc -rc -f &quot;cdnaChange&quot; score_domain_alpha" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="true" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Analysis.clustering domain beta" type="PythonConfigurationType" factoryName="Python">
-      <module name="VHL-Scripts" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\env\Scripts\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="Analysis.clustering" />
-      <option name="PARAMETERS" value="-oc -rc -f &quot;cdnaChange&quot; score_domain_beta" />
+      <option name="PARAMETERS" value="-c 3 -rc -oc -f &quot;cdnaChange&quot; score_domain" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="true" />
@@ -235,6 +247,48 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Analysis.clustering variantType cached  " type="PythonConfigurationType" factoryName="Python">
+      <module name="VHL-Scripts" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\env\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="Analysis.clustering" />
+      <option name="PARAMETERS" value="-rc -f &quot;associatedPhenotypes&quot; score_so" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Analysis.clustering variantType not cached " type="PythonConfigurationType" factoryName="Python">
+      <module name="VHL-Scripts" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\env\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="Analysis.clustering" />
+      <option name="PARAMETERS" value="-c 5 -f &quot;variantTypes&quot; score_so" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -259,8 +313,9 @@
     <list>
       <item itemvalue="Python.Analysis.clustering phenotype cached" />
       <item itemvalue="Python.Analysis.clustering phenotype not cached" />
-      <item itemvalue="Python.Analysis.clustering domain alpha" />
-      <item itemvalue="Python.Analysis.clustering domain beta" />
+      <item itemvalue="Python.Analysis.clustering variantType not cached " />
+      <item itemvalue="Python.Analysis.clustering variantType cached  " />
+      <item itemvalue="Python.Analysis.clustering domain " />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -276,36 +331,41 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22181243" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22181243" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
-      <window_info anchor="bottom" id="Terminal" sideWeight="0.49947312" weight="0.32936078" />
-      <window_info anchor="bottom" id="Event Log" sideWeight="0.2860906" side_tool="true" visible="true" weight="0.32936078" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.7139094" visible="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.71285564" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49947312" weight="0.32936078" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49894625" weight="0.32936078" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.28714436" side_tool="true" visible="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.5763962" weight="0.29144096" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/prelim/score_hpo_heatmap.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/prelim/score_iou_vhl_pheno_heatmap.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/prelim/score_hpo_heatmap.png" />
+    <entry file="file://$PROJECT_DIR$/prelim/score_iou_vhl_pheno_heatmap.png" />
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -332,18 +392,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/sklearn/manifold/spectral_embedding_.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
+        <state relative-caret-position="3213">
           <caret line="202" column="14" selection-start-line="202" selection-start-column="14" selection-end-line="202" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/fetching/Fetcher.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="183" column="20" selection-start-line="183" selection-start-column="20" selection-end-line="183" selection-end-column="20" />
           <folding>
-            <element signature="e#8#48#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
-          <caret line="40" column="40" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="40" />
+        <state relative-caret-position="51">
+          <caret line="3" column="37" selection-start-line="3" selection-start-column="37" selection-end-line="3" selection-end-column="37" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -352,8 +419,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Analysis/clustering/__main__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="75" column="41" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
+        <state relative-caret-position="1513">
+          <caret line="89" column="31" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
@@ -362,11 +429,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="158" lean-forward="true" selection-start-line="158" selection-end-line="158" />
+        <state relative-caret-position="-3162">
+          <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2805">
+          <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="12" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
         </state>
       </provider>
     </entry>

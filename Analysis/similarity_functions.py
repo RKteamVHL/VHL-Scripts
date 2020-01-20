@@ -26,7 +26,6 @@ def score_iou(n1, n2, attr_name):
 	if not union == 0:
 		score = intersect/union	
 
-	#find better way of creating weight name
 	return score
 
 def variant_score_domains(n1, n2, domain):

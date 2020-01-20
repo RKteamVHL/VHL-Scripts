@@ -165,7 +165,6 @@ class ClinVarSubmissions(Fetcher):
 
 	def to_dict_list(self):
 		# Clinvar's header line starts with a '#'
-
 		self.dsv_header = list(self.data.readline().split(ROW_DELIMITER))
 		self.dsv_header[0] = self.dsv_header[0].replace("#", "")
 
@@ -173,10 +172,17 @@ class ClinVarSubmissions(Fetcher):
 		self.filter_rows()
 
 	def filter_rows(self):
+		# filter only rows with pubmed references, append the citation id
 		self.rows = list(filter(lambda row: row['citation_source'] == "PubMed", self.rows))
 		for row in self.rows:
 			row['citation_id'] = row['citation_id\n']
 			row.pop('citation_id\n')
+
+
+CLINVAR_TYPE_MAP = {
+	"single nucleotide variant": "SNV",
+	"indel": "delins"
+}
 
 class ClinVarVariants(Fetcher):
 	"""Fetcher for ClinVar database.
@@ -202,6 +208,7 @@ class ClinVarVariants(Fetcher):
 		self.filter_rows()
 
 		for row in self.rows:
+			# extract cdna change from the Name column, and hpo from the hp column
 			row['cdnaChange'] = vf.get_valid_cdna(row['Name'], check_version=True)
 			all_ids = re.split('[;,]', row['PhenotypeIDS'])
 			hpo_re = re.compile('Human Phenotype Ontology:(?P<hpo>HP:[0-9]+)')
@@ -209,7 +216,7 @@ class ClinVarVariants(Fetcher):
 			hpo_full = filter(lambda aid: hpo_re.search(aid) is not None, all_ids)
 
 			hpo_list = [hpo_re.search(hpoid).groupdict()['hpo'] for hpoid in hpo_full]
-			so_list = [row['Type'].replace(' ', '_')]
+			so_list = [row['Type']]
 
 
 			row['associatedPhenotypes'] = []
@@ -223,7 +230,7 @@ class ClinVarVariants(Fetcher):
 			row['variantTypes']  = []
 			for term in so_list:
 				try:
-					var_so = vf.get_valid_obo(term)
+					var_so = vf.get_valid_obo(CLINVAR_TYPE_MAP.get(term, term))
 					row['variantTypes'].append(var_so)
 				except ValueError as e:
 					self.logger.warning(repr(e))

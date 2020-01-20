@@ -116,18 +116,25 @@ SIMILARITY_METRICS = {
 
 		}
 	},
-	"score_domain_alpha": {
-		"function": sf.variant_score_domains,
+
+	"score_domain": {
+		"function": sf.score_iou,
 		"kwargs": {
-			"domain": "alpha"
+			"attr_name": "affected_domains"
 		}
 	},
-	"score_domain_beta": {
-		"function": sf.variant_score_domains,
-		"kwargs": {
-			"domain": "beta"
-		}
-	}
+	# "score_domain_alpha": {
+	# 	"function": sf.variant_score_domains,
+	# 	"kwargs": {
+	# 		"domain": "alpha"
+	# 	}
+	# },
+	# "score_domain_beta": {
+	# 	"function": sf.variant_score_domains,
+	# 	"kwargs": {
+	# 		"domain": "beta"
+	# 	}
+	# }
 }
 
 # list of dicts, where each dict references a node metric function, and stores
@@ -366,6 +373,7 @@ class VariantGraph(nx.Graph):
 		self.add_edges_from(G.edges(data=True))
 			
 	# TODO: make this function not hardcoded
+	# This should also probably not go in this class
 	def aggregate_cluster(self, affinity_type):
 		feature_label = f'{affinity_type}_label'
 		self.graph[feature_label] = {}
