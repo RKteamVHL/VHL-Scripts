@@ -3,15 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/variant_nodes.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/variant_nodes_with_similarities.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/variant_nodes_with_similarities.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output/score_hpo_heatmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_hpo_heatmap.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output/score_hpo_variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_hpo_variant_nodes.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_heatmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_iou_vhl_pheno_heatmap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_variant_nodes.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/score_iou_vhl_pheno_variant_nodes.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="103" selection-start-line="103" selection-end-line="103" />
+            <state relative-caret-position="506">
+              <caret line="98" column="14" lean-forward="true" selection-start-line="98" selection-start-column="14" selection-end-line="98" selection-end-column="14" />
               <folding>
                 <element signature="e#0#49#0" expanded="true" />
               </folding>
@@ -36,8 +33,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/runpy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
+            <state relative-caret-position="168">
               <caret line="84" selection-start-line="84" selection-end-line="84" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="223">
+              <caret line="244" column="26" selection-start-line="244" selection-start-column="26" selection-end-line="244" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -54,11 +63,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3383">
-              <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
+            <state relative-caret-position="440">
+              <caret line="119" column="30" selection-start-line="119" selection-start-column="30" selection-end-line="119" selection-end-column="30" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -66,14 +75,29 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/figure.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="63" column="53" selection-start-line="63" selection-start-column="53" selection-end-line="63" selection-end-column="53" />
-              <folding>
-                <element signature="e#0#21#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="176">
+              <caret line="2742" selection-start-line="2742" selection-end-line="2742" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/image.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="176">
+              <caret line="689" selection-start-line="689" selection-end-line="689" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/pyplot.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="168">
+              <caret line="2187" selection-start-line="2187" selection-end-line="2187" />
             </state>
           </provider>
         </entry>
@@ -81,8 +105,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2856">
-              <caret line="183" selection-start-line="183" selection-end-line="183" />
+            <state relative-caret-position="209">
+              <caret line="80" column="21" selection-start-line="80" selection-start-column="9" selection-end-line="80" selection-end-column="21" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -102,15 +126,6 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/sklearn/manifold/spectral_embedding_.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3213">
-              <caret line="202" column="14" selection-start-line="202" selection-start-column="14" selection-end-line="202" selection-end-column="14" />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -125,6 +140,7 @@
     <findStrings>
       <find>fused</find>
       <find>affected_domains</find>
+      <find>NODE_METRICS</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -136,8 +152,8 @@
         <option value="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" />
         <option value="$PROJECT_DIR$/Analysis/clustering/__main__.py" />
         <option value="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" />
         <option value="$PROJECT_DIR$/Analysis/similarity_functions.py" />
+        <option value="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" />
         <option value="$PROJECT_DIR$/Analysis/__main__.py" />
         <option value="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" />
       </list>
@@ -184,6 +200,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/FilterFiddler" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -369,15 +386,15 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.7102213" visible="true" weight="0.32936078" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49789253" weight="0.3997833" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.70758694" weight="0.32936078" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.6296101" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49789253" weight="0.32936078" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49947312" weight="0.32936078" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49894625" weight="0.32936078" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.2897787" side_tool="true" visible="true" weight="0.32936078" />
-      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.5763962" weight="0.29144096" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49841937" weight="0.32936078" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.42465752" side_tool="true" visible="true" weight="0.29144096" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.5753425" weight="0.29144096" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -427,6 +444,66 @@
     <MESSAGE value="fixed clinvarvar types; adding plotter" />
     <option name="LAST_COMMIT_MESSAGE" value="fixed clinvarvar types; adding plotter" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py</url>
+          <line>132</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>xy_values[row_sorted_xy_ind, :]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>y_labels[cols]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>x_labels[rows]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>xy_values[rows]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>xy_values[rows, cols]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.any(xy_values &gt; COUNT_THRESHOLD)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.all()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>xy_values</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cols = np.any(xy_values &gt; COUNT_THRESHOLD, axis=1)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/prelim/score_hpo_heatmap.png" />
     <entry file="file://$PROJECT_DIR$/prelim/score_iou_vhl_pheno_heatmap.png" />
@@ -454,22 +531,61 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/sklearn/manifold/spectral_embedding_.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3383">
-          <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="3213">
+          <caret line="202" column="14" selection-start-line="202" selection-start-column="14" selection-end-line="202" selection-end-column="14" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
+    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/numpy/core/multiarray.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2856">
-          <caret line="183" selection-start-line="183" selection-end-line="183" />
+        <state relative-caret-position="74">
+          <caret line="990" column="4" selection-start-line="990" selection-start-column="4" selection-end-line="990" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-505019324/numpy/core/_multiarray_umath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="781" column="4" selection-start-line="781" selection-start-column="4" selection-end-line="781" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="689" selection-start-line="689" selection-end-line="689" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/runpy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="84" selection-start-line="84" selection-end-line="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/pyplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="2187" selection-start-line="2187" selection-end-line="2187" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/figure.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="2742" selection-start-line="2742" selection-end-line="2742" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/fetching/Fetcher.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4">
+          <caret line="155" lean-forward="true" selection-start-line="155" selection-end-line="155" />
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -484,58 +600,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/sklearn/manifold/spectral_embedding_.py">
+    <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3213">
-          <caret line="202" column="14" selection-start-line="202" selection-start-column="14" selection-end-line="202" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="103" selection-start-line="103" selection-end-line="103" />
-          <folding>
-            <element signature="e#0#49#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/runpy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="84" selection-start-line="84" selection-end-line="84" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/numpy/core/multiarray.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74">
-          <caret line="990" column="4" selection-start-line="990" selection-start-column="4" selection-end-line="990" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/fetching/Fetcher.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4">
-          <caret line="155" lean-forward="true" selection-start-line="155" selection-end-line="155" />
+        <state relative-caret-position="223">
+          <caret line="244" column="26" selection-start-line="244" selection-start-column="26" selection-end-line="244" selection-end-column="26" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2019.1/system/python_stubs/-505019324/numpy/core/_multiarray_umath.py">
+    <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="781" column="4" selection-start-line="781" selection-start-column="4" selection-end-line="781" selection-end-column="4" />
+        <state relative-caret-position="209">
+          <caret line="80" column="21" selection-start-line="80" selection-start-column="9" selection-end-line="80" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="506">
+          <caret line="98" column="14" lean-forward="true" selection-start-line="98" selection-start-column="14" selection-end-line="98" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#49#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="63" column="53" selection-start-line="63" selection-start-column="53" selection-end-line="63" selection-end-column="53" />
+        <state relative-caret-position="440">
+          <caret line="119" column="30" selection-start-line="119" selection-start-column="30" selection-end-line="119" selection-end-column="30" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>

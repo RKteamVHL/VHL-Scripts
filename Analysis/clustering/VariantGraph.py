@@ -139,6 +139,8 @@ SIMILARITY_METRICS = {
 
 # list of dicts, where each dict references a node metric function, and stores
 # keyword args for that function
+
+# of important note, these metrics all end up in the nodes 'all' dictionary
 NODE_METRICS = {
 	"affected_domains": {
 		"function": vf.affected_domains,

@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
 	plotter = GraphPlotter(graph=PG)
 	plotter.count_nodes_by(args.filter)
+	plotter.correlation_matrix("generalized_vhl_phenotypes", "variantTypes")
 
 	# plotting the network isn't too informative
 	# nx.draw(PG, 
