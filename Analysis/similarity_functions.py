@@ -2,6 +2,8 @@ import math
 import networkx as nx
 import numpy as np
 from . import variant_functions as vf
+
+
 ### The functions here perform variant-to-variant similarity analysis for pairs of nodes.
 # Individual node analyses are in variant_functions.py
 
