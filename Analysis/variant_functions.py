@@ -89,7 +89,6 @@ GENE3D_VHL_DOMAINS = {
 		"alpha": range(153, 205)
 	},
 
-
 	"ENST00000345392.2":{
 		# 51-117, inclusive
 		"beta": range(51, 118),
@@ -187,7 +186,8 @@ def get_valid_cdna(cdna_str, check_version=False):
 ## Phenotype and Sequency Ontology Utilities
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
-SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
+# SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
+SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/Ontology_Files/so.obo'
 
 HPO_NAME = 'HumanPhenotypeOntology'
 HPO_FILENAME = 'hp.obo'
@@ -234,34 +234,48 @@ def get_valid_obo(term_or_id, obo_type='name'):
 
 
 
+# GENERAL_HPO_TERMS = [
+# 	'neuroendocrine neoplasm', 					# Pheochromocytoma + Paraganglioma + Pancreatic endocrine tumor + Pancreatic islet cell adenoma
+# 	'renal neoplasm', 							# Renal cell carcinoma + Clear cell renal cell carcinoma
+# 	'neoplasm of the central nervous system', 	# Cerebellar hemangioblastoma + Spinal hemangioblastoma
+# 	'vascular neoplasm', 						# Retinal capillary hemangioma
+# 	'neoplasm of the inner ear', 				# Endolymphatic sac tumor
+# 	'neoplasm of the pancreas',					# Neoplasm of the pancreas
+# 	'abnormal pancreas morphology',				# Pancreatic cysts
+# 	'abnormal renal morphology',				# Renal cysts + Multiple Renal cysts
+# 	'abnormality of the epididymis'				# Epididymal cyst
+# ]
+
 GENERAL_HPO_TERMS = [
-	'neuroendocrine neoplasm', 					# Pheochromocytoma + Paraganglioma + Pancreatic endocrine tumor + Pancreatic islet cell adenoma
-	'renal neoplasm', 							# Renal cell carcinoma + Clear cell renal cell carcinoma
-	'neoplasm of the central nervous system', 	# Cerebellar hemangioblastoma + Spinal hemangioblastoma
-	'vascular neoplasm', 						# Retinal capillary hemangioma
-	'neoplasm of the inner ear', 				# Endolymphatic sac tumor
-	'neoplasm of the pancreas',					# Neoplasm of the pancreas 
-	'abnormal pancreas morphology',				# Pancreatic cysts
-	'abnormal renal morphology',				# Renal cysts + Multiple Renal cysts
-	'abnormality of the epididymis'				# Epididymal cyst
+	'neuroendocrine neoplasm',
+	'renal cell carcinoma',
+	'hemangioblastoma',
+	'retinal capillary hemangioma',
+	'pancreatic endocrine tumor',
+	'endolymphatic sac tumor',
+	'abnormality of the kidney',
+	'abnormality of the pancreas',
+	'abnormality of the epididymis',
+	'Abnormality of the ovary'
 ]
 
+# TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [ get_valid_obo(term) for term in GENERAL_HPO_TERMS]
-def generalized_vhl_phenotypes(node):
+def generalized_vhl_phenotype(phenoype):
 	'''Given a node, find its general disease type
 	'''
-	general_phenos = []
-	for pheno in node['all']['associatedPhenotypes']:
-		valid_hpo = get_valid_obo(pheno)
-		for successor in nx.bfs_successors(OBONET,valid_hpo):
-			try:
-				i = GENERAL_HPO_NODES.index(successor[0])
-				general_phenos.append(GENERAL_HPO_NODES[i])
-				break	
-			except ValueError as e:
-				pass
+	general_pheno = None
+
+	valid_hpo = get_valid_obo(phenoype)
+	for successor in nx.bfs_successors(OBONET,valid_hpo):
+		try:
+			i = GENERAL_HPO_NODES.index(successor[0])
+			general_pheno = GENERAL_HPO_NODES[i]
+			break
+		except ValueError as e:
+			pass
 			
-	return list(set(general_phenos))
+	return general_pheno
 
 # TODO: code these
 
@@ -304,17 +318,16 @@ def protein_substituion_score(node):
 
 
 
-
-def affected_domains(node):
+# TODO: this changed to accept cdna, not a Node
+def affected_domains(hgvs):
 	'''Finds the affected VHL domains for a variant
 	'''
 	# TODO: make this less nested
 
 	domains_affected = []
 
-	# for simple missense
-	# TODO: check ncbi and ensembl reference
-	hgvs = node['all'].get('cdnaChange', None)
+
+	# hgvs = node['all'].get('cdnaChange', None)
 	if hgvs is not None:
 
 		# there was a typo in Civic for VARIANT L89R(c.266T>G)
