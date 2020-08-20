@@ -83,9 +83,9 @@ PFAM_VHL_DOMAINS = {
 
 GENE3D_VHL_DOMAINS = {
 	"ENST00000256474.2": {
-		# 51-152, inclusive
+		# 51-152, inclusive, 102bp
 		"beta": range(51, 153),
-		# 153-204, inclusive
+		# 153-204, inclusive, 52 bp
 		"alpha": range(153, 205)
 	},
 
@@ -338,8 +338,8 @@ def affected_domains(hgvs):
 			# if the variant is not utr or intronic
 			if var['startNonCDS'] is None and var['stopNonCDS'] is None:
 				try:
-					start_aa = math.floor(int(var['start'])/3)
-					stop_aa = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
+					start_aa = math.floor(int(var['start'])/3) + 1
+					stop_aa = math.floor(int(var['end'])/3) + 1 if var['end'] is not None else start_aa + 1
 
 					affected_aa = range(start_aa, stop_aa)
 
@@ -347,6 +347,9 @@ def affected_domains(hgvs):
 						# if theres overlap in aa's between the variant and each domain
 						if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(affected_aa))) > 0:
 							domains_affected.append(domain)
+
+					if len(domains_affected) == 0:
+						domains_affectedqq
 				# couldnt cast start or end to integer
 				except ValueError as e:
 					pass
