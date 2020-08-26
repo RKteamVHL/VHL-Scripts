@@ -4,6 +4,7 @@ from Analysis.constants import *
 from itertools import chain
 import certifi
 import gzip
+import glob
 import csv
 import io
 
@@ -142,7 +143,11 @@ class Fetcher(object):
 		self.fix_file()
 		self.to_dict_list()
 
-	def load_from_dsv(self, filenames):
-		with open(filenames, 'r') as file:
-			self.rows = csv.DictReader(file, delimiter=ROW_DELIMITER())
-			self.dsv_header = list(self.rows.fieldnames)
+	def load_from_dsv(self, file_glob):
+
+		self.rows = []
+		self.dsv_header = []
+		for filename in glob.iglob(file_glob):
+			with open(filename, 'r', encoding='utf-8') as file:
+				self.rows.extend(list(csv.DictReader(file, delimiter=ROW_DELIMITER)))
+				# self.dsv_header.extend(list(self.rows.fieldnames))

@@ -183,15 +183,19 @@ def get_valid_cdna(cdna_str, check_version=False):
 
 	return return_cdna
 
+VHL201_FASTA = os.path.join('Analysis', 'files', 'Homo_sapiens_VHL_201_sequence.fa')
+
 ## Phenotype and Sequency Ontology Utilities
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
-# SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/so.obo'
-SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/Ontology_Files/so.obo'
+# SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/Ontology_Files/so.obo'
+SO_HREF = os.path.join('Analysis', 'files', 'so.obo.txt')
+
 
 HPO_NAME = 'HumanPhenotypeOntology'
 HPO_FILENAME = 'hp.obo'
-HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
+# HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
+HPO_HREF = os.path.join('Analysis', 'files', 'hp.obo.txt')
 
 
 #gather HPO and SO into an netork- node keys: id
@@ -259,6 +263,18 @@ GENERAL_HPO_TERMS = [
 	'Abnormality of the ovary'
 ]
 
+GENERAL_SO_TERMS = [
+	'deletion',
+	'exon_loss_variant',
+	'missense_variant',
+	'stop_gained',
+	'utr_variant',
+	'inframe_indel',
+	'delins',
+	'frameshift_variant'
+
+]
+
 # TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [ get_valid_obo(term) for term in GENERAL_HPO_TERMS]
 def generalized_vhl_phenotype(phenoype):
@@ -276,6 +292,26 @@ def generalized_vhl_phenotype(phenoype):
 			pass
 			
 	return general_pheno
+
+
+GENERAL_SO_NODES = [get_valid_obo(term) for term in GENERAL_SO_TERMS]
+def generalized_so_terms(so_type):
+	'''Given a node, find its general so_type
+	'''
+
+	general_so = None
+
+	valid_so = get_valid_obo(so_type)
+	for successor in nx.bfs_successors(OBONET, valid_so):
+		try:
+			i = GENERAL_SO_NODES.index(successor[0])
+			general_so = GENERAL_SO_NODES[i]
+			break
+		except ValueError as e:
+			pass
+
+	return general_so
+
 
 # TODO: code these
 
@@ -349,7 +385,7 @@ def affected_domains(hgvs):
 							domains_affected.append(domain)
 
 					if len(domains_affected) == 0:
-						domains_affectedqq
+						domains_affected = ["cds"]
 				# couldnt cast start or end to integer
 				except ValueError as e:
 					pass

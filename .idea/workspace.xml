@@ -2,120 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
-      <change afterPath="$PROJECT_DIR$/Analysis/features/KimStudents.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/age.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/phenotype.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/clustering_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/features.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/features.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/summary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudents.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/age.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/features.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/Feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/phenotype.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/summary.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="26" selection-start-line="26" selection-end-line="26" />
-              <folding>
-                <element signature="e#0#45#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/features/summary.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="26" column="34" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/features/age.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-291">
-              <caret line="11" column="27" lean-forward="true" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/features/phenotype.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="23" column="48" lean-forward="true" selection-start-line="23" selection-start-column="48" selection-end-line="23" selection-end-column="48" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/core/reshape/concat.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="254" selection-start-line="254" selection-end-line="254" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/features/KimStudents.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="71" column="25" selection-start-line="71" selection-start-column="6" selection-end-line="71" selection-end-column="25" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" column="36" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Analysis/clustering/constants.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="351" column="24" selection-start-line="351" selection-start-column="24" selection-end-line="351" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -125,170 +31,73 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>fused</find>
-      <find>affected_domains</find>
-      <find>NODE_METRICS</find>
-      <find>feature_label</find>
-      <find>logger</find>
-      <find>sort</find>
-      <find>VARIANT_TEMPLATE</find>
-      <find>save</find>
-      <find>decompressed</find>
-      <find>STUDENTS_HEADER</find>
-      <find>dsv_header</find>
-      <find>save_dsv_file</find>
-      <find>all</find>
-      <find>sort_by_attribute</find>
-      <find>compressed</find>
-      <find>self.compressed</find>
-      <find>self.decompressed</find>
-      <find>node</find>
-      <find>DNA_REGEX</find>
-      <find>self.data</find>
-      <find>GENERAL_HPO_TERMS</find>
-      <find>update</find>
-      <find>CURRENT_VHL_TRANSCRIPT</find>
-      <find>argsort</find>
-      <find>DataFrame</find>
-      <find>data</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" />
-        <option value="$PROJECT_DIR$/Analysis/clustering/__main__.py" />
-        <option value="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" />
-        <option value="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" />
-        <option value="$PROJECT_DIR$/AssociationAnalysis/clustering/VariantGraph.py" />
-        <option value="$PROJECT_DIR$/AssociationAnalysis/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/MultiplicityAnalysis/fetching/constants.py" />
-        <option value="$PROJECT_DIR$/MultiplicityAnalysis/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/MultiplicityAnalysis/fetching/__main__.py" />
-        <option value="$PROJECT_DIR$/MultiplicityAnalysis/clustering/VariantGraph.py" />
-        <option value="$PROJECT_DIR$/Analysis/similarity_functions.py" />
-        <option value="$PROJECT_DIR$/Analysis/Association/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/clustering/ClusteringGraph.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/clustering/FamilyGraph.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/clustering/PatientGraph.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/clustering/VariantGraph.py" />
-        <option value="$PROJECT_DIR$/../ror2-data/ror2.json" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/__main__.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/fetching/KimStudents2019.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/fetching/__main__.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/fetching/constants.py" />
-        <option value="$PROJECT_DIR$/Analysis/Multiplicity/fetching/KimStudents.py" />
-        <option value="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" />
-        <option value="$PROJECT_DIR$/Analysis/fetching/constants.py" />
-        <option value="$PROJECT_DIR$/Analysis/constants.py" />
-        <option value="$PROJECT_DIR$/Analysis/fetching/KimStudents.py" />
-        <option value="$PROJECT_DIR$/Analysis/features/KimStudents.py" />
-        <option value="$PROJECT_DIR$/Analysis/features/features.py" />
-        <option value="$PROJECT_DIR$/Analysis/__main__.py" />
-        <option value="$PROJECT_DIR$/Analysis/features/summary.py" />
-        <option value="$PROJECT_DIR$/Analysis/features/phenotype.py" />
-        <option value="$PROJECT_DIR$/Analysis/features/age.py" />
-        <option value="$PROJECT_DIR$/Analysis/variant_functions.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-97" />
-    <option name="y" value="30" />
-    <option name="width" value="1297" />
-    <option name="height" value="959" />
-  </component>
+  <component name="ProjectId" id="1gQa0zsufBZVV9mB3Zc1gPKGJB7" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
-              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
-              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
-              <item name="clustering" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
-              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
-              <item name="features" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Streetview-Navigation" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis\features" />
-      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis" />
-      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis\Multiplicity\clustering" />
-      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
-      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\AssociationAnalysis" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis" />
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\sean_\Documents\Github\VHL-Scripts\Analysis\features" />
+      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis\features" />
+      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis" />
+      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis\Multiplicity\clustering" />
+      <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
+    </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Python.Analysis">
-    <configuration name="Analysis" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.Analysis cached">
+    <configuration name="Analysis Live" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\env\Scripts\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="false" />
+      <option name="ADD_SOURCE_ROOTS" value="false" />
       <option name="SCRIPT_NAME" value="Analysis" />
       <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Analysis cached" type="PythonConfigurationType" factoryName="Python">
+      <module name="VHL-Scripts" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="false" />
+      <option name="ADD_SOURCE_ROOTS" value="false" />
+      <option name="SCRIPT_NAME" value="Analysis" />
+      <option name="PARAMETERS" value="-c &quot;*_data.csv&quot;" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="true" />
@@ -423,13 +232,26 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.Analysis" />
+      <item itemvalue="Python.Analysis cached" />
+      <item itemvalue="Python.Analysis Live" />
       <item itemvalue="Python.Analysis.clustering domain " />
       <item itemvalue="Python.Analysis.clustering variantType cached  " />
       <item itemvalue="Python.Analysis.clustering variantType not cached " />
       <item itemvalue="Python.Analysis.fetching" />
       <item itemvalue="Python.Multiplicity phenotype not cached" />
     </list>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -444,58 +266,13 @@
     </task>
     <servers />
   </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13277134" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.70389885" weight="0.30444205" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.625922" visible="true" weight="0.36078006" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49736565" weight="0.32936078" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49947312" weight="0.32936078" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49841937" weight="0.32936078" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50263435" side_tool="true" weight="0.32936078" />
-      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.5753425" weight="0.29144096" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-    </layout>
-  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
             <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
-              <option name="COLUMN_ORDER">
-                <list>
-                  <option value="0" />
-                  <option value="1" />
-                  <option value="2" />
-                  <option value="3" />
-                </list>
-              </option>
+              <option name="COLUMN_ORDER" />
             </State>
           </value>
         </entry>
@@ -519,6 +296,68 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed clinvarvar types; adding plotter" />
     <option name="LAST_COMMIT_MESSAGE" value="fixed clinvarvar types; adding plotter" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="277" y="95" key="#Python" timestamp="1598388875232">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="277" y="95" key="#Python/0.0.1368.872@0.0.1368.872" timestamp="1598388875232" />
+    <state x="140" y="92" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1598402998967">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="140" y="92" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1368.872@0.0.1368.872" timestamp="1598402998967" />
+    <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598388967804">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1368.872@0.0.1368.872" timestamp="1598388967804" />
+    <state x="93" y="93" width="1181" height="685" key="DiffContextDialog" timestamp="1598059818898">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="93" y="93" width="1181" height="685" key="DiffContextDialog/0.0.1368.872@0.0.1368.872" timestamp="1598059818898" />
+    <state x="465" y="192" key="FileChooserDialogImpl" timestamp="1598382231101">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="465" y="192" key="FileChooserDialogImpl/0.0.1368.872@0.0.1368.872" timestamp="1598382231101" />
+    <state width="1334" height="250" key="GridCell.Tab.0.bottom" timestamp="1598470272507">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1598470272507" />
+    <state width="1334" height="250" key="GridCell.Tab.0.center" timestamp="1598470272506">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1598470272506" />
+    <state width="1334" height="250" key="GridCell.Tab.0.left" timestamp="1598470272506">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1598470272506" />
+    <state width="1334" height="250" key="GridCell.Tab.0.right" timestamp="1598470272507">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1598470272507" />
+    <state width="1334" height="250" key="GridCell.Tab.1.bottom" timestamp="1598470272398">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1598470272398" />
+    <state width="1334" height="250" key="GridCell.Tab.1.center" timestamp="1598470272398">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1598470272398" />
+    <state width="1334" height="250" key="GridCell.Tab.1.left" timestamp="1598470272398">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1598470272398" />
+    <state width="1334" height="250" key="GridCell.Tab.1.right" timestamp="1598470272398">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="1334" height="250" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1598470272398" />
+    <state x="186" y="79" key="SettingsEditor" timestamp="1598387559969">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="186" y="79" key="SettingsEditor/0.0.1368.872@0.0.1368.872" timestamp="1598387559969" />
+    <state x="380" y="261" key="com.intellij.ide.util.TipDialog" timestamp="1598286828462">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="380" y="261" key="com.intellij.ide.util.TipDialog/0.0.1368.872@0.0.1368.872" timestamp="1598286828462" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -568,267 +407,5 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/figure.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="2742" selection-start-line="2742" selection-end-line="2742" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/matplotlib/axes/_axes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="404" selection-start-line="404" selection-end-line="404" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/runpy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="84" selection-start-line="84" selection-end-line="84" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/clustering/constants.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/clustering/constants.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/fetching/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/clustering/VariantGraph.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/fetching/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/fetching/constants.py" />
-    <entry file="file://$PROJECT_DIR$/AssociationAnalysis/fetching/Fetcher.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/fetching/constants.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/fetching/Fetcher.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/fetching/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/variant_functions.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/MultiplicityAnalysis/clustering/VariantGraph.py" />
-    <entry file="file://$PROJECT_DIR$/similarity_functions.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/Association/fetching/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/Multiplicity/clustering/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/Association/fetching/Fetcher.py" />
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/encodings/cp1252.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/Association/clustering/VariantGraph.py" />
-    <entry file="file://$PROJECT_DIR$/../ror2-data/ror2.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="2" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/PatientGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/VariantGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="31" column="24" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/FamilyGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="8" column="11" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/ClusteringGraph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="44" column="49" lean-forward="true" selection-start-line="44" selection-start-column="49" selection-end-line="44" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/urllib/request.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="648" selection-start-line="648" selection-end-line="648" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/Association/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/Multiplicity/__main__.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/Multiplicity/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/Analysis/fetching/__main__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="43" selection-start-line="11" selection-start-column="43" selection-end-line="11" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#36#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/fetching/Fetcher.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="99" selection-start-line="99" selection-end-line="105" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/constants.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/csv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2397">
-          <caret line="150" selection-start-line="150" selection-end-line="150" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/clustering/constants.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/fetching/KimStudents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="841">
-          <caret line="76" column="28" selection-start-line="76" selection-start-column="28" selection-end-line="76" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/io/common.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="398" selection-start-line="398" selection-end-line="398" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/core/ops/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
-          <caret line="466" column="48" lean-forward="true" selection-start-line="466" selection-start-column="48" selection-end-line="466" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/core/generic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="5178" selection-start-line="5178" selection-end-line="5178" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="26" selection-start-line="26" selection-end-line="26" />
-          <folding>
-            <element signature="e#0#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/core/indexing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="840" selection-start-line="840" selection-end-line="840" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/features/features.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="307">
-          <caret line="41" column="22" lean-forward="true" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="22" />
-          <folding>
-            <element signature="e#1#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/features/KimStudents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="71" column="25" selection-start-line="71" selection-start-column="6" selection-end-line="71" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/env/Lib/site-packages/pandas/core/reshape/concat.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="254" selection-start-line="254" selection-end-line="254" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/features/phenotype.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="48" lean-forward="true" selection-start-line="23" selection-start-column="48" selection-end-line="23" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/features/summary.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="26" column="34" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/features/age.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-291">
-          <caret line="11" column="27" lean-forward="true" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="36" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="351" column="24" selection-start-line="351" selection-start-column="24" selection-end-line="351" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
   </component>
 </project>

@@ -2,8 +2,6 @@ import re
 import logging
 import numpy as np
 
-EVALUATED_AGE_REGEX = re.compile("E((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
-LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 
 class Feature:
 	def __init__(self, *args, name="Feature", column=None, **kwargs):
@@ -11,7 +9,8 @@ class Feature:
 		self.column = column
 		self.logger = logging.getLogger(self.name)
 
-	def filter(self, row):
+	@staticmethod
+	def validate_row(row):
 		if row is not None:
 			return True
 
@@ -23,8 +22,9 @@ class Feature:
 		self.rows[category] = self.rows.get(category, [])
 
 	def update(self, row, category):
-		self.add_category(category)
-		self.rows[category].append(row)
+		if self.validate_row(row):
+			self.add_category(category)
+			self.rows[category].append(row)
 
 class NominalFeature(Feature):
 	def __init__(self, *args, **kwargs):
@@ -63,21 +63,21 @@ class IntervalFeature(Feature):
 		self.values.append(value)
 		self.rows.append(row)
 
-	def make_hist(self, n_bins=10):
+	def make_hist(self, bins=10):
 		values = np.array(self.values)
-		bins = np.histogram_bin_edges(values, bins=n_bins)
-		values_bins = np.digitize(values, bins)
+		bins_out = np.histogram_bin_edges(values, bins=bins)
+		values_bins = np.digitize(values, bins_out)
 
-		for i in range(len(bins)-1):
-			category = f'{int(bins[i])}-{int(bins[i+1])}'
+		for i in range(len(bins_out)-1):
+			category = f'{int(bins_out[i])}-{int(bins_out[i+1])}'
 			self.histogram.add_category(category)
 
 		for i in range(len(self.rows)):
 			v_bin = values_bins[i]
-			if v_bin == len(bins):
+			if v_bin == len(bins_out):
 				v_bin -= 1
-			bin_lower = int(bins[v_bin-1])
-			bin_upper = int(bins[v_bin])
+			bin_lower = int(bins_out[v_bin-1])
+			bin_upper = int(bins_out[v_bin])
 
 			self.histogram.update(self.rows[i], f'{bin_lower}-{bin_upper}')
 

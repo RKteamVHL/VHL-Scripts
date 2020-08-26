@@ -1,6 +1,25 @@
-from .features import *
+from .Feature import *
 from ..constants import *
 from .. import variant_functions as vf
+
+EVALUATED_AGE_REGEX = re.compile("E((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
+LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
+
+
+class SummaryFeature(NominalFeature):
+	def __init__(self, *args, **kwargs):
+		super().__init__(self, name="summary", *args, **kwargs)
+
+	def add_row(self, row):
+		super().update(row, "totals")
+
+
+class ResolutionFeature(NominalFeature):
+	def __init__(self, *args, **kwargs):
+		super().__init__(self, name="resolution", *args, **kwargs)
+
+	def add_row(self, row):
+		super().update_by_column(row, "Resolution")
 
 
 class PhenotypeFeature(NominalFeature):
@@ -20,6 +39,23 @@ class PhenotypeFeature(NominalFeature):
 				self.logger.warning(repr(e))
 
 
+class IsolatedPhenotypeFeature(NominalFeature):
+	def __init__(self, *args, **kwargs):
+		super().__init__(self, name="isolated_phenotypes", *args, **kwargs)
+
+	def add_row(self, row):
+		hpo_list = re.split('[;,]', row['Phenotype'])
+		for term in hpo_list:
+			try:
+				if term.casefold() not in NULL_TERMS:
+					var_hpo = vf.generalized_vhl_phenotype(term.strip())
+					# if this is the only phenotype in the column
+					if len(hpo_list) == 1:
+						super().update(row, var_hpo)
+			except ValueError as e:
+				self.logger.warning(repr(e))
+
+
 class VariantTypeFeature(NominalFeature):
 	def __init__(self, *args, **kwargs):
 		super().__init__(self, name="variant_type", *args, **kwargs)
@@ -29,7 +65,7 @@ class VariantTypeFeature(NominalFeature):
 		for term in so_list:
 			try:
 				if term.casefold() not in NULL_TERMS:
-					var_obo = vf.get_valid_obo(term.strip())
+					var_obo = vf.generalized_so_terms(term.strip())
 					super().update(row, var_obo)
 			except ValueError as e:
 				self.logger.warning(repr(e))
@@ -73,6 +109,10 @@ class EvaluatedAgeFeature(RatioFeature):
 	def __init__(self, *args, **kwargs):
 		super().__init__(self, name="evaluated_age", *args, **kwargs)
 
+	def make_hist(self, bins=range(0, 1200, 120)):
+		super().make_hist(bins=bins)
+
+
 	def add_row(self, row):
 		match = EVALUATED_AGE_REGEX.search(row['Age'])
 		if match is not None:
@@ -90,6 +130,9 @@ class EvaluatedAgeFeature(RatioFeature):
 class LastKnownAgeFeature(RatioFeature):
 	def __init__(self, *args, **kwargs):
 		super().__init__(self, name="last_known_age", *args, **kwargs)
+
+	def make_hist(self, bins=range(0, 1200, 120)):
+		super().make_hist(bins=bins)
 
 	def add_row(self, row):
 
