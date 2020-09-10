@@ -16,7 +16,10 @@ class FeatureTable:
 			self.main_feature.add_row(row)
 
 	def to_csv(self, filename):
-		self.dataframe.to_csv(filename)
+		self.dataframe.to_csv(filename, index=False)
+
+	def cluster(self):
+		pass
 
 	def normalize(self, norm_types=["minmax"]):
 		combined = pd.DataFrame()
@@ -50,8 +53,8 @@ class FeatureTable:
 
 			for i in range(len(row_features)):
 				_d = row_features[i].to_dict()
-				feat_dict = {k: len(v) for k, v in _d.items()}
-				for key in _d.keys():
+				feat_dict = {f'{row_features[i].name}_{k}': v for k, v in _d.items()}
+				for key in feat_dict.keys():
 					# use a dict here b/c they keep key order
 					self.row_feature_columns[i][key] = None
 				row_dict.update(feat_dict)

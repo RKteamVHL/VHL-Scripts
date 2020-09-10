@@ -8,11 +8,15 @@ STUDENTS_NAME = 'KimStudents'
 STUDENTS_FILENAME = 'Final Masterlist of VHL Papers.csv'
 
 # Garrett (2016): 1607707061
+# Liam: 1618569887
 # No PMID: 975723769
-# Garrett (confirmed): 64075395
+# Garrett (students): 64075395
 # Kelly: 960822541
+# Safa/Sam: 154810211
+# Sean (VA): 410096135
 # Andreea pre-2016: 1835654764
-STUDENTS_SHEETIDS = ['154810211', '410096135', '1618569887', '859989440', '1835654764', '64075395']
+# Andreea ML: 859989440
+STUDENTS_SHEETIDS = ['960822541', '1618569887', '154810211', '410096135', '975723769', '64075395', '1607707061', '859989440', '1835654764']
 STUDENTS_HREF = [f'https://docs.google.com/spreadsheets/d/1evUglhZpGDUPm3GUXu0uIZSkZsHXnbbfQzl5_Nc8DAQ/export?format=csv&gid={name}' for name in STUDENTS_SHEETIDS]
 
 STUDENTS_HEADER_NAMES = [

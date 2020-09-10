@@ -96,8 +96,9 @@ GENE3D_VHL_DOMAINS = {
 		"alpha": range(118, 164)
 	}
 }
-
-
+ALPHA_LEN = len(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]['alpha'])
+BETA_LEN = len(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]['beta'])
+CDS_LEN = len(VHL_PROTEIN)
 ## Extraction of Variant Amino Acid / Nucleotide Changes
 
 # this regex doesn't get detailed variant info
@@ -263,17 +264,40 @@ GENERAL_HPO_TERMS = [
 	'Abnormality of the ovary'
 ]
 
-GENERAL_SO_TERMS = [
-	'deletion',
-	'exon_loss_variant',
-	'missense_variant',
-	'stop_gained',
-	'utr_variant',
-	'inframe_indel',
-	'delins',
-	'frameshift_variant'
+# GENERAL_SO_TERMS = [
+# 	'deletion',
+# 	'exon_loss_variant',
+# 	'missense_variant',
+# 	'stop_gained',
+# 	'utr_variant',
+# 	'inframe_indel',
+# 	'delins',
+# 	'frameshift_variant',
+# 	'splice_site_variant'
+# ]
+SO_TERM_TYPES = {
+	# group a)
+	'frameshift_variant': 'severe_LOF',
+	'stop_gained': 'severe_LOF',
+	'deletion': 'severe_LOF',
+	'exon_loss_variant': 'severe_LOF',
+	'start_lost': 'severe_LOF',
 
-]
+	# group b)
+	'missense_variant': 'partial_LOF',
+	'inframe_indel': 'partial_LOF',
+
+	# group c)
+	'synonymous_variant': 'minimal_LOF',
+	'splice_site_variant': 'minimal_LOF',
+	'intron_variant': 'minimal_LOF',
+
+	# group d)
+	'utr_variant': 'misc_LOF',
+	'stop_lost': 'misc_LOF',
+	'delins': 'misc_LOF',
+
+}
 
 # TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [ get_valid_obo(term) for term in GENERAL_HPO_TERMS]
@@ -290,11 +314,14 @@ def generalized_vhl_phenotype(phenoype):
 			break
 		except ValueError as e:
 			pass
-			
+
+	if general_pheno is None:
+		raise ValueError(f"Could not find a generalized term for {valid_hpo}")
+
 	return general_pheno
 
 
-GENERAL_SO_NODES = [get_valid_obo(term) for term in GENERAL_SO_TERMS]
+GENERAL_SO_NODES = [get_valid_obo(term) for term in SO_TERM_TYPES.keys()]
 def generalized_so_terms(so_type):
 	'''Given a node, find its general so_type
 	'''
@@ -309,6 +336,9 @@ def generalized_so_terms(so_type):
 			break
 		except ValueError as e:
 			pass
+
+	if general_so is None:
+		raise ValueError(f"Could not find a generalized term for {valid_so}")
 
 	return general_so
 
@@ -391,3 +421,15 @@ def affected_domains(hgvs):
 					pass
 
 	return domains_affected
+
+
+def get_cdna_start(hgvs):
+	match = DNA_REGEX.match(hgvs)
+	cdna_start = 0
+	if match is not None:
+		var = match.groupdict()
+		# if the variant is not utr or intronic
+		if var['startNonCDS'] is None and var['stopNonCDS'] is None:
+			cdna_start = int(var['start'])
+
+	return cdna_start
