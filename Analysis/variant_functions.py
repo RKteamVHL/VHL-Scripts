@@ -257,11 +257,11 @@ GENERAL_HPO_TERMS = [
 	'hemangioblastoma',
 	'retinal capillary hemangioma',
 	'pancreatic endocrine tumor',
-	'endolymphatic sac tumor',
+	# 'endolymphatic sac tumor',
 	'abnormality of the kidney',
 	'abnormality of the pancreas',
-	'abnormality of the epididymis',
-	'Abnormality of the ovary'
+	# 'abnormality of the epididymis',
+	# 'Abnormality of the ovary'
 ]
 
 # GENERAL_SO_TERMS = [
@@ -282,6 +282,7 @@ SO_TERM_TYPES = {
 	'deletion': 'severe_LOF',
 	'exon_loss_variant': 'severe_LOF',
 	'start_lost': 'severe_LOF',
+	'splice_site_variant': 'severe_LOF',
 
 	# group b)
 	'missense_variant': 'partial_LOF',
@@ -289,7 +290,6 @@ SO_TERM_TYPES = {
 
 	# group c)
 	'synonymous_variant': 'minimal_LOF',
-	'splice_site_variant': 'minimal_LOF',
 	'intron_variant': 'minimal_LOF',
 
 	# group d)

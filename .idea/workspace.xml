@@ -4,22 +4,11 @@
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/constants.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/Feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/Feature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/fetching/KimStudents.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/KimStudents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/phenotype_count.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_domain_alpha_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_domain_alpha_variant_nodes.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_domain_beta_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_domain_beta_variant_nodes.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_hpo_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_hpo_variant_nodes.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_heatmap.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/score_iou_vhl_pheno_variant_nodes.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,7 +55,7 @@
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Analysis cached">
+  <component name="RunManager" selected="Python.Analysis Live">
     <configuration name="Analysis Live" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -314,10 +303,10 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1368.872@0.0.1368.872" timestamp="1598388967804" />
-    <state x="444" y="135" key="#xdebugger.evaluate" timestamp="1599748250282">
+    <state x="483" y="160" key="#xdebugger.evaluate" timestamp="1600358721604">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state x="444" y="135" key="#xdebugger.evaluate/0.0.1368.872@0.0.1368.872" timestamp="1599748250282" />
+    <state x="483" y="160" key="#xdebugger.evaluate/0.0.1368.872@0.0.1368.872" timestamp="1600358721604" />
     <state x="93" y="93" width="1181" height="685" key="DiffContextDialog" timestamp="1598059818898">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
@@ -326,38 +315,38 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="465" y="192" key="FileChooserDialogImpl/0.0.1368.872@0.0.1368.872" timestamp="1599330491846" />
-    <state width="1348" height="252" key="GridCell.Tab.0.bottom" timestamp="1599748140730">
+    <state width="1348" height="252" key="GridCell.Tab.0.bottom" timestamp="1600364392902">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1599748140730" />
-    <state width="1348" height="252" key="GridCell.Tab.0.center" timestamp="1599748140729">
+    <state width="1348" height="252" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
+    <state width="1348" height="252" key="GridCell.Tab.0.center" timestamp="1600364392902">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1599748140729" />
-    <state width="1348" height="252" key="GridCell.Tab.0.left" timestamp="1599748140729">
+    <state width="1348" height="252" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
+    <state width="1348" height="252" key="GridCell.Tab.0.left" timestamp="1600364392902">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1599748140729" />
-    <state width="1348" height="252" key="GridCell.Tab.0.right" timestamp="1599748140730">
+    <state width="1348" height="252" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
+    <state width="1348" height="252" key="GridCell.Tab.0.right" timestamp="1600364392902">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1599748140730" />
-    <state width="1348" height="252" key="GridCell.Tab.1.bottom" timestamp="1599748145578">
+    <state width="1348" height="252" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
+    <state width="1348" height="252" key="GridCell.Tab.1.bottom" timestamp="1600364392760">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1599748145578" />
-    <state width="1348" height="252" key="GridCell.Tab.1.center" timestamp="1599748145577">
+    <state width="1348" height="252" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
+    <state width="1348" height="252" key="GridCell.Tab.1.center" timestamp="1600364392760">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1599748145577" />
-    <state width="1348" height="252" key="GridCell.Tab.1.left" timestamp="1599748145577">
+    <state width="1348" height="252" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
+    <state width="1348" height="252" key="GridCell.Tab.1.left" timestamp="1600364392759">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1599748145577" />
-    <state width="1348" height="252" key="GridCell.Tab.1.right" timestamp="1599748145577">
+    <state width="1348" height="252" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392759" />
+    <state width="1348" height="252" key="GridCell.Tab.1.right" timestamp="1600364392760">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1599748145577" />
+    <state width="1348" height="252" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
     <state x="186" y="79" key="SettingsEditor" timestamp="1598387559969">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
@@ -366,16 +355,5 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="380" y="261" key="com.intellij.ide.util.TipDialog/0.0.1368.872@0.0.1368.872" timestamp="1599337278036" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py</url>
-          <line>149</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

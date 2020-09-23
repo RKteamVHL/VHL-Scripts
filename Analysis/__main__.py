@@ -61,10 +61,11 @@ if __name__ == '__main__':
 			table.add_row(row)
 
 	for table in tables:
-		table.make_dataframe()
-		table.normalize(norm_types=['zscore', 'cdf'])
+		table.make_dataframe(include_count=False)
+		# table.normalize(norm_types=['zscore', 'cdf'])
 		table.to_csv(os.path.join(OUTPUT_DIR, f'{table.name}.csv'))
-		table.cluster()
+		table.dataframe.corr(method="pearson").to_csv(os.path.join(OUTPUT_DIR, f'{table.name}_corr.csv'))
+		table.cluster(out_dir=OUTPUT_DIR)
 
 	# this is for error checking generalized phenotypes / variant types
 	# with open('phenotypes.log', 'r') as file_in:

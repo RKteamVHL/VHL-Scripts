@@ -24,6 +24,8 @@ class MutationEventFeature(OrdinalFeature):
 		try:
 			if len(mutlist) > 1:
 				assert(row['Multiple Mutants in Case'].strip().casefold() == "yes")
+		except AssertionError as e:
+			self.logger.warning(repr(e))
 		except ValueError as e:
 			self.logger.warning(repr(e))
 
@@ -117,7 +119,15 @@ class VariantTypeUngroupedFeature(NominalFeature):
 		super().__init__(self, name="variant_type_ungrouped", *args, **kwargs)
 
 	def add_row(self, row):
-		super().update_by_column(row, 'Mutation Type')
+		so_list = re.split('[;,]', row['Mutation Type'])
+		for term in so_list:
+			term = term.casefold().strip()
+			try:
+				if term not in NULL_TERMS:
+					var_obo = vf.get_valid_obo(term)
+					super().update(row, var_obo)
+			except ValueError as e:
+				self.logger.warning(repr(e))
 
 
 class LossOfFunctionFeature(NominalFeature):
@@ -211,7 +221,9 @@ class EvaluatedAgeFeature(RatioFeature):
 				months += int(var['M'])
 
 			if not(var['Y'] is None and var['M'] is None):
-				super().update(row, months)
+				years = months/12
+
+				super().update(row, years)
 
 
 class LastKnownAgeFeature(RatioFeature):

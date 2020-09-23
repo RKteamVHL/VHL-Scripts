@@ -93,7 +93,7 @@ class Fetcher(object):
 		"""
 		k = list(self.data.keys())
 		for i in range(len(k)):
-			with open(f'{i}_{filename}', 'w+', encoding='utf-8') as file:
+			with open(f'{filename[0:-4]}{i}{filename[-4:]}', 'w+', encoding='utf-8') as file:
 				self.data[k[i]].seek(0)
 				file.write(self.data[k[i]].read())
 				self.data[k[i]].seek(0)

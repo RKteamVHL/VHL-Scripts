@@ -18,7 +18,7 @@ class FeatureTable:
 	def to_csv(self, filename):
 		self.dataframe.to_csv(filename, index=False)
 
-	def cluster(self):
+	def cluster(self, out_dir=None, num_clusters=2):
 		pass
 
 	def normalize(self, norm_types=["minmax"]):
@@ -41,7 +41,7 @@ class FeatureTable:
 			combined = pd.concat([combined, df], sort=False, axis=1)
 		self.dataframe = pd.concat([self.dataframe, combined], sort=False, axis=1)
 
-	def make_dataframe(self):
+	def make_dataframe(self, include_count=True):
 		for category, row_list in self.main_feature.rows.items():
 		# for category, row_list in self.main_feature.rows.items():
 			row_dict = {self.main_feature.name: category, "row_count": len(row_list)}
@@ -61,7 +61,10 @@ class FeatureTable:
 
 			self.dataframe = self.dataframe.append(row_dict, ignore_index=True)
 
-		all_cols = [self.main_feature.name, "row_count"]
+		all_cols = [self.main_feature.name]
+
+		if include_count:
+			all_cols.append("row_count")
 		for feat_cols in self.row_feature_columns:
 			all_cols.extend(list(feat_cols.keys()))
 
