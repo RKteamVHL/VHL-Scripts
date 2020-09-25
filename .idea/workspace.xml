@@ -2,19 +2,57 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/Fetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/src/civicpy/civicpy/civic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="327">
+              <caret line="66" column="29" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#45#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="20" column="36" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/clustering/constants.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Analysis/variant_functions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="6817">
+              <caret line="408" selection-start-line="408" selection-end-line="408" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -30,6 +68,42 @@
   <component name="ProjectId" id="1gQa0zsufBZVV9mB3Zc1gPKGJB7" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
+              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
+              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
+              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
+              <item name="clustering" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="VHL-Scripts" type="b2602c69:ProjectViewProjectNode" />
+              <item name="VHL-Scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="Analysis" type="462c0819:PsiDirectoryNode" />
+              <item name="features" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -54,6 +128,18 @@
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts\Analysis\Multiplicity\clustering" />
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager" selected="Python.Analysis Live">
     <configuration name="Analysis Live" type="PythonConfigurationType" factoryName="Python">
@@ -259,12 +345,46 @@
     </task>
     <servers />
   </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="DB Browser" />
+      <window_info id="Project Explorer" />
+      <window_info id="Job Explorer" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13277134" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Console" />
+      <window_info anchor="bottom" id="DB Execution Console" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.70389885" weight="0.30444205" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.625922" weight="0.36078006" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49736565" weight="0.32936078" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49947312" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49841937" visible="true" weight="0.39653304" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50263435" side_tool="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.5753425" weight="0.29144096" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
             <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
               <option name="COLUMN_ORDER" />
             </State>
           </value>
@@ -355,5 +475,27 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="380" y="261" key="com.intellij.ide.util.TipDialog/0.0.1368.872@0.0.1368.872" timestamp="1599337278036" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Analysis/__main__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="327">
+          <caret line="66" column="29" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Analysis/similarity_functions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="20" column="36" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>
