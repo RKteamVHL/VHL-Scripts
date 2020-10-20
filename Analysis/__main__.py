@@ -1,7 +1,10 @@
 import argparse
 
-from .features.KimStudentsFeatureTables import *
 from .fetching.KimStudents import KimStudents
+
+from .features.kimstudents_dataframe_preprocessing import *
+from .features.kimstudents_dataframe_views import *
+from .features.kimstudents_dataframe_clustering import *
 
 OUTPUT_DIR = "output"
 
@@ -11,7 +14,8 @@ if not os.path.isdir(OUTPUT_DIR):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-c', '--cached', help="Load data from the inputted glob files", default="")
+    parser.add_argument('-c', '--cached', help="Load data from local cache", action="store_true")
+    parser.add_argument('-cl', '--cluster', help="Only redo clustering, rather than create all figures", action="store_true")
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -19,65 +23,45 @@ if __name__ == '__main__':
         format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
         datefmt="%H:%M:%S")
 
-    tables = [
-        SummaryTable(),
-        EvaluatedAgeBinnedTable(),
-        LastKnownAgeBinnedTable(),
-        IsolatedPhenotypeTable(),
-        EvaluatedAgeTable(),
-        PhenotypeTable(),
-        VariantTypeTable(),
-        PhenotypeCoocurrenceTable(),
-        LossOfFunctionTable(),
-        MutationEventTable()
-    ]
 
     # test all functions
     fetcher = KimStudents()
 
-    if args.cached != "":
-        fetcher.load_from_dsv(args.cached)
+    if args.cached:
+        fetcher.load_from_dsv((os.path.join(OUTPUT_DIR, "data*.csv")))
     else:
         fetcher.process()
         fetcher.save_raw_file(os.path.join(OUTPUT_DIR, "data.csv"))
 
-    resolution = ResolutionFeature()
-    for row in fetcher.rows:
-        tables[0].add_row(row)
-        resolution.add_row(row)
 
-    # fh = logging.FileHandler('phenotypes.log')
-    # # fh.setLevel(logging.DEBUG)
-    # logging.getLogger("phenotypes").addHandler(fh)
+    out_table = pd.DataFrame(fetcher.rows)
+    out_table = out_table.pipe(kimstudents_preprocessing)
+
+    out_table = out_table[out_table["Resolution"].str.casefold() == "patient"]
+    # out_table = out_table.dropna(subset=COMPUTED_COLUMNS['generalized_mutant_type'], how='all')
+    summary = pd.DataFrame(columns=["Number of Observations"], index=["patient", "kindred"])
+    summary.loc['patient', "Number of Observations"] = len(out_table)
+    if not args.cluster:
+        create_figures(out_table, "by_patient")
+
+    # Clustering
+    clustered = dataframe_snf(out_table, "by_patient").fillna(0)
+
+    # grouping by kindred
+    out_table = out_table.set_index(["PMID", "Kindred Case", "Mutation Event c.DNA."])
+    out_table_phens = out_table[COMPUTED_COLUMNS["generalized_phenotype"]].groupby(out_table.index).agg("sum")
+    out_table_phens[out_table_phens >= 1] = 1
+    out_table_rest = out_table.drop(columns=COMPUTED_COLUMNS["generalized_phenotype"]).groupby(out_table.index).first()
+    out_table = out_table_phens.join(out_table_rest)
     #
-    # fh = logging.FileHandler('variant_type.log')
-    # # fh.setLevel(logging.DEBUG)
-    # logging.getLogger("variant_type").addHandler(fh)
+    summary.loc['kindred', "Number of Observations"] = len(out_table)
+    if not args.cluster:
+        create_figures(out_table, "by_kindred")
+    clustered = dataframe_snf(out_table, "by_kindred").fillna(0)
 
-    for row in resolution.rows["patient"]:
-        for table in tables[1:]:
-            table.add_row(row)
-
-    for table in tables:
-        table.make_dataframe(include_count=False)
-        # table.normalize(norm_types=['zscore', 'cdf'])
-        table.to_csv(os.path.join(OUTPUT_DIR, f'{table.name}.csv'))
-        table.dataframe.corr(method="pearson").to_csv(os.path.join(OUTPUT_DIR, f'{table.name}_corr.csv'))
-        table.cluster(out_dir=OUTPUT_DIR)
-
-# this is for error checking generalized phenotypes / variant types
-# with open('phenotypes.log', 'r') as file_in:
-# 	unique = set()
-# 	for line in file_in:
-# 		unique.add(line)
-# 	with open('phenotypes.log', 'w') as file_out:
-# 		for item in unique:
-# 			file_out.write(item)
-#
-# with open('variant_type.log', 'r') as file_in:
-# 	unique = set()
-# 	for line in file_in:
-# 		unique.add(line)
-# 	with open('variant_type.log', 'w') as file_out:
-# 		for item in unique:
-# 			file_out.write(item)
+    plt.close('all')
+    ax = summary.plot(kind='bar')
+    plt.xticks(rotation=0)
+    for p in ax.patches:
+        ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+    plt.savefig(f'summary.pdf')

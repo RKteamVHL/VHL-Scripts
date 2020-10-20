@@ -94,8 +94,22 @@ GENE3D_VHL_DOMAINS = {
         "alpha": range(118, 164)
     }
 }
-ALPHA_LEN = len(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]['alpha'])
-BETA_LEN = len(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]['beta'])
+
+
+# sources: https://www.ncbi.nlm.nih.gov/protein/4507891, https://www.uniprot.org/uniprot/P40337,
+# https://www.ebi.ac.uk/interpro/protein/UniProt/P40337/
+VHL_FUNCTIONAL_REGIONS = {
+    "tumour_suppression": set(range(64, 204)),
+    "⍺-Domain": set(range(156, 205)),
+    "β-Domain": set(range(64, 144)),
+    "GXEEX8": set(range(14, 54)),
+    "HIF1_alpha_binding": set([67, 69, 75, 77, 78, 79, 88, 91, 98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 115, 117]),
+    "ElonginB_ElonginC_binding": set([79, 153, 159, 161, 162, 163, 165, 166, 174, 177, 178, 184])
+}
+VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
+
+ALPHA_LEN = len(VHL_FUNCTIONAL_REGIONS['⍺-Domain'])
+BETA_LEN = len(VHL_FUNCTIONAL_REGIONS['β-Domain'])
 CDS_LEN = len(VHL_PROTEIN)
 ## Extraction of Variant Amino Acid / Nucleotide Changes
 
@@ -248,12 +262,27 @@ GENERAL_HPO_TERMS = [
     'hemangioblastoma',
     'retinal capillary hemangioma',
     'pancreatic endocrine tumor',
-    # 'endolymphatic sac tumor',
     'abnormality of the kidney',
     'abnormality of the pancreas',
     # 'abnormality of the epididymis',
-    # 'Abnormality of the ovary'
+    # 'abnormality of the ovary',
+    # 'endolymphatic sac tumor'
 ]
+
+HPO_ABBREVIATIONS = {
+    'hemangioblastoma': 'CHB',
+    'renal cell carcinoma': 'RCC',
+    'retinal capillary hemangioma': 'RA',
+    'neuroendocrine neoplasm': 'PPGL',
+    'pancreatic endocrine tumor': 'PNET',
+    'endolymphatic sac tumor': 'ELST',
+    'abnormality of the pancreas': 'PCT',
+    'abnormality of the kidney': 'RCT',
+    'abnormality of the epididymis': 'ECT',
+    'abnormality of the ovary': 'OCT'
+}
+_abbrv = {v: k for k, v in HPO_ABBREVIATIONS.items()}
+HPO_ABBREVIATIONS.update(_abbrv)
 
 # GENERAL_SO_TERMS = [
 # 	'deletion',
@@ -294,7 +323,7 @@ SO_TERM_TYPES = {
 GENERAL_HPO_NODES = [get_valid_obo(term) for term in GENERAL_HPO_TERMS]
 
 
-def generalized_vhl_phenotype(phenoype):
+def generalized_vhl_phenotype(phenoype, use_abbreviation=True):
     '''Given a node, find its general disease type
     '''
     general_pheno = None
@@ -311,6 +340,8 @@ def generalized_vhl_phenotype(phenoype):
     if general_pheno is None:
         raise ValueError(f"Could not find a generalized term for {valid_hpo}")
 
+    if use_abbreviation:
+        general_pheno = HPO_ABBREVIATIONS[general_pheno]
     return general_pheno
 
 
@@ -380,7 +411,7 @@ def protein_substituion_score(node):
 
 
 # TODO: this changed to accept cdna, not a Node
-def affected_domains(hgvs):
+def _affected_domains(hgvs):
     '''Finds the affected VHL domains for a variant
     '''
     # TODO: make this less nested
@@ -408,9 +439,40 @@ def affected_domains(hgvs):
                         if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(
                                 affected_aa))) > 0:
                             domains_affected.append(domain)
+                # couldnt cast start or end to integer
+                except ValueError as e:
+                    pass
 
-                    if len(domains_affected) == 0:
-                        domains_affected = ["cds"]
+    return domains_affected# TODO: this changed to accept cdna, not a Node
+
+def affected_domains(hgvs):
+    '''Finds the affected VHL domains for a variant
+    '''
+    # TODO: make this less nested
+
+    domains_affected = []
+
+    # hgvs = node['all'].get('cdnaChange', None)
+    if hgvs is not None:
+
+        # there was a typo in Civic for VARIANT L89R(c.266T>G)
+        # ENST00000256474.2:.266T>G
+        match = DNA_REGEX.match(hgvs)
+        if match is not None:
+            var = match.groupdict()
+            # if the variant is not utr or intronic
+            if var['startNonCDS'] is None and var['stopNonCDS'] is None:
+                try:
+                    start_aa = math.floor(int(var['start']) / 3) + 1
+                    stop_aa = math.floor(int(var['end']) / 3) + 1 if var['end'] is not None else start_aa + 1
+
+                    affected_aa = set(range(start_aa, stop_aa))
+
+                    for domain in VHL_FUNCTIONAL_REGIONS:
+                        # if theres overlap in aa's between the variant and each domain
+                        if len(list(VHL_FUNCTIONAL_REGIONS[domain] & affected_aa)) > 0:
+                            domains_affected.append(domain)
+
                 # couldnt cast start or end to integer
                 except ValueError as e:
                     pass
