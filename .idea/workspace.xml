@@ -2,25 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/client-soappy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/constants.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_cnn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_decisiontree.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/validation/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/validation/__main__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/validation/core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/ClusteringGraph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/FamilyGraph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/PatientGraph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/VariantGraph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/clustering/constants.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/plotting/GraphPlotter.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/plotting/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/variant_nodes.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/variant_nodes_with_similarities.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" afterDir="false" />
     </list>
@@ -136,6 +130,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Analysis.validation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="VHL-Scripts" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="Analysis.validation" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,7 +178,13 @@
       <item itemvalue="Python.Analysis Live" />
       <item itemvalue="Python.Analysis cached" />
       <item itemvalue="Python.Analysis recluster" />
+      <item itemvalue="Python.Analysis.validation" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Analysis.validation" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -178,7 +200,13 @@
       <workItem from="1602983933312" duration="10000" />
       <workItem from="1603132392998" duration="3824000" />
       <workItem from="1603140218584" duration="616000" />
-      <workItem from="1603215644801" duration="3200000" />
+      <workItem from="1603215644801" duration="3429000" />
+      <workItem from="1603565246923" duration="7953000" />
+      <workItem from="1603575413781" duration="6176000" />
+      <workItem from="1603841679570" duration="3571000" />
+      <workItem from="1604620750789" duration="28204000" />
+      <workItem from="1605142815866" duration="768000" />
+      <workItem from="1605143653112" duration="59901000" />
     </task>
     <servers />
   </component>
@@ -220,18 +248,20 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="277" y="95" key="#Python/0.0.1368.872@0.0.1368.872" timestamp="1598388875232" />
-    <state x="140" y="92" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1598813103647">
-      <screen x="0" y="0" width="1368" height="872" />
+    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605564612090">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="140" y="92" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1368.872@0.0.1368.872" timestamp="1598813103647" />
+    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605564612090" />
     <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598388967804">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1368.872@0.0.1368.872" timestamp="1598388967804" />
-    <state x="483" y="160" key="#xdebugger.evaluate" timestamp="1600358721604">
-      <screen x="0" y="0" width="1368" height="872" />
+    <state x="819" y="432" key="#xdebugger.evaluate" timestamp="1605805087296">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="483" y="160" key="#xdebugger.evaluate/0.0.1368.872@0.0.1368.872" timestamp="1600358721604" />
+    <state x="819" y="432" key="#xdebugger.evaluate/0.0.1920.1040@0.0.1920.1040" timestamp="1605805087296" />
     <state x="93" y="93" width="1181" height="685" key="DiffContextDialog" timestamp="1598059818898">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
@@ -241,154 +271,69 @@
     </state>
     <state x="465" y="192" key="FileChooserDialogImpl/0.0.1368.872@0.0.1368.872" timestamp="1599330491846" />
     <state x="653" y="229" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1603140245087" />
-    <state width="1877" height="311" key="GridCell.Tab.0.bottom" timestamp="1603218853788">
+    <state width="1877" height="204" key="GridCell.Tab.0.bottom" timestamp="1605805089378">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="311" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853788" />
-    <state width="1877" height="311" key="GridCell.Tab.0.center" timestamp="1603218853787">
+    <state width="1877" height="204" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089378" />
+    <state width="1877" height="204" key="GridCell.Tab.0.center" timestamp="1605805089377">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="311" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853787" />
-    <state width="1877" height="311" key="GridCell.Tab.0.left" timestamp="1603218853787">
+    <state width="1877" height="204" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
+    <state width="1877" height="204" key="GridCell.Tab.0.left" timestamp="1605805089377">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="311" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853787" />
-    <state width="1877" height="311" key="GridCell.Tab.0.right" timestamp="1603218853787">
+    <state width="1877" height="204" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
+    <state width="1877" height="204" key="GridCell.Tab.0.right" timestamp="1605805089377">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="311" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853787" />
-    <state width="1877" height="311" key="GridCell.Tab.1.bottom" timestamp="1603218853697">
+    <state width="1877" height="204" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
+    <state width="1877" height="204" key="GridCell.Tab.1.bottom" timestamp="1605805089262">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="311" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853697" />
-    <state width="1877" height="311" key="GridCell.Tab.1.center" timestamp="1603218853697">
+    <state width="1877" height="204" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
+    <state width="1877" height="204" key="GridCell.Tab.1.center" timestamp="1605805089262">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="311" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853697" />
-    <state width="1877" height="311" key="GridCell.Tab.1.left" timestamp="1603218853697">
+    <state width="1877" height="204" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
+    <state width="1877" height="204" key="GridCell.Tab.1.left" timestamp="1605805089262">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392759" />
-    <state width="1877" height="311" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853697" />
-    <state width="1877" height="311" key="GridCell.Tab.1.right" timestamp="1603218853697">
+    <state width="1877" height="204" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
+    <state width="1877" height="204" key="GridCell.Tab.1.right" timestamp="1605805089262">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1348" height="252" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="311" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1603218853697" />
-    <state x="186" y="79" key="SettingsEditor" timestamp="1598387559969">
-      <screen x="0" y="0" width="1368" height="872" />
+    <state width="1877" height="204" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
+    <state x="261" y="94" key="SettingsEditor" timestamp="1605565464127">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="186" y="79" key="SettingsEditor/0.0.1368.872@0.0.1368.872" timestamp="1598387559969" />
+    <state x="261" y="94" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1605565464127" />
+    <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1605653976815">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1605653976815" />
     <state x="380" y="261" key="com.intellij.ide.util.TipDialog" timestamp="1599337278036">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state x="380" y="261" key="com.intellij.ide.util.TipDialog/0.0.1368.872@0.0.1368.872" timestamp="1599337278036" />
   </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1603218853672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="variant_link" />
+      </configuration>
+    </watches-manager>
   </component>
-  <component name="debuggerHistoryManager">
-    <expressions id="evaluateCodeFragment">
-      <expression>
-        <expression-string>df_phen[df_phen['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding'])</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_phen[df_phen['region.alpha'] &gt;= 1]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_phen[df_phen['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding']).sum()[row]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_phen[df_phen['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding']).sum()</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>len(df_clust[df_clust['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding']))</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust[df_clust['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding']).count()</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust[df_clust['region.alpha'] &gt;= 1].dropna(
-            subset=['region.ElonginB_ElonginC_binding'])</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust[df_clust['region.alpha'] &gt;= 1].dropna(
-           subset=['region.ElonginB_ElonginC_binding']).sum()</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-    </expressions>
-    <expressions id="evaluateExpression">
-      <expression>
-        <expression-string>df_phen[(df_phen['region.alpha'] &gt;= 1) &amp; (df_phen['region.ElonginB_ElonginC_binding'].isna())].sum()[row]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>len(df_phen[(df_phen['region.alpha'] &gt;= 1) &amp; (df_phen['region.ElonginB_ElonginC_binding'].isna())])</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_phen[(df_phen['region.alpha'] &gt;= 1) &amp; (df_phen['region.ElonginB_ElonginC_binding'].isna())]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_phen[df_phen['region.alpha'] &gt;= 1]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>len(df_phen)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust[df_clust['region.beta'] &gt;= 1]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust['region.beta'] &gt;= 1</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>df_clust[df_clust['region.beta'] &gt;= 1].dropna(             subset=['region.HIF1_alpha_binding'])</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>len(df_clust[df_clust['region.beta'] &gt;= 1])</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-    </expressions>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/VHL_Scripts$__main__.coverage" NAME="Analysis.validation Coverage Results" MODIFIED="1605574903947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1605805089240" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

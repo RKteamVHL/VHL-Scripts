@@ -284,40 +284,60 @@ HPO_ABBREVIATIONS = {
 _abbrv = {v: k for k, v in HPO_ABBREVIATIONS.items()}
 HPO_ABBREVIATIONS.update(_abbrv)
 
-# GENERAL_SO_TERMS = [
-# 	'deletion',
-# 	'exon_loss_variant',
-# 	'missense_variant',
-# 	'stop_gained',
-# 	'utr_variant',
-# 	'inframe_indel',
-# 	'delins',
-# 	'frameshift_variant',
-# 	'splice_site_variant'
-# ]
+GENERAL_SO_TERMS = [
+	'deletion',
+	'exon_loss_variant',
+	'missense_variant',
+	'stop_gained',
+	'utr_variant',
+	'inframe_indel',
+	'delins',
+	'frameshift_variant',
+	'splice_site_variant',
+    'start_lost',
+    'synonymous_variant',
+    'intron_variant',
+    'stop_lost'
+]
+
+
+
 SO_TERM_TYPES = {
-    # group a)
-    'frameshift_variant': 'severe_LOF',
-    'stop_gained': 'severe_LOF',
-    'deletion': 'severe_LOF',
-    'exon_loss_variant': 'severe_LOF',
-    'start_lost': 'severe_LOF',
-    'splice_site_variant': 'severe_LOF',
-
-    # group b)
-    'missense_variant': 'partial_LOF',
-    'inframe_indel': 'partial_LOF',
-
-    # group c)
-    'synonymous_variant': 'minimal_LOF',
-    'intron_variant': 'minimal_LOF',
-
-    # group d)
-    'utr_variant': 'misc_LOF',
-    'stop_lost': 'misc_LOF',
-    'delins': 'misc_LOF',
-
+    'truncating': ['stop_gained', 'deletion', 'exon_loss_variant', 'start_lost', 'frameshift_variant'],
+    'missense': ['missense_variant', 'inframe_indel'],
 }
+# SO_TERM_TYPES = {
+#     'frameshift': ['frameshift_variant'],
+#     'nonsense': ['stop_gained'],
+#     'deletion': ['deletion', 'exon_loss_variant', 'start_lost'],
+#     'splice': ['splice_site_variant'],
+#     'missense': ['missense_variant', 'inframe_indel'],
+#     'intronic': ['intron_variant', 'utr_variant']
+#
+# }
+# SO_TERM_TYPES = {
+#     # group a)
+#     'frameshift_variant': 'severe_LOF',
+#     'stop_gained': 'severe_LOF',
+#     'deletion': 'severe_LOF',
+#     'exon_loss_variant': 'severe_LOF',
+#     'start_lost': 'severe_LOF',
+#     'splice_site_variant': 'severe_LOF',
+#
+#     # group b)
+#     'missense_variant': 'partial_LOF',
+#     'inframe_indel': 'partial_LOF',
+#
+#     # group c)
+#     'synonymous_variant': 'minimal_LOF',
+#     'intron_variant': 'minimal_LOF',
+#
+#     # group d)
+#     'utr_variant': 'misc_LOF',
+#     'stop_lost': 'misc_LOF',
+#     'delins': 'misc_LOF',
+#
+# }
 
 # TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [get_valid_obo(term) for term in GENERAL_HPO_TERMS]
@@ -345,9 +365,6 @@ def generalized_vhl_phenotype(phenoype, use_abbreviation=True):
     return general_pheno
 
 
-GENERAL_SO_NODES = [get_valid_obo(term) for term in SO_TERM_TYPES.keys()]
-
-
 def generalized_so_terms(so_type):
     '''Given a node, find its general so_type
     '''
@@ -357,8 +374,8 @@ def generalized_so_terms(so_type):
     valid_so = get_valid_obo(so_type)
     for successor in nx.bfs_successors(OBONET, valid_so):
         try:
-            i = GENERAL_SO_NODES.index(successor[0])
-            general_so = GENERAL_SO_NODES[i]
+            i = GENERAL_SO_TERMS.index(successor[0])
+            general_so = GENERAL_SO_TERMS[i]
             break
         except ValueError as e:
             pass
@@ -482,7 +499,7 @@ def affected_domains(hgvs):
 
 def get_cdna_start(hgvs):
     match = DNA_REGEX.match(hgvs)
-    cdna_start = 0
+    cdna_start = None
     if match is not None:
         var = match.groupdict()
         # if the variant is not utr or intronic

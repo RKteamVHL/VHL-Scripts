@@ -162,6 +162,26 @@ def mutant_type_ratios(df):
 
     plt.ylabel("Number of Occurences")
 
+def grouped_mutant_type_ratios(df):
+    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["grouped_mutation_type"]]]
+    pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["grouped_mutation_type"], index=COMPUTED_COLUMNS["generalized_phenotype"])
+
+    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
+        phen_agg = df[df[col] >= 1].sum()
+        pheno_muttypes.loc[col] = phen_agg[COMPUTED_COLUMNS["grouped_mutation_type"]]
+
+    pheno_muttypes = pheno_muttypes.rename_axis("Phenotype", axis=0).rename_axis("Mutant Type", axis=1).rename(lambda x: x.split(".")[1])
+    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[1])
+
+    pheno_muttypes =  pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
+
+    ax = pheno_muttypes.plot(kind="bar", legend=True, figsize=(12, 6), fontsize=8)
+    ax.legend(ncol=2)
+    ax.figure.subplots_adjust(left=0.1, bottom=0.35)
+
+    autolabel(ax, ax.patches)
+
+    plt.ylabel("Ratios of Mutation Types")
 
 def codon_phenotype_subplots(df):
     df = df.set_index("codon_start")
@@ -382,6 +402,24 @@ def plot_clustered_stacked(dfall, labels=None, title="multiple stacked bar plot"
     return axe
 
 
+def autolabel(ax, rects, xpos='center'):
+    """
+    Attach a text label above each bar in *rects*, displaying its height.
+
+    *xpos* indicates which side to place the text w.r.t. the center of
+    the bar. It can be one of the following {'center', 'right', 'left'}.
+    """
+
+    xpos = xpos.lower()  # normalize the case of the parameter
+    ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+    offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}  # x_txt = x + w*off
+
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,
+                f'{height:.2f}', ha=ha[xpos], va='bottom')
+
+
 def create_figures(df, analysis_type):
     fns = [
             regions_alpha_beta,
@@ -396,6 +434,7 @@ def create_figures(df, analysis_type):
             phenotype_correlation_ratio,
             penetrance,
             regions,
+            grouped_mutant_type_ratios
         ]
 
     for fn in fns:

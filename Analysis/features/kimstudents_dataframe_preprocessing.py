@@ -10,7 +10,7 @@ import math
 EVALUATED_AGE_REGEX = re.compile("E((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 
-CDNA_REGEX = re.compile("c\.([0-9]+)[ATCG]")
+# CDNA_REGEX = re.compile("c\.([0-9]+)[ATCG]")
 
 COMPUTED_COLUMNS = {
     "phenotype": [],
@@ -23,7 +23,8 @@ COMPUTED_COLUMNS = {
     "sex": [],
     "resolution": [],
     "domain": [],
-    "region": []
+    "region": [],
+    "grouped_mutation_type": []
 }
 
 def _phenotype_string_to_list(x, generalize=True):
@@ -157,11 +158,10 @@ def _start_cdna_change(x):
     output = {}
     for cdna in cdna_list:
 
-        match = CDNA_REGEX.match(cdna)
+        match = vf.get_cdna_start(cdna)
 
-        if match:
-            num = match.group(1)
-            output["cdna_start"] = int(num)
+        if match is not None:
+            output["cdna_start"] = match
 
 
     return output
@@ -249,6 +249,7 @@ def _functional_regions_from_cdna(x):
 
     return domain_val
 
+
 def add_region_columns(df):
     series = df['Mutation Event c.DNA.'].apply(_functional_regions_from_cdna)
 
@@ -256,6 +257,20 @@ def add_region_columns(df):
     COMPUTED_COLUMNS["region"].extend(featurized.columns.to_list())
     df = df.join(featurized)
     return df
+
+
+def add_grouped_mutation_type_columns(df):
+    for grouptype, muttype_list in vf.SO_TERM_TYPES.items():
+        groupcol = f'grouped_mutation_type.{grouptype}'
+        df[groupcol] = 0
+        for mtype in muttype_list:
+            df[groupcol] = df[groupcol] + df[f'generalized_mutant_type.{mtype}'].fillna(0)
+
+    colnames = [f'grouped_mutation_type.{sotype}' for sotype in vf.SO_TERM_TYPES.keys()]
+    COMPUTED_COLUMNS["grouped_mutation_type"].extend(colnames)
+
+    return df
+
 
 
 def kimstudents_preprocessing(df):
@@ -270,6 +285,7 @@ def kimstudents_preprocessing(df):
           .pipe(add_resolution_columns)
           # .pipe(add_domain_columns)
           .pipe(add_region_columns)
+          .pipe(add_grouped_mutation_type_columns)
           )
     return df
 
