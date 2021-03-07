@@ -14,6 +14,7 @@ LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 
 COMPUTED_COLUMNS = {
     "phenotype": [],
+    "denovo": [],
     "generalized_phenotype": [],
     "mutant_type": [],
     "generalized_mutant_type": [],
@@ -24,6 +25,7 @@ COMPUTED_COLUMNS = {
     "resolution": [],
     "domain": [],
     "region": [],
+    "aa_change": [],
     "grouped_mutation_type": []
 }
 
@@ -208,34 +210,6 @@ def add_resolution_columns(df):
     df = df.join(featurized)
     return df
 
-
-def _domains_from_cdna(x):
-    mutlist = re.split('[;]', x)
-
-    domain_val = {}
-    for term in mutlist:
-        term = term.strip()
-        if term not in NULL_TERMS:
-            for domain in vf.affected_domains(term):
-                col_name = f"domain.{domain}"
-                if domain == "alpha":
-                    domain_val[col_name] = domain_val.get(col_name, 0) + 1
-                elif domain == "beta":
-                    domain_val[col_name] = domain_val.get(col_name, 0) + 1
-                elif domain == "cds":
-                    domain_val[col_name] = domain_val.get(col_name, 0) + 1
-    return domain_val
-
-def add_domain_columns(df):
-    series = df['Mutation Event c.DNA.'].apply(_domains_from_cdna)
-
-    featurized = pd.DataFrame(series.to_list())
-    COMPUTED_COLUMNS["domain"].extend(featurized.columns.to_list())
-    df = df.join(featurized)
-    return df
-
-
-
 def _functional_regions_from_cdna(x):
     mutlist = re.split('[;]', x)
 
@@ -255,6 +229,7 @@ def add_region_columns(df):
 
     featurized = pd.DataFrame(series.to_list())
     COMPUTED_COLUMNS["region"].extend(featurized.columns.to_list())
+    COMPUTED_COLUMNS["domain"].extend([f'region.{dom}' for dom in vf.VHL_DOMAIN_NAMES])
     df = df.join(featurized)
     return df
 
@@ -273,6 +248,27 @@ def add_grouped_mutation_type_columns(df):
 
 
 
+
+def add_aa_change_columns(df):
+    series = df['Predicted Consequence Protein Change'].apply(vf.get_aa_from_predicted_consequence)
+    series = series.apply(lambda x: f"aa_change.{x}")
+    featurized = pd.get_dummies(series).drop(columns=['aa_change.None'])
+
+    COMPUTED_COLUMNS["aa_change"].extend(featurized.columns.to_list())
+    df = df.join(featurized)
+    return df
+
+def add_denovo_column(df):
+    series = df["Confirmed De Novo"].str.strip()
+    series = series.str.casefold()
+    series = series.apply(lambda x: f"denovo.{x}")
+
+    featurized = pd.get_dummies(series)
+    COMPUTED_COLUMNS["denovo"].extend(featurized.columns.to_list())
+
+    df = df.join(featurized)
+    return df
+
 def kimstudents_preprocessing(df):
     df = (df
           .pipe(add_generalized_phenotype_columns)
@@ -282,10 +278,11 @@ def kimstudents_preprocessing(df):
           .pipe(add_cdna_start_columns)
           .pipe(add_codon_columns)
           .pipe(add_sex_columns)
+          .pipe(add_denovo_column)
           .pipe(add_resolution_columns)
-          # .pipe(add_domain_columns)
           .pipe(add_region_columns)
           .pipe(add_grouped_mutation_type_columns)
+          .pipe(add_aa_change_columns)
           )
     return df
 

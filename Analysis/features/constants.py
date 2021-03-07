@@ -1,1 +1,3 @@
 FIGURE_DIR = "figures"
+
+DOMAIN_TICKS = [1, 62, 154, 192, 204, 213]

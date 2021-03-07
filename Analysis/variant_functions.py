@@ -5,7 +5,7 @@ import math
 import networkx as nx
 import obonet
 from Bio import SeqIO
-from Bio.Data.IUPACData import protein_letters_1to3
+from Bio.Data.IUPACData import protein_letters_1to3, protein_letters_3to1
 from Bio.Seq import Seq
 
 ### The functions here are related to variant-based analysis for each individual node.
@@ -61,52 +61,18 @@ CURRENT_VHL_TRANSCRIPT = {
 CURRENT_VHL_PROTEIN = 'NP_000542.1'
 CURRENT_VHL_GENE = 'ENSG00000134086'
 
-PFAM_VHL_DOMAINS = {
-    "ENST00000256474.2": {
-        # 63-143, inclusive
-        "beta": range(63, 144),
-        # 149-204, inclusive
-        "alpha": range(149, 205)
-    },
-
-    # Q: I couldn't find these values on pfam, only on ensembl. Did
-    # ensembl do the mapping, or is it somewhere on pfam?
-    "ENST00000345392.2": {
-        # 63-114, inclusive
-        "beta": range(63, 115),
-        # 114-163, inclusive
-        "alpha": range(114, 164)
-    }
-}
-
-GENE3D_VHL_DOMAINS = {
-    "ENST00000256474.2": {
-        # 51-152, inclusive, 102bp
-        "beta": range(51, 153),
-        # 153-204, inclusive, 52 bp
-        "alpha": range(153, 205)
-    },
-
-    "ENST00000345392.2": {
-        # 51-117, inclusive
-        "beta": range(51, 118),
-        # 118-163, inclusive
-        "alpha": range(118, 164)
-    }
-}
-
-
 # sources: https://www.ncbi.nlm.nih.gov/protein/4507891, https://www.uniprot.org/uniprot/P40337,
 # https://www.ebi.ac.uk/interpro/protein/UniProt/P40337/
 VHL_FUNCTIONAL_REGIONS = {
     "tumour_suppression": set(range(64, 204)),
     "⍺-Domain": set(range(156, 205)),
-    "β-Domain": set(range(64, 144)),
+    "β-Domain": set(range(63, 144)),
     "GXEEX8": set(range(14, 54)),
     "HIF1_alpha_binding": set([67, 69, 75, 77, 78, 79, 88, 91, 98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 115, 117]),
     "ElonginB_ElonginC_binding": set([79, 153, 159, 161, 162, 163, 165, 166, 174, 177, 178, 184])
 }
 VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
+VHL_DOMAIN_NAMES = ["⍺-Domain", "β-Domain", 'Outside of ⍺-Domain and β-Domain']
 
 ALPHA_LEN = len(VHL_FUNCTIONAL_REGIONS['⍺-Domain'])
 BETA_LEN = len(VHL_FUNCTIONAL_REGIONS['β-Domain'])
@@ -159,7 +125,6 @@ RING_TYPE = {
     'G': "purine"
 }
 
-
 def TT_FUNCTION(ref, alt):
     isTransition = RING_TYPE[ref] == RING_TYPE[alt]
     isTransversion = not (RING_TYPE[ref] == RING_TYPE[alt])
@@ -174,6 +139,31 @@ AA_1TO3['*'] = "Ter"
 AA_1TO3['del'] = "del"
 AA_1TO3['fs'] = "fs"
 AA_1TO3['FS'] = AA_1TO3['fs']
+
+AA_3TO1 = protein_letters_3to1
+
+AA_REGEX = re.compile("p\.(?P<from>[a-zA-Z]{3})[0-9]+(?P<to>[a-zA-Z]{3})")
+
+# Note: only works for missense. e.g.,
+# p.Glu70Lys
+# p.Phe136Ser
+# p.Leu101Arg
+# p.Pro86Arg
+# p.Phe76del
+# p.Glu70Lys
+
+
+def get_aa_from_predicted_consequence(aa_str):
+    match = AA_REGEX.match(aa_str)
+
+    if match is not None:
+        aa_group = match.groupdict()
+        from_aa = aa_group.get('from', None)
+        to_aa = aa_group.get('to', None)
+
+        if from_aa is not None and to_aa is not None:
+            if from_aa in AA_3TO1 and to_aa in AA_3TO1:
+                return f"{AA_3TO1[from_aa]}_{AA_3TO1[to_aa]}"
 
 
 def get_valid_cdna(cdna_str, check_version=False):
@@ -244,18 +234,6 @@ def get_valid_obo(term_or_id, obo_type='name'):
 # (namely, Pancreatic endocrine tumor vs neoplasms and cysts of the pancreas )
 
 
-# GENERAL_HPO_TERMS = [
-# 	'neuroendocrine neoplasm', 					# Pheochromocytoma + Paraganglioma + Pancreatic endocrine tumor + Pancreatic islet cell adenoma
-# 	'renal neoplasm', 							# Renal cell carcinoma + Clear cell renal cell carcinoma
-# 	'neoplasm of the central nervous system', 	# Cerebellar hemangioblastoma + Spinal hemangioblastoma
-# 	'vascular neoplasm', 						# Retinal capillary hemangioma
-# 	'neoplasm of the inner ear', 				# Endolymphatic sac tumor
-# 	'neoplasm of the pancreas',					# Neoplasm of the pancreas
-# 	'abnormal pancreas morphology',				# Pancreatic cysts
-# 	'abnormal renal morphology',				# Renal cysts + Multiple Renal cysts
-# 	'abnormality of the epididymis'				# Epididymal cyst
-# ]
-
 GENERAL_HPO_TERMS = [
     'neuroendocrine neoplasm',
     'renal cell carcinoma',
@@ -300,44 +278,10 @@ GENERAL_SO_TERMS = [
     'stop_lost'
 ]
 
-
-
 SO_TERM_TYPES = {
     'truncating': ['stop_gained', 'deletion', 'exon_loss_variant', 'start_lost', 'frameshift_variant'],
     'missense': ['missense_variant', 'inframe_indel'],
 }
-# SO_TERM_TYPES = {
-#     'frameshift': ['frameshift_variant'],
-#     'nonsense': ['stop_gained'],
-#     'deletion': ['deletion', 'exon_loss_variant', 'start_lost'],
-#     'splice': ['splice_site_variant'],
-#     'missense': ['missense_variant', 'inframe_indel'],
-#     'intronic': ['intron_variant', 'utr_variant']
-#
-# }
-# SO_TERM_TYPES = {
-#     # group a)
-#     'frameshift_variant': 'severe_LOF',
-#     'stop_gained': 'severe_LOF',
-#     'deletion': 'severe_LOF',
-#     'exon_loss_variant': 'severe_LOF',
-#     'start_lost': 'severe_LOF',
-#     'splice_site_variant': 'severe_LOF',
-#
-#     # group b)
-#     'missense_variant': 'partial_LOF',
-#     'inframe_indel': 'partial_LOF',
-#
-#     # group c)
-#     'synonymous_variant': 'minimal_LOF',
-#     'intron_variant': 'minimal_LOF',
-#
-#     # group d)
-#     'utr_variant': 'misc_LOF',
-#     'stop_lost': 'misc_LOF',
-#     'delins': 'misc_LOF',
-#
-# }
 
 # TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [get_valid_obo(term) for term in GENERAL_HPO_TERMS]
@@ -384,83 +328,6 @@ def generalized_so_terms(so_type):
         raise ValueError(f"Could not find a generalized term for {valid_so}")
 
     return general_so
-
-
-# TODO: code these
-
-def protein_change(node):
-    pass
-
-
-def nucleotide_change(node):
-    pass
-
-
-def transition_translation(node):
-    pass
-
-
-def protein_substituion_score(node):
-    pass
-
-
-# TODO: figure out if this is needed; remove if not
-# def aa_change_from_cds(cds):
-# 	aa_change = None
-
-# 	match = DNA_REGEX.match(cds)
-# 		if match is not None:
-# 			var = match.groupdict()
-
-# 			#if the variant is not utr or intronic
-# 			if (var['startNonCDS'] is None and var['stopNonCDS'] is None):
-# 				reading_frame_i = math.floor(int(var['start'])/3)
-# 				codon_i = int(var['start'])%3
-
-# 				aa1= VHL_CDS[reading_frame_i:reading_frame_i+3].translate()
-# 				aa1_i = reading_frame_i + 1
-# 				# if ins, dup, or del of length != 3, then FS 
-
-# 				start_aa_i = 
-# 				stop_aa_i = math.floor(int(var['end'])/3) if var['end'] is not None else start_aa + 1
-
-# 				start_aa = VHL_PROTEIN[start_aa_i]
-
-
-# TODO: this changed to accept cdna, not a Node
-def _affected_domains(hgvs):
-    '''Finds the affected VHL domains for a variant
-    '''
-    # TODO: make this less nested
-
-    domains_affected = []
-
-    # hgvs = node['all'].get('cdnaChange', None)
-    if hgvs is not None:
-
-        # there was a typo in Civic for VARIANT L89R(c.266T>G)
-        # ENST00000256474.2:.266T>G
-        match = DNA_REGEX.match(hgvs)
-        if match is not None:
-            var = match.groupdict()
-            # if the variant is not utr or intronic
-            if var['startNonCDS'] is None and var['stopNonCDS'] is None:
-                try:
-                    start_aa = math.floor(int(var['start']) / 3) + 1
-                    stop_aa = math.floor(int(var['end']) / 3) + 1 if var['end'] is not None else start_aa + 1
-
-                    affected_aa = range(start_aa, stop_aa)
-
-                    for domain in GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']]:
-                        # if theres overlap in aa's between the variant and each domain
-                        if len(list(set(GENE3D_VHL_DOMAINS[CURRENT_VHL_TRANSCRIPT['ensembl']][domain]) & set(
-                                affected_aa))) > 0:
-                            domains_affected.append(domain)
-                # couldnt cast start or end to integer
-                except ValueError as e:
-                    pass
-
-    return domains_affected# TODO: this changed to accept cdna, not a Node
 
 def affected_domains(hgvs):
     '''Finds the affected VHL domains for a variant

@@ -45,7 +45,9 @@ STUDENTS_HEADER_NAMES = [
     "Resolution",
     "associatedPhenotypes",
     "variantTypes",
-    "Kindred Case (pedigree)"
+    "Kindred Case (pedigree)",
+    "HGVS_transcript",
+    "HGVS_Predicted_Protein"
 ]
 
 
@@ -73,7 +75,7 @@ class KimStudents(Fetcher):
 
             self.rows = chain(self.rows, csv.DictReader(new_rows, delimiter=ROW_DELIMITER))
 
-        self.filter_rows(lambda row: row['PMID'].isdigit())
+        self.filter_rows(lambda row: row['PMID'].strip() != "PMID")
 
     def filter_rows(self, filt_fun):
         out_rows = []

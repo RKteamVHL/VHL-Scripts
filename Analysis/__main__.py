@@ -6,18 +6,46 @@ from .features.kimstudents_dataframe_preprocessing import *
 from .features.kimstudents_dataframe_views import *
 from .features.kimstudents_dataframe_clustering import *
 from .features.kimstudents_dataframe_decisiontree import *
+from .features.kimstudents_dataframe_stats import STAT_NAMES_FUNCTIONS, run_stats
 
 from .validation.core import get_umd_variants
+
+import numpy as np
 
 OUTPUT_DIR = "output"
 
 if not os.path.isdir(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
+def groupby_patient(df):
+    patient_df = df[df["Resolution"].str.casefold() == "patient"]
+    return patient_df
+
+def groupby_variant(df):
+    variant_df_all = df[df["Resolution"].isin(["patient", "family", "tumour", "variant"])]
+    variant_df = variant_df_all.set_index(["Mutation Event c.DNA."])
+
+    variant_df_phens = variant_df[COMPUTED_COLUMNS["generalized_phenotype"]].groupby(variant_df.index).agg("sum")
+    variant_df_phens[variant_df_phens >= 1] = 1
+    variant_df_rest = variant_df.drop(columns=COMPUTED_COLUMNS["generalized_phenotype"]).groupby(variant_df.index).first()
+    variant_df = variant_df_phens.join(variant_df_rest)
+    return variant_df
+
+def groupby_kindred(df):
+    kindred_df_all = df[df["Resolution"].isin(["patient", "family"])]
+    kindred_df = kindred_df_all.set_index(["PMID", "Kindred Case", "Mutation Event c.DNA."])
+    kindred_df_phens = kindred_df[COMPUTED_COLUMNS["generalized_phenotype"]].groupby(kindred_df.index).agg("sum")
+    kindred_df_phens[kindred_df_phens >= 1] = 1
+    kindred_df_rest = kindred_df.drop(columns=COMPUTED_COLUMNS["generalized_phenotype"]).groupby(kindred_df.index).first()
+    kindred_df = kindred_df_phens.join(kindred_df_rest)
+    return kindred_df
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-c', '--cached', help="Load data from local cache", action="store_true")
+    parser.add_argument('-figs', '--createfigs', help="Create all figures", action="store_true")
     parser.add_argument('-cl', '--cluster', help="Only redo clustering, rather than create all figures", action="store_true")
     args = parser.parse_args()
 
@@ -41,12 +69,12 @@ if __name__ == '__main__':
     out_table = out_table.pipe(kimstudents_preprocessing)
     out_table["Resolution"] = out_table["Resolution"].str.casefold()
 
-    #dropping all rows that dont have a single mutation type or phenotype
-    # see pmid 28388566: row is recorded as CHB, even though there is no mutation for this patient
-    out_table = out_table.dropna(subset=COMPUTED_COLUMNS["generalized_phenotype"], how='all')
-    out_table = out_table.dropna(subset=COMPUTED_COLUMNS["generalized_mutant_type"], how='all')
-    summary = pd.DataFrame(columns=["Number of Observations"], index=["patient", "kindred", "variant"])
+    #dropping all rows that dont have a single mutation type and phenotype
+    # see pmid 28388566 in sheet: row is recorded as CHB, even though there is no mutation for this patient
+    out_table = out_table.dropna(subset=[*COMPUTED_COLUMNS["generalized_phenotype"],
+                                         *COMPUTED_COLUMNS["generalized_mutant_type"]], how='all')
 
+    out_table.to_csv("unfiltered_out.csv")
     if not os.path.isfile("umd.csv"):
         umd_variant_df = get_umd_variants()
         umd_variant_df.to_csv("umd.csv")
@@ -58,52 +86,51 @@ if __name__ == '__main__':
     umd_variant_df.to_csv('umd_out.csv')
 
 
-    # Patient resolution
+    out_df = {
+        "patient": out_table.pipe(groupby_patient),
+        "kindred": out_table.pipe(groupby_kindred),
+        "variant": out_table.pipe(groupby_variant)
+    }
+    summary = pd.DataFrame(columns=list(STAT_NAMES_FUNCTIONS.keys()), index=list(out_df.keys()))
 
-    patient_df = out_table[out_table["Resolution"].str.casefold() == "patient"]
-    # out_table = out_table.dropna(subset=COMPUTED_COLUMNS['generalized_mutant_type'], how='all')
-    summary.loc['patient', "Number of Observations"] = len(patient_df)
+    for df_type, df_out in out_df.items():
 
-    if not args.cluster:
-        create_figures(patient_df, "by_patient")
+        for statname, statfunc in STAT_NAMES_FUNCTIONS.items():
+            summary.loc[df_type, statname] = statfunc(df_out)
+        df_out.sum(skipna=True, numeric_only=True).to_csv(f"pre_dropna_{df_type}.csv")
+        df_out[df_out[COMPUTED_COLUMNS["generalized_phenotype"]] == 0] = np.NaN
+        df = df_out.dropna(subset=COMPUTED_COLUMNS["generalized_phenotype"], how='all')
+        df = df.dropna(subset=COMPUTED_COLUMNS["generalized_mutant_type"], how='all')
 
-    clustered = dataframe_snf(patient_df, "by_patient").fillna(0)
-    decision = dataframe_decisiontree(patient_df, "by_patient")
+
+        df_out.sum(skipna=True, numeric_only=True).to_csv(f"post_dropna_{df_type}.csv")
 
 
-    # Variant resolution
-    variant_df_all = out_table[out_table["Resolution"].isin(["patient", "family", "tumour", "variant"])]
-    variant_df = variant_df_all.set_index(["Mutation Event c.DNA."])
+        if args.createfigs:
+            if not args.cluster:
+                create_descriptive_figures(df, df_type)
 
-    variant_df_phens = variant_df[COMPUTED_COLUMNS["generalized_phenotype"]].groupby(variant_df.index).agg("sum")
-    variant_df_phens[variant_df_phens >= 1] = 1
-    variant_df_rest = variant_df.drop(columns=COMPUTED_COLUMNS["generalized_phenotype"]).groupby(variant_df.index).first()
-    variant_df = variant_df_phens.join(variant_df_rest)
+            clustered = dataframe_snf(df, df_type).fillna(0)
 
-    summary.loc['variant', "Number of Observations"] = len(variant_df)
-    if not args.cluster:
-        create_figures(variant_df, "by_variant")
+            create_cluster_summaries(clustered, df_type)
+            create_cluster_phenotype_summaries(clustered, df_type)
 
-    clustered = dataframe_snf(variant_df, "by_variant").fillna(0)
-    decision = dataframe_decisiontree(variant_df, "by_variant")
+            #disable the decision tree for now
+            # decision = dataframe_decisiontree(df, df_type)
 
-    # Kindred resolution
-    kindred_df_all = out_table[out_table["Resolution"].isin(["patient", "family"])]
-    kindred_df = kindred_df_all.set_index(["PMID", "Kindred Case", "Mutation Event c.DNA."])
-    kindred_df_phens = kindred_df[COMPUTED_COLUMNS["generalized_phenotype"]].groupby(kindred_df.index).agg("sum")
-    kindred_df_phens[kindred_df_phens >= 1] = 1
-    kindred_df_rest = kindred_df.drop(columns=COMPUTED_COLUMNS["generalized_phenotype"]).groupby(kindred_df.index).first()
-    kindred_df = kindred_df_phens.join(kindred_df_rest)
-    #
-    summary.loc['kindred', "Number of Observations"] = len(kindred_df)
-    if not args.cluster:
-        create_figures(kindred_df, "by_kindred")
-    decision = dataframe_decisiontree(kindred_df, "by_kindred")
-    clustered = dataframe_snf(kindred_df, "by_kindred").fillna(0)
 
     plt.close('all')
-    ax = summary.plot(kind='bar')
-    plt.xticks(rotation=0)
-    for p in ax.patches:
-        ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    plt.savefig(f'summary.pdf')
+    summary.to_csv("summary.csv")
+
+    run_stats(os.path.join(STATS_DIR, "patient"))
+
+    refs = out_table[["PMID", "Reference"]]
+    refs = refs.groupby(["Reference", "PMID"])
+    refs.first().to_csv("all_refs.csv")
+    # ax = summary.plot(kind='bar')
+    # plt.xticks(rotation=0)
+    # for p in ax.patches:
+    #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+    # plt.savefig(f'summary.pdf')
+
+

@@ -2,18 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
-      <change afterPath="$PROJECT_DIR$/Analysis/features/constants.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_cnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_decisiontree.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/validation/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/validation/__main__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Analysis/validation/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_stats.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/Feature.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/FeatureTable.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatureTables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/KimStudentsFeatures.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/clustering_functions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/features/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/constants.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Analysis/fetching/KimStudents.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/fetching/KimStudents.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" afterDir="false" />
@@ -44,6 +45,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -63,7 +65,29 @@
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Analysis Live">
+  <component name="RunManager" selected="Python.Analysis Live create figs">
+    <configuration name="Analysis Live create figs" type="PythonConfigurationType" factoryName="Python">
+      <module name="VHL-Scripts" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="false" />
+      <option name="ADD_SOURCE_ROOTS" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="Analysis" />
+      <option name="PARAMETERS" value="-figs" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Analysis Live" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -176,6 +200,7 @@
     </configuration>
     <list>
       <item itemvalue="Python.Analysis Live" />
+      <item itemvalue="Python.Analysis Live create figs" />
       <item itemvalue="Python.Analysis cached" />
       <item itemvalue="Python.Analysis recluster" />
       <item itemvalue="Python.Analysis.validation" />
@@ -206,7 +231,18 @@
       <workItem from="1603841679570" duration="3571000" />
       <workItem from="1604620750789" duration="28204000" />
       <workItem from="1605142815866" duration="768000" />
-      <workItem from="1605143653112" duration="59901000" />
+      <workItem from="1605143653112" duration="70415000" />
+      <workItem from="1606259194880" duration="2426000" />
+      <workItem from="1606949415424" duration="21715000" />
+      <workItem from="1608134730908" duration="45000" />
+      <workItem from="1609780659829" duration="22998000" />
+      <workItem from="1610743300959" duration="63988000" />
+      <workItem from="1612456674146" duration="2732000" />
+      <workItem from="1613144317661" duration="1278000" />
+      <workItem from="1613741269599" duration="2066000" />
+      <workItem from="1614020848344" duration="9262000" />
+      <workItem from="1614272199519" duration="3315000" />
+      <workItem from="1614629351787" duration="7020000" />
     </task>
     <servers />
   </component>
@@ -244,96 +280,92 @@
     <option name="LAST_COMMIT_MESSAGE" value="fixed clinvarvar types; adding plotter" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="277" y="95" key="#Python" timestamp="1598388875232">
-      <screen x="0" y="0" width="1368" height="872" />
-    </state>
-    <state x="277" y="95" key="#Python/0.0.1368.872@0.0.1368.872" timestamp="1598388875232" />
-    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605564612090">
+    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1610012982398">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="140" y="92" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1368.872@0.0.1368.872" timestamp="1598813103647" />
-    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605564612090" />
-    <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598388967804">
-      <screen x="0" y="0" width="1368" height="872" />
-    </state>
-    <state x="415" y="184" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1368.872@0.0.1368.872" timestamp="1598388967804" />
-    <state x="819" y="432" key="#xdebugger.evaluate" timestamp="1605805087296">
+    <state x="543" y="188" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1610012982398" />
+    <state x="586" y="238" key="#xdebugger.evaluate" timestamp="1615066066467">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="483" y="160" key="#xdebugger.evaluate/0.0.1368.872@0.0.1368.872" timestamp="1600358721604" />
-    <state x="819" y="432" key="#xdebugger.evaluate/0.0.1920.1040@0.0.1920.1040" timestamp="1605805087296" />
-    <state x="93" y="93" width="1181" height="685" key="DiffContextDialog" timestamp="1598059818898">
-      <screen x="0" y="0" width="1368" height="872" />
-    </state>
-    <state x="93" y="93" width="1181" height="685" key="DiffContextDialog/0.0.1368.872@0.0.1368.872" timestamp="1598059818898" />
-    <state x="653" y="229" key="FileChooserDialogImpl" timestamp="1603140245087">
+    <state x="586" y="238" key="#xdebugger.evaluate/0.0.1920.1040@0.0.1920.1040" timestamp="1611251992415" />
+    <state x="586" y="238" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615066066467" />
+    <state x="653" y="229" key="FileChooserDialogImpl" timestamp="1612492640054">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="465" y="192" key="FileChooserDialogImpl/0.0.1368.872@0.0.1368.872" timestamp="1599330491846" />
-    <state x="653" y="229" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1603140245087" />
-    <state width="1877" height="204" key="GridCell.Tab.0.bottom" timestamp="1605805089378">
+    <state x="653" y="229" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1612492640054" />
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom" timestamp="1615067014674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="204" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089378" />
-    <state width="1877" height="204" key="GridCell.Tab.0.center" timestamp="1605805089377">
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008363" />
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014674" />
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633204809" />
+    <state width="1877" height="281" key="GridCell.Tab.0.center" timestamp="1615067014674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="204" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
-    <state width="1877" height="204" key="GridCell.Tab.0.left" timestamp="1605805089377">
+    <state width="1877" height="281" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008363" />
+    <state width="1877" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014674" />
+    <state width="1877" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633204808" />
+    <state width="1877" height="281" key="GridCell.Tab.0.left" timestamp="1615067014674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="204" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
-    <state width="1877" height="204" key="GridCell.Tab.0.right" timestamp="1605805089377">
+    <state width="1877" height="281" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008363" />
+    <state width="1877" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014674" />
+    <state width="1877" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633204808" />
+    <state width="1877" height="281" key="GridCell.Tab.0.right" timestamp="1615067014674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392902" />
-    <state width="1877" height="204" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089377" />
-    <state width="1877" height="204" key="GridCell.Tab.1.bottom" timestamp="1605805089262">
+    <state width="1877" height="281" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008363" />
+    <state width="1877" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014674" />
+    <state width="1877" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633204808" />
+    <state width="1877" height="281" key="GridCell.Tab.1.bottom" timestamp="1615067014513">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="204" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
-    <state width="1877" height="204" key="GridCell.Tab.1.center" timestamp="1605805089262">
+    <state width="1877" height="281" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008265" />
+    <state width="1877" height="281" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014513" />
+    <state width="1877" height="281" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633447418" />
+    <state width="1877" height="281" key="GridCell.Tab.1.center" timestamp="1615067014512">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="204" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
-    <state width="1877" height="204" key="GridCell.Tab.1.left" timestamp="1605805089262">
+    <state width="1877" height="281" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008265" />
+    <state width="1877" height="281" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014512" />
+    <state width="1877" height="281" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633447418" />
+    <state width="1877" height="281" key="GridCell.Tab.1.left" timestamp="1615067014512">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1600364392759" />
-    <state width="1877" height="204" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
-    <state width="1877" height="204" key="GridCell.Tab.1.right" timestamp="1605805089262">
+    <state width="1877" height="281" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008265" />
+    <state width="1877" height="281" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014512" />
+    <state width="1877" height="281" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633447417" />
+    <state width="1877" height="281" key="GridCell.Tab.1.right" timestamp="1615067014512">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1348" height="252" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1600364392760" />
-    <state width="1877" height="204" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1605805089262" />
-    <state x="261" y="94" key="SettingsEditor" timestamp="1605565464127">
+    <state width="1877" height="281" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1611252008265" />
+    <state width="1877" height="281" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615067014512" />
+    <state width="1877" height="281" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1614633447418" />
+    <state x="261" y="94" key="SettingsEditor" timestamp="1611117812445">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="186" y="79" key="SettingsEditor/0.0.1368.872@0.0.1368.872" timestamp="1598387559969" />
-    <state x="261" y="94" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1605565464127" />
-    <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1605653976815">
+    <state x="261" y="94" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1611117812445" />
+    <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1611106462078">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1605653976815" />
-    <state x="380" y="261" key="com.intellij.ide.util.TipDialog" timestamp="1599337278036">
-      <screen x="0" y="0" width="1368" height="872" />
-    </state>
-    <state x="380" y="261" key="com.intellij.ide.util.TipDialog/0.0.1368.872@0.0.1368.872" timestamp="1599337278036" />
+    <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1611106462078" />
   </component>
   <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="variant_link" />
-      </configuration>
-    </watches-manager>
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/VHL_Scripts$__main__.coverage" NAME="Analysis.validation Coverage Results" MODIFIED="1605574903947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1605805089240" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live_create_figs_.coverage" NAME="Analysis Live create figs Coverage Results" MODIFIED="1610016523209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_cached.coverage" NAME="Analysis cached Coverage Results" MODIFIED="1611184337740" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live_create_figs.coverage" NAME="Analysis Live create figs Coverage Results" MODIFIED="1615067014482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1615066867059" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
