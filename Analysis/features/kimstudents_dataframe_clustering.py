@@ -12,10 +12,8 @@ from .. import variant_functions as vf
 # from sklearn.cluster import spectral_clustering
 from sklearn.cluster import SpectralClustering
 
-def dataframe_snf(df, analysis_type):
-    fig_path = os.path.join(constants.FIGURE_DIR, analysis_type)
-    if not os.path.isdir(fig_path):
-        os.makedirs(fig_path)
+def dataframe_snf(df, directory):
+
 
     col_names = ["generalized_phenotype", "generalized_mutant_type", "codon"]
 
@@ -55,21 +53,25 @@ def dataframe_snf(df, analysis_type):
         # fused_net = snf.snf(feat_metrics, K=len(df_cols.index))
 
     best, second = snf.get_n_clusters(fused_net)
-    n_clust = best
+    sc1 = SpectralClustering(best, affinity='precomputed', n_init=100, assign_labels='discretize')
+    labels1 = sc1.fit_predict(fused_net)
+    df["cluster_labels_best"] = labels1
 
-    sc = SpectralClustering(n_clust, affinity='precomputed', n_init=100, assign_labels='discretize')
-    labels = sc.fit_predict(fused_net)
-    df["cluster_labels"] = labels
-    df = df.sort_values(by="cluster_labels")
-    df.to_csv(os.path.join(fig_path, f"clustered_out.tsv"), sep='\t')
-    plt.close('all')
+    sc2 = SpectralClustering(second, affinity='precomputed', n_init=100, assign_labels='discretize')
+    labels2 = sc2.fit_predict(fused_net)
+    df["cluster_labels_second"] = labels2
 
-    sorted_i = np.argsort(labels, axis=0)
-    for i in range(len(col_names)):
-        sorted_fused = feat_metrics[i][sorted_i, :]
-        sorted_fused = sorted_fused[:, sorted_i]
-        ax = plt.imshow(sorted_fused, cmap='hot', interpolation='nearest')
-        plt.savefig(os.path.join(fig_path, f'sorted_{col_names[i]}_affinities.pdf'))
-        plt.close('all')
+    df = df.sort_values(by="cluster_labels_best")
+
+
+    #plotting affinity mats
+    # plt.close('all')
+    # sorted_i = np.argsort(labels1, axis=0)
+    # for i in range(len(col_names)):
+    #     sorted_fused = feat_metrics[i][sorted_i, :]
+    #     sorted_fused = sorted_fused[:, sorted_i]
+    #     ax = plt.imshow(sorted_fused, cmap='hot', interpolation='nearest')
+    #     plt.savefig(os.path.join(directory, f'sorted_{col_names[i]}_affinities.pdf'))
+    #     plt.close('all')
 
     return df

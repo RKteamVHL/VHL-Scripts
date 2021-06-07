@@ -25,6 +25,7 @@ COMPUTED_COLUMNS = {
     "resolution": [],
     "domain": [],
     "region": [],
+    "cdna_change": [],
     "aa_change": [],
     "grouped_mutation_type": []
 }
@@ -268,6 +269,7 @@ def add_denovo_column(df):
 
     df = df.join(featurized)
     return df
+
 
 def kimstudents_preprocessing(df):
     df = (df

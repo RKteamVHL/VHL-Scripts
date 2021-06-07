@@ -283,6 +283,7 @@ SO_TERM_TYPES = {
     'missense': ['missense_variant', 'inframe_indel'],
 }
 
+
 # TODO: this has been coded for phenotype entry, not Node
 GENERAL_HPO_NODES = [get_valid_obo(term) for term in GENERAL_HPO_TERMS]
 

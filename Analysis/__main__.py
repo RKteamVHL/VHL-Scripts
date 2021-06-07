@@ -11,6 +11,7 @@ from .features.kimstudents_dataframe_stats import STAT_NAMES_FUNCTIONS, run_stat
 from .validation.core import get_umd_variants
 
 import numpy as np
+import pandas as pd
 
 OUTPUT_DIR = "output"
 
@@ -75,6 +76,8 @@ if __name__ == '__main__':
                                          *COMPUTED_COLUMNS["generalized_mutant_type"]], how='all')
 
     out_table.to_csv("unfiltered_out.csv")
+    supplementary_table = out_table.pipe(create_supplementary_tables)
+    supplementary_table.to_csv("supplementary_1.csv", index=False)
     if not os.path.isfile("umd.csv"):
         umd_variant_df = get_umd_variants()
         umd_variant_df.to_csv("umd.csv")
@@ -94,23 +97,22 @@ if __name__ == '__main__':
     summary = pd.DataFrame(columns=list(STAT_NAMES_FUNCTIONS.keys()), index=list(out_df.keys()))
 
     for df_type, df_out in out_df.items():
-
-        for statname, statfunc in STAT_NAMES_FUNCTIONS.items():
-            summary.loc[df_type, statname] = statfunc(df_out)
         df_out.sum(skipna=True, numeric_only=True).to_csv(f"pre_dropna_{df_type}.csv")
         df_out[df_out[COMPUTED_COLUMNS["generalized_phenotype"]] == 0] = np.NaN
         df = df_out.dropna(subset=COMPUTED_COLUMNS["generalized_phenotype"], how='all')
         df = df.dropna(subset=COMPUTED_COLUMNS["generalized_mutant_type"], how='all')
 
+        for statname, statfunc in STAT_NAMES_FUNCTIONS.items():
+            summary.loc[df_type, statname] = statfunc(df)
 
         df_out.sum(skipna=True, numeric_only=True).to_csv(f"post_dropna_{df_type}.csv")
-
 
         if args.createfigs:
             if not args.cluster:
                 create_descriptive_figures(df, df_type)
 
             clustered = dataframe_snf(df, df_type).fillna(0)
+
 
             create_cluster_summaries(clustered, df_type)
             create_cluster_phenotype_summaries(clustered, df_type)
@@ -123,10 +125,21 @@ if __name__ == '__main__':
     summary.to_csv("summary.csv")
 
     run_stats(os.path.join(STATS_DIR, "patient"))
+    run_stats(os.path.join(STATS_DIR, "kindred"))
 
     refs = out_table[["PMID", "Reference"]]
     refs = refs.groupby(["Reference", "PMID"])
     refs.first().to_csv("all_refs.csv")
+
+    vars = out_table.copy()[["HGVS_transcript"]]
+    vars.loc[:, "HGVS_transcript"] = vars["HGVS_transcript"].str.split(";")
+    vars = vars.explode(column="HGVS_transcript")
+    vars.loc[:, "HGVS_transcript"] = vars["HGVS_transcript"].str.replace("NM_000551.3:", "")
+    vars = vars.replace('', np.nan)
+    vars = vars.dropna()
+    vars.to_csv("all_variants.csv")
+
+
     # ax = summary.plot(kind='bar')
     # plt.xticks(rotation=0)
     # for p in ax.patches:
