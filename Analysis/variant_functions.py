@@ -224,7 +224,8 @@ OBONET_UD = OBONET.to_undirected()
 def get_valid_obo(term_or_id, obo_type='name'):
     tid = term_or_id.strip().casefold()
     if tid in OBONET:
-        return OBONET.node[tid][obo_type]
+        node_data = OBONET.nodes[tid][obo_type]
+        return node_data
     else:
         raise ValueError(f"Could not find an OBO node for {tid}")
 
