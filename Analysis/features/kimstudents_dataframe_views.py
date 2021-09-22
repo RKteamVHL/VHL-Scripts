@@ -694,4 +694,5 @@ def create_supplementary_tables(df):
     df_trimmed = df[list(SUPPLEMENTARY_HEADERS.keys())]
     df_trimmed = df_trimmed.rename(columns=SUPPLEMENTARY_HEADERS)
     df_sorted = df_trimmed.sort_values(by=["Reference"])
+    df_sorted = df_sorted.replace(r'^\s*$', "N/A", regex=True)
     return df_sorted

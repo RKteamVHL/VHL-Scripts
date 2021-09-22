@@ -105,7 +105,7 @@ if __name__ == '__main__':
         for statname, statfunc in STAT_NAMES_FUNCTIONS.items():
             summary.loc[df_type, statname] = statfunc(df)
 
-        df_out.sum(skipna=True, numeric_only=True).to_csv(f"post_dropna_{df_type}.csv")
+        df.sum(skipna=True, numeric_only=True).to_csv(f"post_dropna_{df_type}.csv")
 
         if args.createfigs:
             if not args.cluster:

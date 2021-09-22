@@ -4,13 +4,7 @@
     <list default="true" id="21473517-eeb5-49ee-94ef-ec1cbcde06a0" name="Default Changelist" comment="fixed clinvarvar types; adding plotter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_clustering.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_preprocessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_stats.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/features/kimstudents_dataframe_views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/validation/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/validation/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/validation/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/validation/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis/variant_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis/variant_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/civicpy/civicpy/civic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/src/snfpy/snf/compute.py" afterDir="false" />
     </list>
@@ -43,7 +37,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ChordsICanUse" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Streetview-Navigation" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -61,7 +55,7 @@
       <recent name="C:\Users\sean_\Documents\Github\Cloned\VHL-Scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Analysis Live">
+  <component name="RunManager" selected="Python.Analysis Live create figs">
     <configuration name="Analysis Live create figs" type="PythonConfigurationType" factoryName="Python">
       <module name="VHL-Scripts" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -248,6 +242,13 @@
       <workItem from="1621730922193" duration="1942000" />
       <workItem from="1623029664162" duration="3291000" />
       <workItem from="1623077764754" duration="1704000" />
+      <workItem from="1623080603534" duration="2360000" />
+      <workItem from="1623438043943" duration="300000" />
+      <workItem from="1624042936815" duration="410000" />
+      <workItem from="1625613213221" duration="3339000" />
+      <workItem from="1626898615286" duration="2533000" />
+      <workItem from="1628107659810" duration="1242000" />
+      <workItem from="1631572509858" duration="14000" />
     </task>
     <servers />
   </component>
@@ -285,66 +286,46 @@
     <option name="LAST_COMMIT_MESSAGE" value="fixed clinvarvar types; adding plotter" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="600" y="349" width="1092" height="715" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1621528558155">
+    <state x="617" y="104" width="694" height="784" key="#xdebugger.evaluate" timestamp="1623090008314">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="600" y="349" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1621528558155" />
-    <state x="743" y="172" width="694" height="784" key="#xdebugger.evaluate" timestamp="1623032431800">
+    <state x="617" y="104" width="694" height="784" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623090008314" />
+    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1631572521760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="743" y="172" width="694" height="784" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032431800" />
-    <state x="653" y="229" key="FileChooserDialogImpl" timestamp="1618015674113">
+    <state x="740" y="261" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1631572521760" />
+    <state width="1401" height="281" key="GridCell.Tab.0.bottom" timestamp="1627337449310">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="653" y="229" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1618015674113" />
-    <state width="1405" height="281" key="GridCell.Tab.0.bottom" timestamp="1623032974219">
+    <state width="1401" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449310" />
+    <state width="1401" height="281" key="GridCell.Tab.0.center" timestamp="1627337449310">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974219" />
-    <state width="1377" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.0.center" timestamp="1623032974219">
+    <state width="1401" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449310" />
+    <state width="1401" height="281" key="GridCell.Tab.0.left" timestamp="1627337449309">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974219" />
-    <state width="1377" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.0.left" timestamp="1623032974219">
+    <state width="1401" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449309" />
+    <state width="1401" height="281" key="GridCell.Tab.0.right" timestamp="1627337449310">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974219" />
-    <state width="1377" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.0.right" timestamp="1623032974219">
+    <state width="1401" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449310" />
+    <state width="1401" height="281" key="GridCell.Tab.1.bottom" timestamp="1627337449145">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974219" />
-    <state width="1377" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.1.bottom" timestamp="1623032974220">
+    <state width="1401" height="281" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449145" />
+    <state width="1401" height="281" key="GridCell.Tab.1.center" timestamp="1627337449145">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974220" />
-    <state width="1377" height="281" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.1.center" timestamp="1623032974220">
+    <state width="1401" height="281" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449145" />
+    <state width="1401" height="281" key="GridCell.Tab.1.left" timestamp="1627337449145">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974220" />
-    <state width="1377" height="281" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.1.left" timestamp="1623032974220">
+    <state width="1401" height="281" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449145" />
+    <state width="1401" height="281" key="GridCell.Tab.1.right" timestamp="1627337449145">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1405" height="281" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974220" />
-    <state width="1377" height="281" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state width="1405" height="281" key="GridCell.Tab.1.right" timestamp="1623032974220">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1405" height="281" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1623032974220" />
-    <state width="1377" height="281" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1621631196653" />
-    <state x="794" y="92" key="SettingsEditor" timestamp="1615110415787">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="794" y="92" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1615110415787" />
-    <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1621564987047">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="968" height="528" key="XDebugger.FullValuePopup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1621564987047" />
+    <state width="1401" height="281" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1627337449145" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -362,7 +343,7 @@
     <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_validation.coverage" NAME="Analysis.validation Coverage Results" MODIFIED="1621988167556" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live_create_figs_.coverage" NAME="Analysis Live create figs Coverage Results" MODIFIED="1610016523209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_cached.coverage" NAME="Analysis cached Coverage Results" MODIFIED="1617996159534" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live_create_figs.coverage" NAME="Analysis Live create figs Coverage Results" MODIFIED="1617919945054" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1623032746311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live_create_figs.coverage" NAME="Analysis Live create figs Coverage Results" MODIFIED="1627337449112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VHL_Scripts$Analysis_Live.coverage" NAME="Analysis Live Coverage Results" MODIFIED="1623090026992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
