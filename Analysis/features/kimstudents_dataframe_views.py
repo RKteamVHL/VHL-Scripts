@@ -1,5 +1,5 @@
 import os
-
+import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -431,7 +431,7 @@ def _phenotype_correlation(df):
 
 def phenotype_correlation_counts(df):
     pheno_pheno = _phenotype_correlation(df)
-    # ax = sns.heatmap(pheno_pheno.astype(float))
+    ax = sns.heatmap(pheno_pheno.astype(float))
     return pheno_pheno
 
 
@@ -443,7 +443,7 @@ def phenotype_correlation_ratio(df):
             col_max = max(pheno_pheno[col_j].max(), pheno_pheno.loc[col_i].max())
             pheno_pheno.loc[col_i][col_j] = pheno_pheno.loc[col_i][col_j] / col_max
 
-    # ax = sns.heatmap(pheno_pheno.astype(float))
+    ax = sns.heatmap(pheno_pheno.astype(float))
 
     return pheno_pheno
 
@@ -459,7 +459,7 @@ def phenotype_codon_heatmap(df):
     codon_df = codon_df[order]
     # codon_df = codon_df.iloc[:, 0:TAKE_TOP]
 
-    # ax = sns.heatmap(codon_df.astype(float))
+    ax = sns.heatmap(codon_df.astype(float))
 
     return codon_df
 
@@ -479,7 +479,7 @@ def phenotype_aachange_heatmap(df):
     # aachange_df = aachange_df.iloc[:, 0:TAKE_TOP]
 
     # aachange_df = aachange_df.loc[:, (aachange_df.sum() >= 5)]
-    # ax = sns.heatmap(aachange_df.astype(float))
+    ax = sns.heatmap(aachange_df.astype(float))
 
     return aachange_df
 
