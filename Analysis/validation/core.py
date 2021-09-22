@@ -1,5 +1,5 @@
-import requests
 import pandas as pd
+import requests
 from lxml import html
 
 cdna_xpath = '/html/body/div/table[1]/tr[2]/td[1]'

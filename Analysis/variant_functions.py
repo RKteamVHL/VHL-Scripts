@@ -1,7 +1,7 @@
+import math
 import os
 import re
 
-import math
 import networkx as nx
 import obonet
 from Bio import SeqIO

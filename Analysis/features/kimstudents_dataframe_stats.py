@@ -1,14 +1,14 @@
+import os
+from itertools import combinations
+
+import numpy as np
+import pandas as pd
+from scipy.stats import binom_test
+from scipy.stats import chi2_contingency
+from scipy.stats import ks_2samp
+
 from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
 from .kimstudents_dataframe_views import TESTS_DIR, DATA_DIR
-import numpy as np
-from scipy.stats import chi2_contingency
-from scipy.stats import binom_test
-from scipy.stats import fisher_exact
-from scipy.stats import ks_2samp
-from itertools import combinations
-from statsmodels.sandbox.stats.multicomp import multipletests
-import pandas as pd
-import os
 
 PVALUE = 0.05
 

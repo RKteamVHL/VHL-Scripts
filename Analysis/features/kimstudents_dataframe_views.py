@@ -1,12 +1,13 @@
 import os
-import numpy as np
-import pandas as pd
-import seaborn as sns
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from cycler import cycler
-from .. import variant_functions as vf
+
 from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
+from .. import variant_functions as vf
 
 STATS_DIR = "statistics"
 if not os.path.isdir(STATS_DIR):

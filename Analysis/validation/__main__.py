@@ -1,5 +1,6 @@
-from .core import *
 import pandas as pd
+
+from .core import *
 
 if __name__ == "__main__":
     masterlist_ref_df = pd.read_csv("all_refs.csv")

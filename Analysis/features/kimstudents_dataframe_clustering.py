@@ -1,16 +1,9 @@
-from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
-from . kimstudents_dataframe_views import plot_clustered_stacked
 import snf
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-from . import constants
-import seaborn as sns
-import numpy as np
-
-from .. import variant_functions as vf
 # from sklearn.cluster import spectral_clustering
 from sklearn.cluster import SpectralClustering
+
+from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
+
 
 def dataframe_snf(df, directory):
 

@@ -1,11 +1,12 @@
+import collections
+import logging
+import re
+
+import numpy as np
 import pandas as pd
+
 from .. import variant_functions as vf
 from ..constants import *
-import re
-import numpy as np
-import logging
-import collections
-import math
 
 EVALUATED_AGE_REGEX = re.compile("E((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
