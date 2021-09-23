@@ -10,3 +10,5 @@ lxml~=4.6.3
 networkx~=2.6.3
 obonet~=0.3.0
 seaborn~=0.11.2
+snfpy~=0.2.2
+biopython~=1.79

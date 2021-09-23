@@ -4,8 +4,12 @@ Python version 3.7 or later is required for running all scripts. The libraries u
 ```requirements.txt
 numpy~=1.21.2           # numpy, pandas, and scipy are used for all data manipulation, including  
 pandas~=1.3.3           # acquistion, cleaning/filtering, and metric calculations
-scipy~=1.7.1            
-scikit-learn~=0.24.2    # scikit-learn is used for the spectral clustering of patient, kindred, and variant graphs
+scipy~=1.7.1 
+obonet~=0.3.0           # obonet is used for Human phenotype and sequennce ontologies
+biopython~=1.79         # biopython is used for pVHL protein changes
+scikit-learn~=0.24.2    # scikit-learn is used with snfpy and networkx for the spectral clustering of patient, kindred, and variant graphs
+networkx~=2.6.3
+snfpy~=0.2.2
 matplotlib~=3.4.3       # matplotlib and cycler are used in the creation of all figures
 cycler~=0.10.0
 seaborn~=0.11.2         # seaborn is used for the heatmap visualizations
