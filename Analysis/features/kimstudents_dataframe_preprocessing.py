@@ -287,6 +287,7 @@ def kimstudents_preprocessing(df):
           .pipe(add_grouped_mutation_type_columns)
           .pipe(add_aa_change_columns)
           )
+    df["Resolution"] = df["Resolution"].str.casefold()
     return df
 
 

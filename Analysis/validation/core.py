@@ -1,6 +1,14 @@
 import pandas as pd
 import requests
 from lxml import html
+import os
+
+STATS_DIR = "statistics"
+VALIDATION_DIR = "validation"
+
+validation_path = os.path.join(STATS_DIR, VALIDATION_DIR)
+if not os.path.isdir(validation_path):
+    os.makedirs(validation_path)
 
 cdna_xpath = '/html/body/div/table[1]/tr[2]/td[1]'
 aa_xpath = '/html/body/div/table[1]/tr[2]/td[2]'
@@ -107,7 +115,7 @@ def get_umd_variants():
 
         pubmed_ele = v_tree.xpath(pubmed_xpath)
         if pubmed_ele and pubmed_ele[0].text.isdecimal():
-            variant["UMD_PMID"] = pubmed_ele[0].text
+            variant["UMD_PMID"] = int(pubmed_ele[0].text)
 
 
         if variant:
@@ -116,3 +124,16 @@ def get_umd_variants():
     variant_df = pd.DataFrame.from_dict(variants)
 
     return variant_df
+
+
+def create_umd_validation_table(df):
+    umd_path = os.path.join(validation_path, "umd.csv")
+    if not os.path.isfile(umd_path):
+        umd_variant_df = get_umd_variants()
+        umd_variant_df.to_csv(umd_path)
+
+    umd_variant_df = pd.read_csv(umd_path, dtype={'UMD_PMID':str})
+
+    umd_variant_df['cdna_in_students'] = umd_variant_df['Mutation Event c.DNA.'].isin(df['Mutation Event c.DNA.'])
+    umd_variant_df['pmid_in_students'] = umd_variant_df['UMD_PMID'].isin(df['PMID'])
+    umd_variant_df.to_csv(os.path.join(validation_path, 'umd_out.csv'))

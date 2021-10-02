@@ -2,10 +2,11 @@ import snf
 # from sklearn.cluster import spectral_clustering
 from sklearn.cluster import SpectralClustering
 
+
 from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
 
 
-def dataframe_snf(df, directory):
+def dataframe_snf(df):
 
 
     col_names = ["generalized_phenotype", "generalized_mutant_type", "codon"]
@@ -47,11 +48,11 @@ def dataframe_snf(df, directory):
 
     best, second = snf.get_n_clusters(fused_net)
     sc1 = SpectralClustering(best, affinity='precomputed', n_init=100, assign_labels='discretize')
-    labels1 = sc1.fit_predict(fused_net)
+    labels1 = sc1.fit_predict(fused_net) + 1
     df["cluster_labels_best"] = labels1
 
     sc2 = SpectralClustering(second, affinity='precomputed', n_init=100, assign_labels='discretize')
-    labels2 = sc2.fit_predict(fused_net)
+    labels2 = sc2.fit_predict(fused_net) + 1
     df["cluster_labels_second"] = labels2
 
     df = df.sort_values(by="cluster_labels_best")

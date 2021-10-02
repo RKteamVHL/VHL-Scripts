@@ -8,6 +8,7 @@ from cycler import cycler
 
 from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
 from .. import variant_functions as vf
+from .kimstudents_dataframe_clustering import *
 
 STATS_DIR = "statistics"
 if not os.path.isdir(STATS_DIR):
@@ -16,23 +17,8 @@ if not os.path.isdir(STATS_DIR):
 FIGURE_DIR = "figures"
 DATA_DIR = "data"
 
-TESTS_DIR = "tests"
 
-SUPPLEMENTARY_HEADERS = {
-    "Kindred Case": "Kindred Case",
-    "Mutation Type": "Mutation Type",
-    "Transcript Reference": "Transcript Reference",
-    "HGVS_transcript": "HGVS Transcript",
-    "HGVS_Predicted_Protein": "HGVS Predicted Protein",
-    "Multiple Mutants in Case":  "Multiple Mutants in Case",
-    "Confirmed De Novo": "Confirmed De Novo",
-    "Phenotype": "Phenotype",
-    "Age": "Age",
-    "Sex": "Sex",
-    "Resolution": "Resolution",
-    "Reference": "Reference",
-    "PMID": "PMID"
-}
+TESTS_DIR = "tests"
 
 DOMAIN_TICKS = [1, 62, 154, 192, 204, 213]
 
@@ -589,45 +575,53 @@ def plot_cluster_property(df, figure_path, property_name, cluster_column="cluste
         plt.close('all')
 
 
-def create_descriptive_figures(df, analysis_type):
-    fns = [
-        regions_alpha_beta,
-        regions_elongin_hifa,
-        regions,
-        # missense_domains,
-        mutant_type_counts,
-        mutant_type_ratios,
-        codon_phenotype_subplots,
-        codon_histogram,
-        ratio_of_phenotypes,
-        phenotype_correlation_counts,
-        phenotype_correlation_ratio,
-        penetrance,
-        grouped_mutant_type_ratios,
-        grouped_mutant_type_counts,
-        phenotype_codon_heatmap,
-        phenotype_aachange_heatmap
-    ]
+def create_descriptive_figures(dfs):
+    for df_type, df_out in dfs.items():
+        fns = [
+            regions_alpha_beta,
+            regions_elongin_hifa,
+            regions,
+            # missense_domains,
+            mutant_type_counts,
+            mutant_type_ratios,
+            codon_phenotype_subplots,
+            codon_histogram,
+            ratio_of_phenotypes,
+            phenotype_correlation_counts,
+            phenotype_correlation_ratio,
+            penetrance,
+            grouped_mutant_type_ratios,
+            grouped_mutant_type_counts,
+            phenotype_codon_heatmap,
+            phenotype_aachange_heatmap
+        ]
 
-    for fn in fns:
-        stats_name = fn.__name__
-        plt.close('all')
-        dataframe = fn(df)
-        stats_path = os.path.join(STATS_DIR, analysis_type)
-        fig_path = os.path.join(stats_path, FIGURE_DIR)
-        data_path = os.path.join(stats_path, DATA_DIR)
-        if not os.path.isdir(stats_path):
-            os.makedirs(stats_path)
+        for fn in fns:
+            stats_name = fn.__name__
+            plt.close('all')
+            dataframe = fn(df_out)
+            stats_path = os.path.join(STATS_DIR, df_type)
+            fig_path = os.path.join(stats_path, FIGURE_DIR)
+            data_path = os.path.join(stats_path, DATA_DIR)
+            if not os.path.isdir(stats_path):
+                os.makedirs(stats_path)
 
-        if not os.path.isdir(fig_path):
-            os.makedirs(fig_path)
+            if not os.path.isdir(fig_path):
+                os.makedirs(fig_path)
 
-        if not os.path.isdir(data_path):
-            os.makedirs(data_path)
+            if not os.path.isdir(data_path):
+                os.makedirs(data_path)
 
-        plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
-        dataframe.to_csv(os.path.join(data_path, f'{stats_name}.csv'))
+            plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
+            dataframe.to_csv(os.path.join(data_path, f'{stats_name}.csv'))
 
+def create_cluster_figures(dfs):
+    for df_type, df_out in dfs.items():
+
+        clustered = dataframe_snf(df_out).fillna(0)
+
+        create_cluster_summaries(clustered, df_type)
+        create_cluster_phenotype_summaries(clustered, df_type)
 
 def create_cluster_summaries(df, analysis_type):
     base_path = os.path.join(STATS_DIR, analysis_type, "cluster")
@@ -649,14 +643,18 @@ def create_cluster_summaries(df, analysis_type):
         prop_df = df.set_index(clust_type)[COMPUTED_COLUMNS[prop]]
         plot_cluster_property(prop_df, cluster_column=clust_type, figure_path=fig_path, property_name=prop,
                               use_mean=True)
-
+        df["codon_start"] = df["codon_start"].astype(int)
         codon = df.set_index("codon_start")
+
+
         codon = codon[codon['generalized_mutant_type.missense_variant'] != 0]
         # codon = codon.dropna(subset=['generalized_mutant_type.missense_variant'])
         codon = pd.get_dummies(codon[codon.index.notnull()][clust_type]).sort_index()
         codon = codon.groupby(codon.index).sum()
-
-        axs = codon.plot(kind="bar", xticks=[], subplots=True, figsize=(12, 10), title=["" for v in codon.columns])
+        codons = pd.DataFrame(index=set(range(0, 214)), columns=codon.columns)
+        codons[:] = 0
+        codons.loc[set(codon.index)] = codon
+        axs = codons.plot(kind="bar", xticks=[], subplots=True, figsize=(12, 10), title=["" for v in codon.columns])
         # for ax in axs:
         #     ax.set_xticks(DOMAIN_TICKS)
         plt.savefig(os.path.join(fig_path, f'clustered_codon_start.pdf'))
@@ -690,10 +688,3 @@ def create_cluster_phenotype_summaries(df, analysis_type):
             autolabel(ax, ax.patches)
             plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.pdf'))
             plt.close('all')
-
-def create_supplementary_tables(df):
-    df_trimmed = df[list(SUPPLEMENTARY_HEADERS.keys())]
-    df_trimmed = df_trimmed.rename(columns=SUPPLEMENTARY_HEADERS)
-    df_sorted = df_trimmed.sort_values(by=["Reference"])
-    df_sorted = df_sorted.replace(r'^\s*$', "N/A", regex=True)
-    return df_sorted

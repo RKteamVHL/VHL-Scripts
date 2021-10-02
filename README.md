@@ -99,3 +99,25 @@ Files:  statistics\patient\cluster\cluster_labels_second\clustered_generalized_p
 
 Code: Analysis\features\kimstudents_dataframe_views.py (line 632)
 ``` 
+## Files
+The scripts output the fetched individual input files to the /output directory, which get combined into a single masterlist.
+The first step of filtering is to drop all entries that do not have either a phenotype or a mutation- the output of this step is
+saved in:
+```
+statistics/summary/postdropsupplementary_1.csv
+``` 
+The next step is to create additional annotated columns with clean values to 
+be used in further analysis. The resulting file is:
+```
+statistics/summary/filtered_out.csv
+``` 
+#### Table 1
+The summary statistics for the total number of patients, kindreds, and variants are saved to:
+```
+statistics/summary/postdropsummary.csv
+``` 
+The breakdown of these summaries by phenotype and mutation type are saved in :
+```
+statistics/summary/summary_by_type.csv
+```
+Together, these two files are used to create Table 1.

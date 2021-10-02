@@ -6,69 +6,12 @@ import pandas as pd
 from scipy.stats import binom_test
 from scipy.stats import chi2_contingency
 from scipy.stats import ks_2samp
-
-from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
 from .kimstudents_dataframe_views import TESTS_DIR, DATA_DIR
 
 PVALUE = 0.05
 
 HIGHEST_N = 10
 
-
-def total_observations(df):
-    return len(df.index)
-
-
-def total_with_sex_data(df):
-    df_sex = df.dropna(subset=["sex.f", "sex.m"], how="all")
-    return len(df_sex.index)
-
-def total_female(df):
-    df_sex = df.dropna(subset=COMPUTED_COLUMNS['sex'], how="all")
-    df_female = df_sex.dropna(subset=["sex.f"])
-    return len(df_female.index)
-
-def total_male(df):
-    df_sex = df.dropna(subset=COMPUTED_COLUMNS['sex'], how="all")
-    df_male = df_sex.dropna(subset=["sex.m"])
-    return len(df_male.index)
-
-def total_with_age_data(df):
-    df_age = df.dropna(subset=COMPUTED_COLUMNS['age'], how="all")
-    return len(df_age.index)
-
-def total_with_lk_age(df):
-    df_age = df.dropna(subset=COMPUTED_COLUMNS['age'], how="all")
-    df_lk = df_age.dropna(subset=["last_known_age"], how="all")
-    return len(df_lk.index)
-
-def total_with_onset_age(df):
-    df_age = df.dropna(subset=COMPUTED_COLUMNS['age'], how="all")
-    df_onset = df_age.dropna(subset=["evaluated_age"], how="all")
-    return len(df_onset.index)
-
-def lk_age_mean(df):
-    df_age = df.dropna(subset=COMPUTED_COLUMNS['age'], how="all")
-    df_lk = df_age.dropna(subset=["last_known_age"], how="all")
-    return df_lk["last_known_age"].mean()
-
-def onset_age_mean(df):
-    df_age = df.dropna(subset=COMPUTED_COLUMNS['age'], how="all")
-    df_onset = df_age.dropna(subset=["evaluated_age"], how="all")
-    return df_onset["evaluated_age"].mean()
-
-def total_denovo(df):
-    df_denovo = df[df["denovo.yes"] == 1]
-    return len(df_denovo.index)
-
-def total_with_phenotype(df):
-    df = df.replace(0, np.NaN)
-    df_pheno = df.dropna(subset=COMPUTED_COLUMNS["generalized_phenotype"], how='all')
-    return len(df_pheno.index)
-
-def total_with_muttype(df):
-    df_muttype = df.dropna(subset=COMPUTED_COLUMNS["generalized_mutant_type"], how='all')
-    return len(df_muttype.index)
 
 
 def get_asterisks_for_pval(p_val, alpha):
@@ -215,18 +158,3 @@ def run_stats(root_dir):
     chisq_and_posthoc_corrected(regions_elohif_df, os.path.join(test_dir, "regions_elohif_chisquare.csv"))
     ks_test(penetrance_df, os.path.join(test_dir, "penetrance_ks.csv") )
 
-
-STAT_NAMES_FUNCTIONS = {
-    "Number of Observations": total_observations,
-    "Total N with sex data": total_with_sex_data,
-    "Total male": total_male,
-    "Total female": total_female,
-    "Total N with age data": total_with_age_data,
-    "Total with last known age": total_with_lk_age,
-    "Total with onset age": total_with_onset_age,
-    "Mean last known age": lk_age_mean,
-    "Mean onset age": onset_age_mean,
-    "N confirmed de novo": total_denovo,
-    "N with phenotype": total_with_phenotype,
-    "N with muttype": total_with_muttype,
-}
