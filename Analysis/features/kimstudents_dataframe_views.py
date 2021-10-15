@@ -512,7 +512,7 @@ def plot_clustered_stacked(dfall, labels=None, title="multiple stacked bar plot"
     return axe
 
 
-def autolabel(ax, rects, xpos='center'):
+def autolabel(ax, rects, xpos='center', as_percentage=False):
     """
     Attach a text label above each bar in *rects*, displaying its height.
 
@@ -525,13 +525,17 @@ def autolabel(ax, rects, xpos='center'):
     offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}  # x_txt = x + w*off
     for rect in rects:
         height = rect.get_height()
-        text = f'{height:.0f}' if float(int(height)) == height else f'{height:.2f}'
+        text = None
+        if as_percentage:
+            text = f'{height:.0f}' if float(int(height)) == height else f'{height:.1%}'
+        else:
+            text = f'{height:.0f}' if float(int(height)) == height else f'{height:.2f}'
         ax.text(rect.get_x() + rect.get_width() * offset[xpos], 1.01 * height,
                 text, ha=ha[xpos], va='bottom')
 
 
 def plot_cluster_property(df, figure_path, property_name, cluster_column="cluster_labels", use_mean=False,
-                          save_csv=False, ratio_type='within'):
+                          save_csv=False, ratio_type='ratio_of_total'):
     df_sums = df.sum().sort_values()
     if not os.path.isdir(figure_path):
         os.makedirs(figure_path)
@@ -564,12 +568,17 @@ def plot_cluster_property(df, figure_path, property_name, cluster_column="cluste
         elif ratio_type == "across":
             df_sums = df_counts.sum()
             df_ratio = df_counts.divide(df_sums)
+        elif ratio_type == "ratio_of_total":
+            df_sums = df.groupby(cluster_column).count()
+            df_sums = df_sums.rename(columns=lambda x: x.split(".")[1] if "." in x else x)
+            df_ratio = df_counts.divide(df_sums, axis='index')
+            df_ratio = df_ratio[df_counts.columns]
         ax = df_ratio.plot(kind="bar", figsize=(12, 8))
         if save_csv:
             df_ratio.to_csv(os.path.join(figure_path, f'clustered_{property_name}_ratios.csv'))
         ax.set_xlabel("Cluster", rotation=0)
         ax.set_ylabel("Ratio of Observations")
-        autolabel(ax, ax.patches)
+        autolabel(ax, ax.patches, as_percentage=True)
 
         plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.pdf'))
         plt.close('all')

@@ -86,7 +86,7 @@ def compare_pmids(df_list, df_cols):
 
 def get_umd_variants():
 
-    page = requests.get('http://www.umd.be/VHL/4DACTION/W_DMDT1/1')
+    page = requests.get('http://www.umd.be/VHL/4DACTION/W_DMDT1/1', verify=False)
     tree = html.fromstring(page.content)
     all_links = tree.xpath("//a")
     variant_link_set = set()

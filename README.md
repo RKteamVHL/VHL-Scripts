@@ -49,6 +49,12 @@ The core functions are implemented in the Analysis module, which can be run with
 ```
 Running the command without the "createfigs" argument will run all of the data analysis and statistical tests without creating
 all of the figures, which can take some time.
+
+Additionally, running the scripts with the following command:
+```commandline
+(test_env) C:\\...\\VHL-Scripts>py -m Analysis --createfigs --validation
+```
+Will also run the scripts that validate our data against the [UMD VHL](http://www.umd.be/VHL/) database. 
 ## Figures
 All relevant output figures are saved in the "statistics" folder that gets created after running the scripts. The folders
 are separated by patient, kindred, and variant. Inside these separate folders are the "data" and "figures" subfolders; the "figures"
