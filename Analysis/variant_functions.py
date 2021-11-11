@@ -142,7 +142,7 @@ AA_1TO3['FS'] = AA_1TO3['fs']
 
 AA_3TO1 = protein_letters_3to1
 
-AA_REGEX = re.compile("p\.(?P<from>[a-zA-Z]{3})[0-9]+(?P<to>[a-zA-Z]{3})")
+AA_REGEX_3 = re.compile("p\.(?P<from>[a-zA-Z]{3})(?P<aa>[0-9]+)(?P<to>[a-zA-Z]{3})")
 
 # Note: only works for missense. e.g.,
 # p.Glu70Lys
@@ -153,17 +153,22 @@ AA_REGEX = re.compile("p\.(?P<from>[a-zA-Z]{3})[0-9]+(?P<to>[a-zA-Z]{3})")
 # p.Glu70Lys
 
 
-def get_aa_from_predicted_consequence(aa_str):
-    match = AA_REGEX.match(aa_str)
+def get_aa_from_predicted_consequence(aa_str, include_under=True):
+    match = AA_REGEX_3.match(aa_str)
 
     if match is not None:
         aa_group = match.groupdict()
         from_aa = aa_group.get('from', None)
         to_aa = aa_group.get('to', None)
+        aa = aa_group.get('aa', None)
 
         if from_aa is not None and to_aa is not None:
             if from_aa in AA_3TO1 and to_aa in AA_3TO1:
-                return f"{AA_3TO1[from_aa]}_{AA_3TO1[to_aa]}"
+                if include_under:
+                    return f"{AA_3TO1[from_aa]}_{AA_3TO1[to_aa]}"
+                else:
+                    return f"p.{AA_3TO1[from_aa]}{int(aa)}{AA_3TO1[to_aa]}"
+
 
 
 def get_valid_cdna(cdna_str, check_version=False):

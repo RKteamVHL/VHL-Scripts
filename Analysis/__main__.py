@@ -86,7 +86,7 @@ if __name__ == '__main__':
     create_postdropsupplementary_table(out_table)
     if args.validation:
         create_umd_validation_table(out_table)
-        create_litvar_variant_table(out_table)
+        create_litvar_validation_table(out_table)
 
     filtered_out_df = {
         "patient": out_table.pipe(groupby_patient).pipe(filter_phenotype_mutanttype),

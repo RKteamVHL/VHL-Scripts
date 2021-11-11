@@ -3,7 +3,7 @@ import requests
 from lxml import html
 import os
 import litvar.utils
-from ..variant_functions import AA_3TO1
+from ..variant_functions import get_aa_from_predicted_consequence
 
 STATS_DIR = "statistics"
 VALIDATION_DIR = "validation"
@@ -128,17 +128,16 @@ def get_umd_variants():
     return variant_df
 
 def get_litvar_variants():
-    df_out = pd.DataFrame(columns=["RSID", "PMID"])
+    df_out = pd.DataFrame(columns=["RSID", "HGVS", "PMID"])
     rsid_pmid_pairs = []
-    for variant in litvar.utils.publications_from_query("VHL"):
-        for pmid in variant.pmids:
-            rsid_pmid_pairs.append({"PMID": pmid, "RSID": variant.rsid})
+    for rsid, variant in litvar.utils.publications_from_query("VHL").items():
+        for pmid in variant["pmids"]:
+            rsid_pmid_pairs.append({"PMID": pmid, "RSID": rsid, "HGVS": variant["hgvs"]})
 
     df_out = df_out.append(rsid_pmid_pairs)
-    df_out = df_out.groupby("PMID").agg(lambda col: ','.join(col))
     return df_out
 
-def create_litvar_variant_table(df):
+def create_litvar_validation_table(df):
     litvar_path = os.path.join(validation_path, "litvar.csv")
     if not os.path.isfile(litvar_path):
         litvar_variant_df = get_litvar_variants()
@@ -150,6 +149,7 @@ def create_litvar_variant_table(df):
 
     # litvar_variant_df['cdna_in_students'] = litvar_variant_df['Mutation Event c.DNA.'].isin(df['Mutation Event c.DNA.'])
     litvar_variant_df['pmid_in_students'] = litvar_variant_df['PMID'].isin(df['PMID'])
+    litvar_variant_df['hgvs_in_students'] = litvar_variant_df['HGVS'].isin(df['Predicted Consequence Protein Change'].apply(get_aa_from_predicted_consequence, include_under=False))
     litvar_variant_df.to_csv(os.path.join(validation_path, 'litvar_out.csv'))
 
 def create_umd_validation_table(df):
