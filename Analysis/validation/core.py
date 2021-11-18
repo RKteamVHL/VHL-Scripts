@@ -150,7 +150,13 @@ def create_litvar_validation_table(df):
     # litvar_variant_df['cdna_in_students'] = litvar_variant_df['Mutation Event c.DNA.'].isin(df['Mutation Event c.DNA.'])
     litvar_variant_df['pmid_in_students'] = litvar_variant_df['PMID'].isin(df['PMID'])
     litvar_variant_df['hgvs_in_students'] = litvar_variant_df['HGVS'].isin(df['Predicted Consequence Protein Change'].apply(get_aa_from_predicted_consequence, include_under=False))
+    # filtering out chuvash polycythemia
+    litvar_variant_df_no_chuvash = litvar_variant_df[litvar_variant_df["HGVS"] != "p.R200W"]
+
+    litvar_pmid_df = litvar_variant_df_no_chuvash.loc[:, ["PMID", "pmid_in_students"]].groupby("PMID").first()
     litvar_variant_df.to_csv(os.path.join(validation_path, 'litvar_out.csv'))
+    litvar_pmid_df.to_csv(os.path.join(validation_path, 'litvar_pmids.csv'))
+
 
 def create_umd_validation_table(df):
     umd_path = os.path.join(validation_path, "umd.csv")
