@@ -546,7 +546,8 @@ def plot_cluster_property(df, figure_path, property_name, cluster_column="cluste
         df_stds = df.groupby(cluster_column).std()
         df_stds = df_stds[df_sums.index.to_list()].rename(columns=lambda x: x.split(".")[1] if "." in x else x)
         df_means.plot(kind="bar", yerr=df_stds, figsize=(12, 8))
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_means.pdf'))
+        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_means.pdf'))
+        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_means.eps'), format='eps')
         plt.close('all')
 
     else:
@@ -559,7 +560,8 @@ def plot_cluster_property(df, figure_path, property_name, cluster_column="cluste
         ax.set_xlabel("Cluster", rotation=0)
         ax.set_ylabel("Number of Observations")
         autolabel(ax, ax.patches)
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_counts.pdf'))
+        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_counts.pdf'))
+        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_counts.eps'), format='eps')
         plt.close('all')
 
         if ratio_type == "within":
@@ -580,7 +582,8 @@ def plot_cluster_property(df, figure_path, property_name, cluster_column="cluste
         ax.set_ylabel("Ratio of Observations")
         autolabel(ax, ax.patches, as_percentage=True)
 
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.pdf'))
+        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.pdf'))
+        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.eps'), format='eps')
         plt.close('all')
 
 
@@ -621,7 +624,8 @@ def create_descriptive_figures(dfs):
             if not os.path.isdir(data_path):
                 os.makedirs(data_path)
 
-            plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
+            # plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
+            plt.savefig(os.path.join(fig_path, f'{stats_name}.eps'), format='eps')
             dataframe.to_csv(os.path.join(data_path, f'{stats_name}.csv'))
 
 def create_cluster_figures(dfs):
@@ -666,7 +670,8 @@ def create_cluster_summaries(df, analysis_type):
         axs = codons.plot(kind="bar", xticks=[], subplots=True, figsize=(12, 10), title=["" for v in codon.columns])
         # for ax in axs:
         #     ax.set_xticks(DOMAIN_TICKS)
-        plt.savefig(os.path.join(fig_path, f'clustered_codon_start.pdf'))
+        # plt.savefig(os.path.join(fig_path, f'clustered_codon_start.pdf'))
+        plt.savefig(os.path.join(fig_path, f'clustered_codon_start.eps'), format='eps')
 
         df.to_csv(os.path.join(fig_path, f"clustered_out.tsv"), sep='\t')
         plt.close('all')
@@ -695,5 +700,6 @@ def create_cluster_phenotype_summaries(df, analysis_type):
             df_ratio = df_counts.divide(df_counts.sum())
             ax = df_ratio.plot(kind="bar", figsize=(12, 8))
             autolabel(ax, ax.patches)
-            plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.pdf'))
+            plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.eps'), format='eps')
+            # plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.pdf'))
             plt.close('all')
