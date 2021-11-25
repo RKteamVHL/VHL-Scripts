@@ -7,10 +7,10 @@ from .fetching.KimStudents import KimStudents
 from .validation.core import *
 from .features.kimstudents_dataframe_summaries import *
 
-OUTPUT_DIR = "output"
+INPUT_DIR = "input"
 
-if not os.path.isdir(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+if not os.path.isdir(INPUT_DIR):
+    os.makedirs(INPUT_DIR)
 
 def groupby_patient(df):
     patient_df = df[df["Resolution"].str.casefold() == "patient"]
@@ -61,10 +61,10 @@ if __name__ == '__main__':
     fetcher = KimStudents()
 
     if args.cached:
-        fetcher.load_from_dsv((os.path.join(OUTPUT_DIR, "data*.csv")))
+        fetcher.load_from_dsv((os.path.join(INPUT_DIR, "data*.csv")))
     else:
         fetcher.process()
-        fetcher.save_raw_file(os.path.join(OUTPUT_DIR, "data.csv"))
+        fetcher.save_raw_file(os.path.join(INPUT_DIR, "data.csv"))
 
 
     # generate all clean columns needed for further anaysis

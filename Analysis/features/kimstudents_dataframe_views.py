@@ -81,6 +81,7 @@ def missense_regions(df):
 
 def regions(df):
     df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["region"]]]
+    df = df.sort_index()
 
     alpha_cols = ["ElonginB_ElonginC_binding", "⍺-Domain"]
     beta_cols = ["HIF1_alpha_binding", "β-Domain"]
@@ -303,6 +304,7 @@ def codon_histogram(df):
 
     ax1.set_xticks(DOMAIN_TICKS)
     ax2.set_xticks(DOMAIN_TICKS)
+    ax2.set_xticklabels(ax2.get_xticks(), rotation=45)
 
     for p in ax1.patches:
         thresh = 50
@@ -374,19 +376,16 @@ def penetrance(df):
     iso_ind = summed_phenos[summed_phenos == 1].index
 
     df = df.loc[iso_ind]
-    # df["evaluated_age"] = df["evaluated_age"].apply(np.floor)
-    df = df.set_index("evaluated_age").sort_index()
-    iso_sorted = df[COMPUTED_COLUMNS["generalized_phenotype"]].fillna(0)
-    iso_sorted.index = iso_sorted.index.astype(int)
-    # iso_sorted = iso_sorted.groupby(iso_sorted.index).sum()
-    # iso_sorted = iso_sorted.reindex(labels= list(range(iso_sorted.index.min(), iso_sorted.index.max()+1)), fill_value=0.0)
-    # summed = iso_sorted.sum()
-    # meets_thresh = summed[summed>threshold]
-    # iso_sorted = iso_sorted[meets_thresh.index]
 
+    df = df.set_index("evaluated_age").sort_index()
+    iso_df = df[COMPUTED_COLUMNS["generalized_phenotype"]].fillna(0).rename(columns=lambda x: x.split(".")[1])
+    iso_df.index = iso_df.index.astype(int)
+
+    sorted = iso_df.sum().sort_values(ascending=False)
+    sorted_filtered = sorted[sorted != 0]
+    iso_sorted = iso_df[sorted_filtered.index]
     pdf = iso_sorted / iso_sorted.sum()
     cdf = pdf.cumsum()
-    cdf = cdf.rename(columns=lambda x: x.split(".")[1])
 
     fig = plt.figure(figsize=(8, 6))
 
@@ -394,7 +393,7 @@ def penetrance(df):
 
     plt.xlabel("Age (Years)")
     plt.ylabel("Cumulative Distribution")
-    plt.legend(ax, cdf.columns)
+    plt.legend(ax, [f"{ind} (N={int(val)})" for ind, val in sorted_filtered.iteritems()])
 
     return iso_sorted
 

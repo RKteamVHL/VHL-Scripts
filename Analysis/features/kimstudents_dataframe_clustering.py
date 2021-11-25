@@ -47,11 +47,11 @@ def dataframe_snf(df):
         # fused_net = snf.snf(feat_metrics, K=len(df_cols.index))
 
     best, second = snf.get_n_clusters(fused_net)
-    sc1 = SpectralClustering(best, affinity='precomputed', n_init=100, assign_labels='discretize', random_state=2)
+    sc1 = SpectralClustering(best, affinity='precomputed', n_init=100, assign_labels='discretize', random_state=3)
     labels1 = sc1.fit_predict(fused_net) + 1
     df["cluster_labels_best"] = labels1
 
-    sc2 = SpectralClustering(second, affinity='precomputed', n_init=100, assign_labels='discretize', random_state=2)
+    sc2 = SpectralClustering(second, affinity='precomputed', n_init=100, assign_labels='discretize', random_state=3)
     labels2 = sc2.fit_predict(fused_net) + 1
     df["cluster_labels_second"] = labels2
 

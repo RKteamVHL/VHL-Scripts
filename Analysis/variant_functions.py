@@ -286,7 +286,7 @@ GENERAL_SO_TERMS = [
 
 SO_TERM_TYPES = {
     'truncating': ['stop_gained', 'deletion', 'exon_loss_variant', 'start_lost', 'frameshift_variant'],
-    'missense': ['missense_variant', 'inframe_indel'],
+    'non-truncating': ['missense_variant', 'inframe_indel'],
 }
 
 
