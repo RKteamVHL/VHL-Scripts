@@ -8,11 +8,20 @@ import pandas as pd
 from .. import variant_functions as vf
 from ..constants import *
 
+# this file contains all code relevant for cleaning up the raw KimStudents masterlist dataframe. generally, the strategy
+# is to keep all of the input columns and append additional, analysis-specific columns
+# The majority of the functions in this file are written to be used by the pandas.DataFrame.pipe function, and the rest
+# are helper-functions used by the piping functions
+
+
+# patterns for extracted the year/month age numbers from the Evaluated and Last Known Age columns
 EVALUATED_AGE_REGEX = re.compile("E((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 LASTKNOWN_AGE_REGEX = re.compile("lk((?P<Y>[0-9]+)Y)?((?P<M>[0-9]+)M)?")
 
 # CDNA_REGEX = re.compile("c\.([0-9]+)[ATCG]")
 
+# this dictionary keeps lists of all additional computed columns grouped together roughly by the type of
+# analysis the columns will be used for
 COMPUTED_COLUMNS = {
     "phenotype": [],
     "denovo": [],
@@ -31,7 +40,15 @@ COMPUTED_COLUMNS = {
     "grouped_mutation_type": []
 }
 
+
 def _phenotype_string_to_list(x, generalize=True):
+    """
+    Converts a string of phenotype hpo terms separated by a comma or semicolon into a list
+    @param x: string of phenotypes
+    @param generalize: if True, the function takes the listed phenotype and converts it to a context-relevant phenotype
+        based on the HPO tree. The conversion is usually an abstraction to a higher node on the HPO tree
+    @return:
+    """
     hpo_list = re.split('[;,]', x)
     output_categories = []
     type_ = "phenotype"
@@ -59,6 +76,11 @@ def _phenotype_string_to_list(x, generalize=True):
 
 
 def add_generalized_phenotype_columns(df):
+    """
+    Adds generalized phenotype data to a copy of the inputted dataframe and returns it
+    @param df:
+    @return:
+    """
     hpo_series = df['Phenotype'].apply(_phenotype_string_to_list, generalize=True)
 
     pheno_counts = hpo_series.apply(collections.Counter)
@@ -69,6 +91,11 @@ def add_generalized_phenotype_columns(df):
 
 
 def add_phenotype_columns(df):
+    """
+    Adds non-generalized phenotype data to a copy of the inputted dataframe and returns it
+    @param df:
+    @return:
+    """
     hpo_series = df['Phenotype'].apply(_phenotype_string_to_list, generalize=False)
 
     pheno_counts = hpo_series.apply(collections.Counter)
@@ -79,6 +106,13 @@ def add_phenotype_columns(df):
 
 
 def _mutant_string_to_list(x, generalize=True):
+    """
+    Converts a string of mutation type sequence ontology (SO) terms separated by a comma or semicolon into a list
+    @param x: string of mutation types
+    @param generalize: if True, the function takes the listed mutation type and converts it to a context-relevant
+        mutation based on the SO tree. The conversion is usually an abstraction to a higher node on the SO tree
+    @return:
+    """
     so_list = re.split('[;,]', x)
     output_categories = []
     type_ = "mutant_type"
@@ -101,6 +135,11 @@ def _mutant_string_to_list(x, generalize=True):
 
 
 def add_generalized_mutant_type_columns(df):
+    """
+    Adds generalized mutation-type data to a copy of the inputted dataframe and returns it
+    @param df:
+    @return:
+    """
     variant_series = df['Mutation Type'].apply(_mutant_string_to_list, generalize=True)
 
     mutant_type_counts = variant_series.apply(collections.Counter)
@@ -111,12 +150,15 @@ def add_generalized_mutant_type_columns(df):
 
 
 def _age_to_records(age_str):
+    """
+    Converts an Age string into an Age dict, calculating total age of the patient at the same time
+    @param age_str:
+    @return:
+    """
     record = {}
     if isinstance(age_str, str):
         e_match = EVALUATED_AGE_REGEX.search(age_str)
         lk_match = LASTKNOWN_AGE_REGEX.search(age_str)
-
-
 
         if lk_match is None:
             lk_match = e_match
@@ -147,7 +189,13 @@ def _age_to_records(age_str):
 
     return record
 
+
 def add_age_columns(df):
+    """
+    Adds age data to a copy of the inputted dataframe and returns it
+    @param df:
+    @return:
+    """
 
     age_series = df['Age'].apply(_age_to_records)
 
@@ -166,7 +214,6 @@ def _start_cdna_change(x):
 
         if match is not None:
             output["cdna_start"] = match
-
 
     return output
 

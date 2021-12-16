@@ -27,6 +27,7 @@ class Fetcher(object):
         decompressed: bytestream of data after decompression.
         data: the final stream of data that gets written to a file.
             Used to fix files, if needed
+        request_data: dictionary of the data to be used in the body of the post request
     """
 
     def __init__(self):
@@ -146,7 +147,9 @@ class Fetcher(object):
         self.to_dict_list()
 
     def load_from_dsv(self, file_glob):
+        """Loads multiple csv files with identical headers and adds them to the fetcher row list
 
+        """
         self.rows = []
         self.dsv_header = []
         for filename in glob.iglob(file_glob):

@@ -53,6 +53,8 @@ STUDENTS_HEADER_NAMES = [
 
 class KimStudents(Fetcher):
     """Fetcher for Raymond's custom student-procured database.
+    Extends the Fetcher class, which provides functionality of fetching, extracting, and cleaning of
+    csv files from external sources. The KimStudents class fetches and cleans VHL variants from the students master list
     """
 
     def __init__(self):
@@ -65,7 +67,7 @@ class KimStudents(Fetcher):
         self.dsv_header = STUDENTS_HEADER_NAMES
 
     def to_dict_list(self):
-
+        # a generator is used here so not all rows have to be loaded into memory as a list at once
         def empty_gen():
             yield from ()
 
@@ -75,6 +77,8 @@ class KimStudents(Fetcher):
 
             self.rows = chain(self.rows, csv.DictReader(new_rows, delimiter=ROW_DELIMITER))
 
+        # since multiple sheets are being combined, the header row gets repeated; remove the row if it had PMID in
+        #its pmid column
         self.filter_rows(lambda row: row['PMID'].strip() != "PMID")
 
     def filter_rows(self, filt_fun):
