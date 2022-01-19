@@ -3,7 +3,7 @@ import logging
 from itertools import chain
 
 from .Fetcher import Fetcher
-from ..constants import *
+from Analysis.constants import *
 
 STUDENTS_NAME = 'KimStudents'
 STUDENTS_FILENAME = 'Final Masterlist of VHL Papers.csv'

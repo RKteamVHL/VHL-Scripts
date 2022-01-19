@@ -3,7 +3,7 @@ import argparse
 from .features.kimstudents_dataframe_preprocessing import *
 from .features.kimstudents_dataframe_stats import run_stats
 from .features.kimstudents_dataframe_views import *
-from .fetching.KimStudents import KimStudents
+from Analysis.fetching.kimstudents.KimStudents import KimStudents
 from .validation.core import *
 from .features.kimstudents_dataframe_summaries import *
 
