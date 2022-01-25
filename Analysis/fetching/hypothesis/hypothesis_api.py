@@ -4,7 +4,7 @@ import urllib.parse
 
 import json
 
-from .Annotation import HypothesisAnnotation
+from .Annotation import AugmentedAnnotation
 
 TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secret_token.txt")
 SECRET_TOKEN = ""
@@ -41,7 +41,7 @@ def get_annotations_by_group(group_id, search_after):
             response_dict = json.loads(response.read().decode('utf-8'))
 
             for row in response_dict['rows']:
-                new_annotation = HypothesisAnnotation.from_dict(row)
+                new_annotation = AugmentedAnnotation.from_dict(row)
                 annotations.append(new_annotation)
 
             total_annotations = response_dict['total']
