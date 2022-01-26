@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List
+import pandas as pd
 import re
 import copy
 import enum
@@ -7,13 +8,15 @@ import enum
 
 class AnnotationType(enum.IntEnum):
     INVALID = -1
+    REPLY = enum.auto()
     EVIDENCE = enum.auto()
     INFORMATION = enum.auto()
     METHODOLGY = enum.auto()
     CASE = enum.auto()
+    COHORT = enum.auto()
 
 
-BODY_TAG_REGEX = re.compile("^(?P<name>\w+):(?P<body>.*)$", flags=re.MULTILINE)
+BODY_TAG_REGEX = re.compile("^(?P<name>\w+): *(?P<body>.*)$", flags=re.MULTILINE)
 
 # for tag lists, only mandatory tags are used to determine the annotation type
 
@@ -23,7 +26,8 @@ EVIDENCE_TAGS = [
 
 INFORMATION_TAGS = [
     "PMID",
-    "Gene"
+    "Gene",
+    "StandardizedReferenceSequence"
 ]
 
 METHODOLOGY_TAGS = [
@@ -33,16 +37,17 @@ METHODOLOGY_TAGS = [
 ]
 
 CASE_TAGS = [
-    "PatientID",
-    "KindredID",
-    "Case",
-    "DiseaseAssertion",
-    "FamilyInfo",
-    "CasePresentingHPOs",
-    "CaseHPOFreeText",
-    "CaseNotHPOs",
-    "CaseNotHPOFreeText",
-    "CasePreviousTesting"
+    "CasePresentingHPOs"
+    # "Case",
+    # "CasePresentingHPOs",
+    # "CaseHPOFreeText",
+    # "CaseNotHPOs",
+    # "CaseNotHPOFreeText",
+    # "CasePreviousTesting"
+]
+
+COHORT_TAGS = [
+    "GroupPresentingHPOs"
 ]
 
 
@@ -99,8 +104,19 @@ class AugmentedAnnotation(HypothesisAnnotation):
     def get_tags_from_tags_list(self):
         for tag in self.tags:
             tag_split = tag.split(":")
-            self.tag_dictionary[tag_split[0]] = ",".join(tag_split[1:]).strip() if len(tag_split) > 1 else ""
-            pass
+            tag_name = ""
+            tag_value = ""
+
+            # normal tags in the format TagName:TagValue
+            if len(tag_split) > 1:
+                tag_name = ":".join(tag_split[0:-1]).strip()
+                tag_value = tag_split[-1].strip()
+
+            # flag tags, in the format TagName
+            elif len(tag_split) == 1:
+                tag_name = tag_split[0].strip()
+
+            self.tag_dictionary[tag_name] = tag_value
 
     def assign_type(self):
         # checking for evidence statement annotation
@@ -119,8 +135,23 @@ class AugmentedAnnotation(HypothesisAnnotation):
         elif any([key in self.tag_dictionary for key in CASE_TAGS]):
             self.annotation_type = AnnotationType.CASE.name
 
+        # checking for COHORT annotation
+        elif any([key in self.tag_dictionary for key in COHORT_TAGS]):
+            self.annotation_type = AnnotationType.COHORT.name
+
+        elif len(self.references) > 0:
+            self.annotation_type = AnnotationType.REPLY.name
+
     def as_dict(self):
         return asdict(self)
+
+    def as_dataframe(self):
+        """Returns the annotation as a pandas Dataframe
+
+        This strips the annotation of all it's metadata
+        """
+        pass
+
 
     @staticmethod
     def from_dict(d):
@@ -129,3 +160,27 @@ class AugmentedAnnotation(HypothesisAnnotation):
         new_annotation.get_tags_from_tags_list()
         new_annotation.assign_type()
         return new_annotation
+
+
+"""Notes:
+GroupID/KindredID and GroupID/ KindredID -> both appear in body tags
+INVALID annotations -> 
+    - evidencestatement instead of EvidenceStatement for some annotations
+    - most are caused by GroupID/KidredID inconsistencies
+    - some are replies to other annotations
+    - "Evidence": "", in https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5503545/#annotations:piBWZEfzEeyuGbdGPpU0qw
+    -  GroupID: 2, where the spaces mess up the regex. https://hyp.is/P5YEylOrEeyZUH-REJFQqQ/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
+    -  GroupID: 20, same as above. https://hyp.is/Qsb8-FftEeyKeXeNmFIZ-A/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
+    -  GroupID: 36, same as above. https://hyp.is/4YVg3l1ZEey-rK9ETACNew/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
+    - the following seems to be EvidenceStatement, but is missing the tag. https://hyp.is/2hjYGmgAEeyxyyeAzATdxg/iovs.arvojournals.org/article.aspx?articleid=2162471
+    - https://hyp.is/fvvwcmgSEey8rcsikkfNuA/jmg.bmj.com/content/39/7/e38
+    - https://hyp.is/HophImj6Eey5L0efg0JjHQ/jmg.bmj.com/content/39/7/e38
+    - "" https://hyp.is/qd0YnHrnEey7X5esN467Aw/onlinelibrary.wiley.com/doi/abs/10.1002/humu.21219
+    
+ClinVarID:Yes vs ClinVarID:XXX -> having both makes the second get overwritten
+
+Last known age vs age of presentation -> do we care about last known?
+
+The following is an example where age of presentation is 'mid 40s', but no exact date is given. Does this pop up a lot, and if so where is the age range usually put?
+
+"""
