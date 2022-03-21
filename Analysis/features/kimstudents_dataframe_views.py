@@ -266,18 +266,8 @@ def codon_phenotype_subplots(df):
     return codon
 
 
-def codon_histogram(df):
-    df = df.set_index("codon_start")
-    df = df[df.index.notnull()]
-
-    phens = df[COMPUTED_COLUMNS["generalized_phenotype"]]
-
-    codon = phens.groupby(phens.index).agg("sum")
-    codon = codon.rename_axis("Codon Position").rename(columns=lambda x: x.split(".")[1])
-
-    combined = codon.sum(axis=1)
+def _plot_codon(combined):
     split = [combined.sort_values().iloc[-2], combined.sort_values().iloc[-1]]
-
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [1, 3]})
     fig.subplots_adjust(hspace=0.05)
     fig.set_figwidth(8)
@@ -307,7 +297,7 @@ def codon_histogram(df):
     ax2.set_xticklabels(ax2.get_xticks(), rotation=45)
 
     for p in ax1.patches:
-        thresh = 50
+        thresh = 17
 
         if p.get_height() >= thresh:
             # ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
@@ -326,7 +316,45 @@ def codon_histogram(df):
     plt.ylabel('# of Mutations')
     plt.xlabel('Codon Position')
 
-    return combined
+def codon_histogram(df):
+    df = df.set_index("codon_start")
+    df = df[df.index.notnull()]
+    df["default_score"] = 1
+
+    codon_score = df["default_score"]
+
+    codon = codon_score.groupby(codon_score.index).agg("sum")
+    codon = codon.rename("Codon Count")
+
+    _plot_codon(codon)
+    return codon
+
+
+def codon_blosum62_histogram(df):
+    df = df.set_index("codon_start")
+    df = df[df.index.notnull()]
+
+    codon_blosum = df["blosum62_score"]
+
+    codon = codon_blosum.groupby(codon_blosum.index).agg("sum")
+    codon = codon.rename("BLOSUM Score")
+
+
+    _plot_codon(codon)
+    return codon
+
+def codon_blosum90_histogram(df):
+    df = df.set_index("codon_start")
+    df = df[df.index.notnull()]
+
+    codon_blosum = df["blosum90_score"]
+
+    codon = codon_blosum.groupby(codon_blosum.index).agg("sum")
+    codon = codon.rename("BLOSUM Score")
+
+    _plot_codon(codon)
+    return codon
+
 
 
 def ratio_of_phenotypes(df, generalized=True):
@@ -597,6 +625,8 @@ def create_descriptive_figures(dfs):
             mutant_type_ratios,
             codon_phenotype_subplots,
             codon_histogram,
+            codon_blosum62_histogram,
+            codon_blosum90_histogram,
             ratio_of_phenotypes,
             phenotype_correlation_counts,
             phenotype_correlation_ratio,

@@ -68,6 +68,8 @@ def binomial_and_posthoc_corrected(df, outfile):
     n = df.iloc[:, 0].sum()
     n_categories = 213
 
+    adjusted_p_thresh = PVALUE/n_categories
+
     report_df = pd.DataFrame(index=df.index, columns=["p_value", "corrected", "reject", "significance"])
     p_vals = []
 
@@ -81,9 +83,9 @@ def binomial_and_posthoc_corrected(df, outfile):
     # reject_list, corrected_p_vals = multipletests(p_vals, method='bonferroni')[:2]
     for p_val, cat in zip(p_vals, df.index):
         report_df.loc[cat, "p_value"] = p_val
-        report_df.loc[cat, "corrected"] = PVALUE/len(p_vals)
-        report_df.loc[cat, "reject"] = p_val < PVALUE/len(p_vals)
-        report_df.loc[cat, "significance"] = get_asterisks_for_pval(p_val, PVALUE/len(p_vals))
+        report_df.loc[cat, "corrected"] = adjusted_p_thresh
+        report_df.loc[cat, "reject"] = p_val < adjusted_p_thresh
+        report_df.loc[cat, "significance"] = get_asterisks_for_pval(p_val,adjusted_p_thresh)
 
         # print(
         #     f"{cat}: p_value: {p_val:5f}; corrected: {corr_p_val:5f} ({get_asterisks_for_pval(p_val)}) reject: {reject}")
@@ -132,27 +134,24 @@ def run_stats(root_dir):
     if not os.path.isdir(test_dir):
         os.makedirs(test_dir)
 
-    codon_pheno_name = "phenotype_codon_heatmap.csv"
-    codon_name = "codon_histogram.csv"
-    aachange_name = "phenotype_aachange_heatmap.csv"
-    penetrance_name = "penetrance.csv"
-    regions_ab_name = "regions_alpha_beta.csv"
-    regions_elohif_name = "regions_elongin_hifa.csv"
-    muttype_name = "grouped_mutant_type_counts.csv"
 
-    codon_pheno_df = pd.read_csv(os.path.join(data_dir, codon_pheno_name), index_col=0)
-    codon_df = pd.read_csv(os.path.join(data_dir, codon_name), index_col=0)
-    aachange_df = pd.read_csv(os.path.join(data_dir, aachange_name), index_col=0)
-    penetrance_df = pd.read_csv(os.path.join(data_dir, penetrance_name), index_col=0)
-    regions_ab_df = pd.read_csv(os.path.join(data_dir, regions_ab_name), index_col=0)
-    regions_elohif_df = pd.read_csv(os.path.join(data_dir, regions_elohif_name), index_col=0)
-    muttype_df = pd.read_csv(os.path.join(data_dir, muttype_name), index_col=0)
+    codon_pheno_df = pd.read_csv(os.path.join(data_dir, "phenotype_codon_heatmap.csv"), index_col=0)
+    codon_df = pd.read_csv(os.path.join(data_dir, "codon_histogram.csv"), index_col=0)
+    codon_blosum62_df = pd.read_csv(os.path.join(data_dir, "codon_blosum62_histogram.csv"), index_col=0)
+    codon_blosum90_df = pd.read_csv(os.path.join(data_dir, "codon_blosum90_histogram.csv"), index_col=0)
+    aachange_df = pd.read_csv(os.path.join(data_dir, "phenotype_aachange_heatmap.csv"), index_col=0)
+    penetrance_df = pd.read_csv(os.path.join(data_dir, "penetrance.csv"), index_col=0)
+    regions_ab_df = pd.read_csv(os.path.join(data_dir, "regions_alpha_beta.csv"), index_col=0)
+    regions_elohif_df = pd.read_csv(os.path.join(data_dir, "regions_elongin_hifa.csv"), index_col=0)
+    muttype_df = pd.read_csv(os.path.join(data_dir, "grouped_mutant_type_counts.csv"), index_col=0)
 
     # regions_df = regions_df.drop(columns=["ElonginB_ElonginC_binding", "HIF1_alpha_binding", "GXEEX8"])
     regions_ab_df = regions_ab_df[["region.⍺-Domain", "region.β-Domain"]]
     regions_elohif_df = regions_elohif_df.drop(columns=["region.GXEEX8"])
 
     binomial_and_posthoc_corrected(codon_df, os.path.join(test_dir, "codon_binom.csv"))
+    binomial_and_posthoc_corrected(codon_blosum62_df, os.path.join(test_dir, "codon_binom_62.csv"))
+    binomial_and_posthoc_corrected(codon_blosum90_df, os.path.join(test_dir, "codon_binom_90.csv"))
     chisq_and_posthoc_corrected(muttype_df, os.path.join(test_dir, "muttype_chisquare.csv"))
     chisq_and_posthoc_corrected(regions_ab_df, os.path.join(test_dir, "regions_ab_chisquare.csv"))
     chisq_and_posthoc_corrected(regions_elohif_df, os.path.join(test_dir, "regions_elohif_chisquare.csv"))

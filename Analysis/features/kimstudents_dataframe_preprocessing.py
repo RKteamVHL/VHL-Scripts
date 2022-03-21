@@ -8,6 +8,11 @@ import pandas as pd
 from .. import variant_functions as vf
 from ..constants import *
 
+from Bio.Align import substitution_matrices
+import Bio.Align
+BLOSUM90 = substitution_matrices.load("BLOSUM90")
+BLOSUM62 = substitution_matrices.load("BLOSUM62")
+PAM30 = substitution_matrices.load("PAM30")
 # this file contains all code relevant for cleaning up the raw KimStudents masterlist dataframe. generally, the strategy
 # is to keep all of the input columns and append additional, analysis-specific columns
 # The majority of the functions in this file are written to be used by the pandas.DataFrame.pipe function, and the rest
@@ -37,6 +42,8 @@ COMPUTED_COLUMNS = {
     "region": [],
     "cdna_change": [],
     "aa_change": [],
+    "blosum_score": [],
+    "pam_score": [],
     "grouped_mutation_type": []
 }
 
@@ -318,6 +325,43 @@ def add_denovo_column(df):
     df = df.join(featurized)
     return df
 
+def _aa_substitution_score(aa_tuple, b_mat, bit):
+    score = None
+    if aa_tuple is not None:
+        aa_list = [aa[0] for aa in b_mat.keys()[:24]]
+
+        if (aa_tuple[0] in aa_list) and (aa_tuple[1] in aa_list) and (aa_tuple[0] != aa_tuple[1]):
+            score = 2 ** (-b_mat[aa_tuple[0]][aa_tuple[1]] / bit)
+    return score
+
+def _blossum62_score(aa_tuple):
+    return _aa_substitution_score(aa_tuple, BLOSUM62, 2)
+
+def _blossum90_score(aa_tuple):
+    return _aa_substitution_score(aa_tuple, BLOSUM90, 3)
+
+def _pam30_score(aa_tuple):
+    return _aa_substitution_score(aa_tuple, PAM30, 3)
+
+def add_blosum_column(df):
+
+    series = df['Predicted Consequence Protein Change'].apply(vf.get_aa_from_predicted_consequence, return_tuple=True)
+    series62 = series.apply(_blossum62_score).rename("blosum62_score")
+    series80 = series.apply(_blossum90_score).rename("blosum90_score")
+
+    COMPUTED_COLUMNS["blosum_score"].extend(["blosum62_score, blosum90_score"])
+    df = df.join(series62)
+    df = df.join(series80)
+    return df
+
+def add_pam_column(df):
+
+    series = df['Predicted Consequence Protein Change'].apply(vf.get_aa_from_predicted_consequence, return_tuple=True)
+    series30 = series.apply(_blossum62_score).rename("pam30_score")
+
+    COMPUTED_COLUMNS["pam_score"].extend(["pam30_score"])
+    df = df.join(series30)
+    return df
 
 def kimstudents_preprocessing(df):
     df = (df
@@ -333,6 +377,7 @@ def kimstudents_preprocessing(df):
           .pipe(add_region_columns)
           .pipe(add_grouped_mutation_type_columns)
           .pipe(add_aa_change_columns)
+          .pipe(add_blosum_column)
           )
     df["Resolution"] = df["Resolution"].str.casefold()
     return df

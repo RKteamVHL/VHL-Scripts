@@ -11,7 +11,6 @@ from Bio.Seq import Seq
 ### The functions here are related to variant-based analysis for each individual node.
 # Variant-Variant similarity functions are in similarity_functions.py
 
-
 ## Transcript CDS and Protein information
 # The following code loads the VHL201 transcript, which contains sequences for:
 # utr5-exon1-exon2-exon3-utr3
@@ -141,6 +140,10 @@ AA_1TO3['fs'] = "fs"
 AA_1TO3['FS'] = AA_1TO3['fs']
 
 AA_3TO1 = protein_letters_3to1
+AA_3TO1['Ter'] = "*"
+AA_3TO1['del'] = "del"
+AA_3TO1['fs'] = "fs"
+AA_3TO1['FS'] = AA_3TO1['fs']
 
 AA_REGEX_3 = re.compile("p\.(?P<from>[a-zA-Z]{3})(?P<aa>[0-9]+)(?P<to>[a-zA-Z]{3})")
 
@@ -153,7 +156,8 @@ AA_REGEX_3 = re.compile("p\.(?P<from>[a-zA-Z]{3})(?P<aa>[0-9]+)(?P<to>[a-zA-Z]{3
 # p.Glu70Lys
 
 
-def get_aa_from_predicted_consequence(aa_str, include_under=True):
+def get_aa_from_predicted_consequence(aa_str_raw, include_under=True, return_tuple=False):
+    aa_str = aa_str_raw.replace("*", "Ter")
     match = AA_REGEX_3.match(aa_str)
 
     if match is not None:
@@ -164,6 +168,8 @@ def get_aa_from_predicted_consequence(aa_str, include_under=True):
 
         if from_aa is not None and to_aa is not None:
             if from_aa in AA_3TO1 and to_aa in AA_3TO1:
+                if return_tuple:
+                    return AA_3TO1[from_aa], AA_3TO1[to_aa]
                 if include_under:
                     return f"{AA_3TO1[from_aa]}_{AA_3TO1[to_aa]}"
                 else:

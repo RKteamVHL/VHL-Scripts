@@ -89,7 +89,7 @@ class AugmentedAnnotation(HypothesisAnnotation):
     """
     body_tags: List[str] = field(default_factory=list)
     tag_dictionary: Dict[str, str] = field(default_factory=dict)
-    annotation_type: str = AnnotationType.INVALID.name
+    type: str = AnnotationType.INVALID.name
 
     def get_tags_from_body(self):
         tag_match = re.finditer(BODY_TAG_REGEX, self.text)
@@ -121,37 +121,29 @@ class AugmentedAnnotation(HypothesisAnnotation):
     def assign_type(self):
         # checking for evidence statement annotation
         if any([key in self.tag_dictionary for key in EVIDENCE_TAGS]):
-            self.annotation_type = AnnotationType.EVIDENCE.name
+            self.type = AnnotationType.EVIDENCE.name
 
         # checking for article info annotation
         elif any([key in self.tag_dictionary for key in INFORMATION_TAGS]):
-            self.annotation_type = AnnotationType.INFORMATION.name
+            self.type = AnnotationType.INFORMATION.name
 
         # checking for methodology annotation
         elif any([key in self.tag_dictionary for key in METHODOLOGY_TAGS]):
-            self.annotation_type = AnnotationType.METHODOLGY.name
+            self.type = AnnotationType.METHODOLGY.name
 
         # checking for case annotation
         elif any([key in self.tag_dictionary for key in CASE_TAGS]):
-            self.annotation_type = AnnotationType.CASE.name
+            self.type = AnnotationType.CASE.name
 
         # checking for COHORT annotation
         elif any([key in self.tag_dictionary for key in COHORT_TAGS]):
-            self.annotation_type = AnnotationType.COHORT.name
+            self.type = AnnotationType.COHORT.name
 
         elif len(self.references) > 0:
-            self.annotation_type = AnnotationType.REPLY.name
+            self.type = AnnotationType.REPLY.name
 
     def as_dict(self):
         return asdict(self)
-
-    def as_dataframe(self):
-        """Returns the annotation as a pandas Dataframe
-
-        This strips the annotation of all it's metadata
-        """
-        pass
-
 
     @staticmethod
     def from_dict(d):
@@ -162,25 +154,14 @@ class AugmentedAnnotation(HypothesisAnnotation):
         return new_annotation
 
 
-"""Notes:
-GroupID/KindredID and GroupID/ KindredID -> both appear in body tags
-INVALID annotations -> 
-    - evidencestatement instead of EvidenceStatement for some annotations
-    - most are caused by GroupID/KidredID inconsistencies
-    - some are replies to other annotations
-    - "Evidence": "", in https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5503545/#annotations:piBWZEfzEeyuGbdGPpU0qw
-    -  GroupID: 2, where the spaces mess up the regex. https://hyp.is/P5YEylOrEeyZUH-REJFQqQ/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
-    -  GroupID: 20, same as above. https://hyp.is/Qsb8-FftEeyKeXeNmFIZ-A/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
-    -  GroupID: 36, same as above. https://hyp.is/4YVg3l1ZEey-rK9ETACNew/onlinelibrary.wiley.com/doi/abs/10.1002/humu.20385
-    - the following seems to be EvidenceStatement, but is missing the tag. https://hyp.is/2hjYGmgAEeyxyyeAzATdxg/iovs.arvojournals.org/article.aspx?articleid=2162471
-    - https://hyp.is/fvvwcmgSEey8rcsikkfNuA/jmg.bmj.com/content/39/7/e38
-    - https://hyp.is/HophImj6Eey5L0efg0JjHQ/jmg.bmj.com/content/39/7/e38
-    - "" https://hyp.is/qd0YnHrnEey7X5esN467Aw/onlinelibrary.wiley.com/doi/abs/10.1002/humu.21219
-    
-ClinVarID:Yes vs ClinVarID:XXX -> having both makes the second get overwritten
-
-Last known age vs age of presentation -> do we care about last known?
-
-The following is an example where age of presentation is 'mid 40s', but no exact date is given. Does this pop up a lot, and if so where is the age range usually put?
-
-"""
+def get_invalid_dataframe(annotations: List[AugmentedAnnotation]):
+    dict_list = []
+    for annotation in annotations:
+        if annotation.type == AnnotationType.INVALID.name:
+            dict_list.append({
+                "link": annotation.links["html"],
+                "type": annotation.type,
+                "author": annotation.user,
+            })
+    out_df = pd.DataFrame.from_records(dict_list)
+    return out_df
