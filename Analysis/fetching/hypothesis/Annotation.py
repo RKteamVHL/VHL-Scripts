@@ -14,6 +14,7 @@ class AnnotationType(enum.IntEnum):
     METHODOLGY = enum.auto()
     CASE = enum.auto()
     COHORT = enum.auto()
+    ASSAY = enum.auto()
 
 
 BODY_TAG_REGEX = re.compile("^(?P<name>\w+): *(?P<body>.*)$", flags=re.MULTILINE)
@@ -50,6 +51,9 @@ COHORT_TAGS = [
     "GroupPresentingHPOs"
 ]
 
+ASSAY_TAGS = [
+    "ExperimentalAssay"
+]
 
 @dataclass
 class HypothesisAnnotation:
@@ -139,6 +143,10 @@ class AugmentedAnnotation(HypothesisAnnotation):
         elif any([key in self.tag_dictionary for key in COHORT_TAGS]):
             self.type = AnnotationType.COHORT.name
 
+        # checking for experiment assay annotation
+        elif any([key in self.tag_dictionary for key in ASSAY_TAGS]):
+            self.type = AnnotationType.ASSAY.name
+
         elif len(self.references) > 0:
             self.type = AnnotationType.REPLY.name
 
@@ -165,3 +173,16 @@ def get_invalid_dataframe(annotations: List[AugmentedAnnotation]):
             })
     out_df = pd.DataFrame.from_records(dict_list)
     return out_df
+
+
+def get_annotation_summary(annotations: List[AugmentedAnnotation]):
+    record_list = []
+    for annotation in annotations:
+        record = {"type": annotation.type}
+        record.update(annotation.tag_dictionary)
+        record_list.append(record)
+
+    df = pd.DataFrame.from_records(record_list)
+    df["count"] = 1
+    out_df = df.groupby("type").count()
+    return out_df["count"]
