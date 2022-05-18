@@ -21,7 +21,9 @@ STUDENTS_SHEETIDS = ['960822541', '1618569887', '154810211', '410096135', '97572
                      '859989440', '1835654764']
 STUDENTS_HREF = [
 
-    f'https://docs.google.com/spreadsheets/d/1evUglhZpGDUPm3GUXu0uIZSkZsHXnbbfQzl5_Nc8DAQ/export?format=csv&gid={name}'
+    f'https://docs.google.com/spreadsheets/d/19GvZImKqvVc2whF3VRBYqrbUZp6jKVm_mg-EH-1kG-c/export?format=csv&gid={name}'
+    #old masterlist:
+    # f'https://docs.google.com/spreadsheets/d/1evUglhZpGDUPm3GUXu0uIZSkZsHXnbbfQzl5_Nc8DAQ/export?format=csv&gid={name}'
     for name in STUDENTS_SHEETIDS]
 
 STUDENTS_HEADER_NAMES = [
