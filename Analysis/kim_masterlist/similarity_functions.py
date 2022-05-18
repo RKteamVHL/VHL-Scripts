@@ -3,7 +3,7 @@ import math
 import networkx as nx
 import numpy as np
 
-from . import variant_functions as vf
+from Analysis.kim_masterlist import variant_functions as vf
 
 
 ### The functions here perform variant-to-variant similarity analysis for pairs of nodes.

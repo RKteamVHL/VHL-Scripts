@@ -1,6 +1,6 @@
 import logging
 
-from Analysis.fetching.kimstudents.KimStudents import KimStudents
+from Analysis.kim_masterlist.fetching import KimStudents
 
 #fetching can be run as a module to test the fetching classes/functionality on a higher level
 if __name__ == '__main__':

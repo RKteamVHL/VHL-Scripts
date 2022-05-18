@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from cycler import cycler
 
-from .kimstudents_dataframe_preprocessing import COMPUTED_COLUMNS
 from .. import variant_functions as vf
 from .kimstudents_dataframe_clustering import *
 

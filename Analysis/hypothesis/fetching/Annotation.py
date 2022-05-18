@@ -1,9 +1,15 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List
+import numpy as np
 import pandas as pd
 import re
 import copy
 import enum
+
+NULL_TERMS = ["unknown", "none", "", "N/A"]
+
+BODY_TAGS_NAME = "BODY"
+TEXT_TAGS_NAME = "TEXT"
 
 
 class AnnotationType(enum.IntEnum):
@@ -11,7 +17,7 @@ class AnnotationType(enum.IntEnum):
     REPLY = enum.auto()
     EVIDENCE = enum.auto()
     INFORMATION = enum.auto()
-    METHODOLGY = enum.auto()
+    METHODOLOGY = enum.auto()
     CASE = enum.auto()
     COHORT = enum.auto()
     ASSAY = enum.auto()
@@ -39,12 +45,6 @@ METHODOLOGY_TAGS = [
 
 CASE_TAGS = [
     "CasePresentingHPOs"
-    # "Case",
-    # "CasePresentingHPOs",
-    # "CaseHPOFreeText",
-    # "CaseNotHPOs",
-    # "CaseNotHPOFreeText",
-    # "CasePreviousTesting"
 ]
 
 COHORT_TAGS = [
@@ -91,17 +91,27 @@ class AugmentedAnnotation(HypothesisAnnotation):
     This class contains additional properties and methods for parsing and storing tags embedded into the annotation
     body, along with converting all tags to a dictionary (rather than a string)
     """
-    body_tags: List[str] = field(default_factory=list)
-    tag_dictionary: Dict[str, str] = field(default_factory=dict)
+    text_tags: Dict[str, str] = field(default_factory=dict)
+    body_tags: Dict[str, str] = field(default_factory=dict)
     type: str = AnnotationType.INVALID.name
 
-    def get_tags_from_body(self):
+    def get_tags_from_text(self):
         tag_match = re.finditer(BODY_TAG_REGEX, self.text)
         if tag_match:
             # TODO: some assertion/error checking on tag_dict
             for match in tag_match:
                 tag_dict = match.groupdict()
-                self.tag_dictionary[tag_dict["name"]] = tag_dict["body"].strip()
+                tag_name = tag_dict["name"]
+                tag_value = tag_dict["body"].strip()
+
+                # if the tag name is already in the tag_dict, fetch its corresponding list; else, return an empty list
+                new_list = self.text_tags.get(tag_name, [])
+
+                # if the value is already in the tag_dict, ignore it (removes tags that get duplicated in body
+                # and tag list)
+                if tag_value not in new_list:
+                    new_list.append(tag_value)
+                self.text_tags[tag_name] = new_list
         else:  # error or log something here
             pass
 
@@ -111,40 +121,54 @@ class AugmentedAnnotation(HypothesisAnnotation):
             tag_name = ""
             tag_value = ""
 
+            # double tags, in the format TagName1:TagName2:TagValue i.e., AgeOfPresentation
+            if len(tag_split) == 3:
+                tag_name = tag_split[0].strip()
+                tag_name2 = tag_split[1].strip()
+                tag_value = {tag_name2: tag_split[2].strip()}
+
             # normal tags in the format TagName:TagValue
-            if len(tag_split) > 1:
-                tag_name = ":".join(tag_split[0:-1]).strip()
-                tag_value = tag_split[-1].strip()
+            elif len(tag_split) == 2:
+                tag_name = tag_split[0].strip()
+                tag_value = tag_split[1].strip()
 
             # flag tags, in the format TagName
             elif len(tag_split) == 1:
                 tag_name = tag_split[0].strip()
+                tag_value = True
 
-            self.tag_dictionary[tag_name] = tag_value
+            # if the tag name is already in the tag_dict, fetch its corresponding list; else, return an empty list
+            new_list = self.body_tags.get(tag_name, [])
+
+            # if the value is already in the tag_dict, ignore it (removes tags that get duplicated in body
+            # and tag list)
+            if tag_value not in new_list:
+                new_list.append(tag_value)
+            self.body_tags[tag_name] = new_list
 
     def assign_type(self):
         # checking for evidence statement annotation
-        if any([key in self.tag_dictionary for key in EVIDENCE_TAGS]):
+        if any([key in self.body_tags for key in EVIDENCE_TAGS]):
             self.type = AnnotationType.EVIDENCE.name
 
         # checking for article info annotation
-        elif any([key in self.tag_dictionary for key in INFORMATION_TAGS]):
+        elif any([key in self.text_tags for key in INFORMATION_TAGS]):
             self.type = AnnotationType.INFORMATION.name
 
         # checking for methodology annotation
-        elif any([key in self.tag_dictionary for key in METHODOLOGY_TAGS]):
-            self.type = AnnotationType.METHODOLGY.name
+        elif any([key in self.text_tags for key in METHODOLOGY_TAGS]):
+            self.type = AnnotationType.METHODOLOGY.name
 
         # checking for case annotation
-        elif any([key in self.tag_dictionary for key in CASE_TAGS]):
+        elif any([key in self.text_tags for key in CASE_TAGS]):
             self.type = AnnotationType.CASE.name
 
         # checking for COHORT annotation
-        elif any([key in self.tag_dictionary for key in COHORT_TAGS]):
+        elif any([key in self.text_tags for key in COHORT_TAGS]):
             self.type = AnnotationType.COHORT.name
 
         # checking for experiment assay annotation
-        elif any([key in self.tag_dictionary for key in ASSAY_TAGS]):
+        elif any([key in self.body_tags for key in ASSAY_TAGS]):
             self.type = AnnotationType.ASSAY.name
 
         elif len(self.references) > 0:
@@ -156,33 +180,32 @@ class AugmentedAnnotation(HypothesisAnnotation):
     @staticmethod
     def from_dict(d):
         new_annotation = AugmentedAnnotation(**copy.deepcopy(d))
-        new_annotation.get_tags_from_body()
+        new_annotation.get_tags_from_text()
         new_annotation.get_tags_from_tags_list()
         new_annotation.assign_type()
         return new_annotation
 
 
-def get_invalid_dataframe(annotations: List[AugmentedAnnotation]):
-    dict_list = []
-    for annotation in annotations:
-        if annotation.type == AnnotationType.INVALID.name:
-            dict_list.append({
-                "link": annotation.links["html"],
-                "type": annotation.type,
-                "author": annotation.user,
-            })
-    out_df = pd.DataFrame.from_records(dict_list)
+def _fix_df_nan(df: pd.DataFrame):
+    out_df = df
+    for term in NULL_TERMS:
+        out_df = out_df.replace(term, np.NaN)
     return out_df
 
-
-def get_annotation_summary(annotations: List[AugmentedAnnotation]):
+# this function returns a dataframe with a couple of caveats:
+# 1.    only the tag type and properties in the annotation tag_dictionary are included
+# 2.    if the tag is one which can have multiple values simultaneously ie. DiseaseEntity or AgeOfPresentation,
+#       then only the first of the values is returned
+def get_df_from_annotations(annotations: List[AugmentedAnnotation]):
     record_list = []
+    column_set = set()
     for annotation in annotations:
         record = {"type": annotation.type}
-        record.update(annotation.tag_dictionary)
+        record.update({f'{TEXT_TAGS_NAME}.{k}': v for k, v in annotation.text_tags.items()})
+        record.update({f'{BODY_TAGS_NAME}.{k}': v for k, v in annotation.body_tags.items()})
         record_list.append(record)
+        column_set.update(record.keys())
 
     df = pd.DataFrame.from_records(record_list)
-    df["count"] = 1
-    out_df = df.groupby("type").count()
-    return out_df["count"]
+    df = df.pipe(_fix_df_nan)
+    return df

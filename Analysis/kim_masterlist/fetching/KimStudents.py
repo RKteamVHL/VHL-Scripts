@@ -3,7 +3,7 @@ import logging
 from itertools import chain
 
 from .Fetcher import Fetcher
-from Analysis.constants import *
+from Analysis.kim_masterlist.constants import *
 
 STUDENTS_NAME = 'KimStudents'
 STUDENTS_FILENAME = 'Final Masterlist of VHL Papers.csv'
@@ -20,6 +20,7 @@ STUDENTS_FILENAME = 'Final Masterlist of VHL Papers.csv'
 STUDENTS_SHEETIDS = ['960822541', '1618569887', '154810211', '410096135', '975723769', '64075395', '1607707061',
                      '859989440', '1835654764']
 STUDENTS_HREF = [
+
     f'https://docs.google.com/spreadsheets/d/1evUglhZpGDUPm3GUXu0uIZSkZsHXnbbfQzl5_Nc8DAQ/export?format=csv&gid={name}'
     for name in STUDENTS_SHEETIDS]
 

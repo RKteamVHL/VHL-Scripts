@@ -3,7 +3,7 @@ import requests
 from lxml import html
 import os
 import litvar.utils
-from ..variant_functions import get_aa_from_predicted_consequence
+from Analysis.kim_masterlist.variant_functions import get_aa_from_predicted_consequence
 
 STATS_DIR = "statistics"
 VALIDATION_DIR = "validation"

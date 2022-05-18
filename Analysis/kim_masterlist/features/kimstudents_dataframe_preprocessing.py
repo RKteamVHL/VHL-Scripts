@@ -5,11 +5,11 @@ import re
 import numpy as np
 import pandas as pd
 
-from .. import variant_functions as vf
-from ..constants import *
+from Analysis.kim_masterlist import variant_functions as vf
+from Analysis.kim_masterlist.constants import *
 
 from Bio.Align import substitution_matrices
-import Bio.Align
+
 BLOSUM90 = substitution_matrices.load("BLOSUM90")
 BLOSUM62 = substitution_matrices.load("BLOSUM62")
 PAM30 = substitution_matrices.load("PAM30")

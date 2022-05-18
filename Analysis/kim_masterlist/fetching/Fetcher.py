@@ -8,7 +8,7 @@ from itertools import chain
 
 import certifi
 
-from Analysis.constants import *
+from Analysis.kim_masterlist.constants import *
 
 
 class Fetcher(object):

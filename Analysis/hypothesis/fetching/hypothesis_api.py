@@ -6,8 +6,13 @@ import json
 
 from .Annotation import AugmentedAnnotation
 
-TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secret_token.txt")
+INPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../files", "input")
+TOKEN_FILE = os.path.join(INPUT_DIR, "secret_token.txt")
 SECRET_TOKEN = ""
+
+if not os.path.isdir(INPUT_DIR):
+    os.makedirs(INPUT_DIR)
+
 with open(TOKEN_FILE, "r", encoding="utf-8") as file:
     SECRET_TOKEN = file.readline().strip()
 
