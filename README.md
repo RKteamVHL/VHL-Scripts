@@ -42,88 +42,15 @@ With the virtual environment activated, all depenencies can be installed by runn
 ```
 If there are no errors, the environment should now be set up to run all scripts properly
 
-## Running all Scripts
-The core functions are implemented in the Analysis module, which can be run with the following command:
-```commandline
-(test_env) C:\\...\\VHL-Scripts>py -m Analysis --createfigs
-```
-Running the command without the "createfigs" argument will run all of the data analysis and statistical tests without creating
-all of the figures, which can take some time.
+##Hypothes.is
+The VHL Hypothesis Annotation group on hypothes.is contains 5000+ expert-curated annotations for ~370 papers on germline
+VHL variants. The hypothesis python package contains script related to downloading, cleaning, and summarizing statistics
+ of these annotations. Further information on running these scripts can be found in 
+[the hypothesis package](hypothesis/README.md). Moving forward, the VHL Hypothesis Annotation group will maintain our 
+most up-to-date data.
 
-Additionally, running the scripts with the following command:
-```commandline
-(test_env) C:\\...\\VHL-Scripts>py -m Analysis --createfigs --validation
-```
-Will also run the scripts that validate our data against the [UMD VHL](http://www.umd.be/VHL/) database. 
-## Figures
-All relevant output figures are saved in the "statistics" folder that gets created after running the scripts. The folders
-are separated by patient, kindred, and variant. Inside these separate folders are the "data" and "figures" subfolders; the "figures"
-folder contains the matplotlib-generated .pdf figures, and the "data" folder contains the raw data used to generate the figures.
-
-Of interest are:
-
-##### Fig 1. Age-related penetrance for patients that present with a single phenotype
-```commandline
-File: statistics\patient\figures\penetrance.pdf
-Code: Analysis\features\kimstudents_dataframe_views.py (line 382)
-```
-##### Fig. 2. Phenotype co-occurrence ratios for (A) patient-, (B) family- and (C) variant-based data
-```commandline
-File: statistics\(patient, family, or variant)\figures\phenotype_correlation_ratio.pdf
-Code: Analysis\features\kimstudents_dataframe_views.py (line 438)
-```
-##### Fig 3. Frequency of missense variants along the VHL gene for (A) patient-, (B) family- and (C) variant-based data. 
-```commandline
-Files: statistics\(patient, family, or variant)\figures\codon_histogram.pdf
-Code: Analysis\features\kimstudents_dataframe_views.py (line 282)
-```
-##### Fig 4. Distribution of truncating and non-truncating variant by phenotype for (A) patient-, (B) family- and (C) variant-based data
-```commandline
-Files: statistics\(patient, family, or variant)\figures\grouped_mutant_type_counts.pdf
-Code: Analysis\features\kimstudents_dataframe_views.py (line 240)
-```
-##### Fig 5. Frequency of coding variants in protein and functional domains for (A) patient-, (B) family- and (C) variant-based data
-```commandline
-Files: statistics\(patient, family, or variant)\figures\regions.pdf
-Code: Analysis\features\kimstudents_dataframe_views.py (line 96)
-```
-##### Fig 6. Cluster phenotype, variant type, variant domain and codon distribution for two patient clusters.
-```commandline
-Files:  statistics\patient\cluster\cluster_labels_best\clustered_generalized_phenotype_counts.pdf
-        statistics\patient\cluster\cluster_labels_best\clustered_domain_counts.pdf
-        statistics\patient\cluster\cluster_labels_best\clustered_grouped_mutation_type_counts.pdf
-        statistics\patient\cluster\cluster_labels_best\clustered_codon_start.pdf
-
-Code: Analysis\features\kimstudents_dataframe_views.py (line 632)
-``` 
-##### Fig 7. Cluster phenotype (A), variant type (B), variant domain (C) and codon statistics (D) for each of the 4 patient clusters
-```commandline
-Files:  statistics\patient\cluster\cluster_labels_second\clustered_generalized_phenotype_counts.pdf
-        statistics\patient\cluster\cluster_labels_second\clustered_domain_counts.pdf
-        statistics\patient\cluster\cluster_labels_second\clustered_grouped_mutation_type_counts.pdf
-        statistics\patient\cluster\cluster_labels_second\clustered_codon_start.pdf
-
-Code: Analysis\features\kimstudents_dataframe_views.py (line 632)
-``` 
-## Files
-The scripts output the fetched individual input files to the /output directory, which get combined into a single masterlist.
-The first step of filtering is to drop all entries that do not have either a phenotype or a mutation- the output of this step is
-saved in:
-```
-statistics/summary/postdropsupplementary_1.csv
-``` 
-The next step is to create additional annotated columns with clean values to 
-be used in further analysis. The resulting file is:
-```
-statistics/summary/filtered_out.csv
-``` 
-#### Table 1
-The summary statistics for the total number of patients, kindreds, and variants are saved to:
-```
-statistics/summary/postdropsummary.csv
-``` 
-The breakdown of these summaries by phenotype and mutation type are saved in :
-```
-statistics/summary/summary_by_type.csv
-```
-Together, these two files are used to create Table 1.
+##Kim Student Masterlist
+The Kim Student VHL variant Masterlist contains expert-curated variant information extracted from 427 papers. 
+A comprehensive description of the collection, screening, analysis, and discussion of the data can be found our paper:
+[Large scale genotype- and phenotype-driven machine learning in Von Hippel-Lindau disease](https://doi.org/10.1002/humu.24392).
+More information on running the scripts and understanding their outputs can be found in [the kim masterlist package](kim_masterlist/README.md).
