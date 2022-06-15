@@ -42,14 +42,14 @@ With the virtual environment activated, all depenencies can be installed by runn
 ```
 If there are no errors, the environment should now be set up to run all scripts properly
 
-##Hypothes.is
+## Hypothes.is
 The VHL Hypothesis Annotation group on hypothes.is contains 5000+ expert-curated annotations for ~370 papers on germline
 VHL variants. The hypothesis python package contains script related to downloading, cleaning, and summarizing statistics
  of these annotations. Further information on running these scripts can be found in 
 [the hypothesis package](hypothesis/README.md). Moving forward, the VHL Hypothesis Annotation group will maintain our 
 most up-to-date data.
 
-##Kim Student Masterlist
+## Kim Student Masterlist
 The Kim Student VHL variant Masterlist contains expert-curated variant information extracted from 427 papers. 
 A comprehensive description of the collection, screening, analysis, and discussion of the data can be found our paper:
 [Large scale genotype- and phenotype-driven machine learning in Von Hippel-Lindau disease](https://doi.org/10.1002/humu.24392).
