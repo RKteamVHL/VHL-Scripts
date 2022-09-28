@@ -386,8 +386,7 @@ def ratio_of_phenotypes(df, generalized=True):
 
 
 def penetrance(df):
-    # this threshold is arbitrary right now
-    # threshold = 10
+
     df = df.dropna(subset=COMPUTED_COLUMNS["age"])
 
     summed_phenos = df[COMPUTED_COLUMNS["generalized_phenotype"]].sum(axis=1)

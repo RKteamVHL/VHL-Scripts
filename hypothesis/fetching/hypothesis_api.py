@@ -5,8 +5,8 @@ import urllib.parse
 import json
 
 from .Annotation import AugmentedAnnotation
+from ..config import INPUT_DIR
 
-INPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../files", "input")
 TOKEN_FILE = os.path.join(INPUT_DIR, "secret_token.txt")
 SECRET_TOKEN = ""
 
@@ -54,4 +54,10 @@ def get_annotations_by_group(group_id, search_after):
                 reached_end = True
             next_checkpoint = response_dict['rows'][-1]['created']
 
+    return annotations
+
+
+def get_annotations_from_json(path):
+    with open(path, "r") as file:
+        annotations = [AugmentedAnnotation.from_dict(a) for a in json.load(file)]
     return annotations

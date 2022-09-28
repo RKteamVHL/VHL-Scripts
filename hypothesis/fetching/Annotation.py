@@ -1,3 +1,6 @@
+# the 'annotations' import (used for type-hinting in static methods)
+# should not be confused with our custom Annotation class
+from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List
 import numpy as np
@@ -6,10 +9,17 @@ import re
 import copy
 import enum
 
+
+
 NULL_TERMS = ["unknown", "none", "", "N/A"]
 
+# BODY and TEXT need to be separated so that we can discern body tags from text tags when used later
 BODY_TAGS_NAME = "BODY"
 TEXT_TAGS_NAME = "TEXT"
+
+ANNOTATION_HEADERS = {
+    ""
+}
 
 
 class AnnotationType(enum.IntEnum):
@@ -54,6 +64,13 @@ COHORT_TAGS = [
 ASSAY_TAGS = [
     "ExperimentalAssay"
 ]
+
+
+def _fix_df_nan(df: pd.DataFrame):
+    out_df = df
+    for term in NULL_TERMS:
+        out_df = out_df.replace(term, np.NaN)
+    return out_df
 
 @dataclass
 class HypothesisAnnotation:
@@ -185,27 +202,27 @@ class AugmentedAnnotation(HypothesisAnnotation):
         new_annotation.assign_type()
         return new_annotation
 
+    # this function returns a dataframe with a couple of caveats:
+    # 1.    if the tag came from the body, it will be prepended with the BODY_TAGS_NAME constant, otherwise if it comes from
+    #       the text, it will be prepended with TEXT_TAGS_NAME
+    # 2.    individual cells will contain lists, which won't get formatted properly if exported to a csv file
+    # It's also important to note that some data (i.e., user info) is excluded from the output csv file
+    @staticmethod
+    def df_from_annotations(annotations: List[AugmentedAnnotation]):
+        record_list = []
+        column_set = set()
+        for annotation in annotations:
+            record = {
+                "type": annotation.type,
+                'uri': annotation.links['html'],
+                "source": annotation.target[0]['source'],
+                "text": annotation.text
+            }
+            record.update({f'{TEXT_TAGS_NAME}.{k}': v for k, v in annotation.text_tags.items()})
+            record.update({f'{BODY_TAGS_NAME}.{k}': v for k, v in annotation.body_tags.items()})
+            record_list.append(record)
+            column_set.update(record.keys())
 
-def _fix_df_nan(df: pd.DataFrame):
-    out_df = df
-    for term in NULL_TERMS:
-        out_df = out_df.replace(term, np.NaN)
-    return out_df
-
-# this function returns a dataframe with a couple of caveats:
-# 1.    if the tag came from the body, it will be prepended with the BODY_TAGS_NAME constant, otherwise if it comes from
-#       the text, it will be prepended with TEXT_TAGS_NAME
-# 2.
-def get_df_from_annotations(annotations: List[AugmentedAnnotation]):
-    record_list = []
-    column_set = set()
-    for annotation in annotations:
-        record = {"type": annotation.type, 'uri': annotation.links['html']}
-        record.update({f'{TEXT_TAGS_NAME}.{k}': v for k, v in annotation.text_tags.items()})
-        record.update({f'{BODY_TAGS_NAME}.{k}': v for k, v in annotation.body_tags.items()})
-        record_list.append(record)
-        column_set.update(record.keys())
-
-    df = pd.DataFrame.from_records(record_list)
-    df = df.pipe(_fix_df_nan)
-    return df
+        df = pd.DataFrame.from_records(record_list)
+        df = df.pipe(_fix_df_nan)
+        return df

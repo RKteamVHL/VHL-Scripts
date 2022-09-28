@@ -1,13 +1,15 @@
 from typing import List
-from ..fetching.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType, get_df_from_annotations
-from ..fetching.clingen_allele_registry_api import get_variant_by_caid
+from ..fetching.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
+from ..variant_functions import get_variant_by_caid, clinvarid_to_variant_dict, VHL_PHENOTYPES
 import pandas as pd
-from ..variant_functions import clinvarid_to_variant_dict
 import numpy as np
 
 NULL_TERMS = ['n/a', 'N/A', 'NA']
 NON_STANDARD_REFS = ['NM_000551.2', 'AF010238.1']
 STANDARD_REFS = ['NM_000551.3', 'NM_000551.4']
+
+
+
 
 def _fix_na(df):
     return_df = df.replace(NULL_TERMS, [np.nan]*len(NULL_TERMS))
@@ -187,6 +189,58 @@ def get_case_tumors(annotation_df: pd.DataFrame):
 def get_penetrance(annotation_df: pd.DataFrame):
     pass
 
+def get_missense_variants(annotation_df: pd.DataFrame):
+    x_labels = ['from_aa', 'to_aa', 'pos']
+    y_labels = list(set(VHL_PHENOTYPES.values()))
+
+    muttype_col = f'{BODY_TAGS_NAME}.MutationType'
+
+    # features
+    aa_change_col = f'{BODY_TAGS_NAME}.AminoAcidChange'
+    codon_col = f'{BODY_TAGS_NAME}.ProteinPosition'
+
+    # labels
+    pheno_col = f'{BODY_TAGS_NAME}.DiseaseEntity'
+
+    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+
+    # clean up the features
+    feature_df = valid_df[[muttype_col, aa_change_col, codon_col]].dropna().applymap(lambda x: x[0]).apply(_fix_na)
+    feature_df = feature_df.dropna(how='any')
+    feature_df = feature_df[feature_df[muttype_col].str.contains('missense_variant')]
+
+    feature_df[['from_aa', 'to_aa']] = feature_df[aa_change_col].str.split('to', expand=True)
+    feature_df[feature_df['to_aa'] == '*'] = 'TER'
+    feature_df = feature_df.rename(columns={codon_col: 'pos'})
+
+    # clean up the labels
+    pheno_df = valid_df.loc[feature_df.index, [pheno_col]]
+
+    def _fix_pheno(cell):
+        to_return = []
+        if isinstance(cell, list):
+            for ele in cell:
+                if isinstance(ele, str):
+                    if ele.casefold() in VHL_PHENOTYPES:
+                        to_return.append(VHL_PHENOTYPES[ele.casefold()])
+        else:
+            to_return = []
+
+        if not to_return:
+            to_return.append('asymptomatic')
+
+        return to_return
+
+    pheno_s = pheno_df[pheno_col].map(_fix_pheno)
+    pheno_s = pheno_s.rename('phenotype')
+    # s = pheno_s.explode()
+
+    x = feature_df[x_labels]
+    #y = (pd.crosstab(s.index, s)).clip(0, 1)
+    y = pheno_s
+
+    return x.join(y)
+
 
 # these are statistics related to error-checking
 def get_invalid_dataframe(annotations: List[AugmentedAnnotation]):
@@ -218,6 +272,7 @@ def get_annotation_summary(annotations: List[AugmentedAnnotation]):
 def get_all_statistics(annotations: List[AugmentedAnnotation]):
     output_df_list = []
     statistic_fns = [
+        get_missense_variants,
         get_unique_clinvar_variants,
         get_previously_published_variants,
         get_papers,
@@ -226,12 +281,12 @@ def get_all_statistics(annotations: List[AugmentedAnnotation]):
         get_nonstandard_refseq,
         get_family_pedigree_variants
     ]
-    raw_df = get_df_from_annotations(annotations)
+    raw_df = AugmentedAnnotation.df_from_annotations(annotations)
     for fn in statistic_fns:
         df = raw_df.pipe(fn)
         df = df.dropna(axis="columns", how="all")
 
-        df = df.reindex(sorted(df.columns), axis=1)
+        #df = df.reindex(sorted(df.columns), axis=1)
 
         df.name = fn.__name__.replace("get_", "")
 
