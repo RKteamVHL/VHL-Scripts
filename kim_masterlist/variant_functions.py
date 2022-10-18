@@ -215,7 +215,7 @@ HPO_FILENAME = 'hp.obo'
 # HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
 HPO_HREF = os.path.join(LIB_DIR, 'hp.obo.txt')
 
-# gather HPO and SO into an netork- node keys: id
+# gather HPO and SO into a network- node keys: id
 _g = nx.compose(obonet.read_obo(SO_HREF), obonet.read_obo(HPO_HREF))
 
 # add the id to the node attributes
@@ -303,12 +303,12 @@ SO_TERM_TYPES = {
 GENERAL_HPO_NODES = [get_valid_obo(term) for term in GENERAL_HPO_TERMS]
 
 
-def generalized_vhl_phenotype(phenoype, use_abbreviation=True):
+def generalized_vhl_phenotype(phenotype, use_abbreviation=True):
     '''Given a node, find its general disease type
     '''
     general_pheno = None
 
-    valid_hpo = get_valid_obo(phenoype)
+    valid_hpo = get_valid_obo(phenotype)
     for successor in nx.bfs_successors(OBONET, valid_hpo):
         try:
             i = GENERAL_HPO_NODES.index(successor[0])

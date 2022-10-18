@@ -3,7 +3,7 @@ import argparse
 import os
 import json
 from .fetching.hypothesis_api import get_annotations_by_group, get_annotations_from_json
-from .features.statistics import get_all_statistics
+from .features.summary import get_all_statistics
 from . import config
 
 if __name__ == '__main__':
@@ -31,7 +31,7 @@ if __name__ == '__main__':
             json.dump([a.as_dict() for a in annotations], file, indent=4)
 
 
-    # converting to csv and computing stats
+    # converting to csv and computing summary
     output_df, output_stats = get_all_statistics(annotations)
     output_df = output_df.reindex(sorted(output_df.columns), axis=1)
     output_df.to_csv(os.path.join(config.OUTPUT_DIR, "all_annotations.csv"))

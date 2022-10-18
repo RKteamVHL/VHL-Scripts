@@ -1,18 +1,14 @@
 from typing import List
-from ..fetching.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
-from ..variant_functions import get_variant_by_caid, clinvarid_to_variant_dict, VHL_PHENOTYPES
+from ..annotations.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
+from ..fetching.clinvar_variants import clinvarid_to_variant_dict
+from ..fetching.caid_variants import get_variant_by_caid
+from ..variant_functions import VHL_PHENOTYPES
+from .. import config
 import pandas as pd
 import numpy as np
 
-NULL_TERMS = ['n/a', 'N/A', 'NA']
-NON_STANDARD_REFS = ['NM_000551.2', 'AF010238.1']
-STANDARD_REFS = ['NM_000551.3', 'NM_000551.4']
-
-
-
-
 def _fix_na(df):
-    return_df = df.replace(NULL_TERMS, [np.nan]*len(NULL_TERMS))
+    return_df = df.replace(config.NULL_TERMS, [np.nan]*len(config.NULL_TERMS))
     return return_df
 
 def _fix_clinvar(clinvar_list):
@@ -137,8 +133,8 @@ def get_nonstandard_refseq(annotation_df: pd.DataFrame):
     refseq_df.loc[:, "StandardRef"] = False
     refseq_df.loc[:, "NonStandardRef"] = False
 
-    refseq_df.loc[:, "StandardRef"] = refseq_df[refseq_col].str.contains('|'.join(STANDARD_REFS))
-    refseq_df.loc[:, "NonStandardRef"] = refseq_df[refseq_col].str.contains('|'.join(NON_STANDARD_REFS))
+    refseq_df.loc[:, "StandardRef"] = refseq_df[refseq_col].str.contains('|'.join(config.STANDARD_REFS))
+    refseq_df.loc[:, "NonStandardRef"] = refseq_df[refseq_col].str.contains('|'.join(config.NON_STANDARD_REFS))
 
     nonstandard_df = refseq_df
     return nonstandard_df

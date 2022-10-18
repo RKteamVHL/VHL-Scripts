@@ -112,7 +112,7 @@ class AugmentedAnnotation(HypothesisAnnotation):
     body_tags: Dict[str, str] = field(default_factory=dict)
     type: str = AnnotationType.INVALID.name
 
-    def get_tags_from_text(self):
+    def _get_tags_from_text(self):
         tag_match = re.finditer(BODY_TAG_REGEX, self.text)
         if tag_match:
             # TODO: some assertion/error checking on tag_dict
@@ -132,7 +132,7 @@ class AugmentedAnnotation(HypothesisAnnotation):
         else:  # error or log something here
             pass
 
-    def get_tags_from_tags_list(self):
+    def _get_tags_from_tags_list(self):
         for tag in self.tags:
             tag_split = tag.split(":")
             tag_name = ""
@@ -163,9 +163,11 @@ class AugmentedAnnotation(HypothesisAnnotation):
                 new_list.append(tag_value)
             self.body_tags[tag_name] = new_list
 
-    def assign_type(self):
+    def _assign_type(self):
+        if len(self.references) > 0:
+            self.type = AnnotationType.REPLY.name
         # checking for evidence statement annotation
-        if any([key in self.body_tags for key in EVIDENCE_TAGS]):
+        elif any([key in self.body_tags for key in EVIDENCE_TAGS]):
             self.type = AnnotationType.EVIDENCE.name
 
         # checking for article info annotation
@@ -188,18 +190,15 @@ class AugmentedAnnotation(HypothesisAnnotation):
         elif any([key in self.body_tags for key in ASSAY_TAGS]):
             self.type = AnnotationType.ASSAY.name
 
-        elif len(self.references) > 0:
-            self.type = AnnotationType.REPLY.name
-
     def as_dict(self):
         return asdict(self)
 
     @staticmethod
     def from_dict(d):
         new_annotation = AugmentedAnnotation(**copy.deepcopy(d))
-        new_annotation.get_tags_from_text()
-        new_annotation.get_tags_from_tags_list()
-        new_annotation.assign_type()
+        new_annotation._get_tags_from_text()
+        new_annotation._get_tags_from_tags_list()
+        new_annotation._assign_type()
         return new_annotation
 
     # this function returns a dataframe with a couple of caveats:
@@ -220,6 +219,8 @@ class AugmentedAnnotation(HypothesisAnnotation):
             }
             record.update({f'{TEXT_TAGS_NAME}.{k}': v for k, v in annotation.text_tags.items()})
             record.update({f'{BODY_TAGS_NAME}.{k}': v for k, v in annotation.body_tags.items()})
+            # record.update({f'{TEXT_TAGS_NAME}.{k}': v[0] if len(v) == 1 else v for k, v in annotation.text_tags.items()})
+            # record.update({f'{BODY_TAGS_NAME}.{k}': v[0] if len(v) == 1 else v for k, v in annotation.body_tags.items()})
             record_list.append(record)
             column_set.update(record.keys())
 

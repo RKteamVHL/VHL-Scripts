@@ -4,7 +4,7 @@ import urllib.parse
 
 import json
 
-from .Annotation import AugmentedAnnotation
+from ..annotations.Annotation import AugmentedAnnotation
 from ..config import INPUT_DIR
 
 TOKEN_FILE = os.path.join(INPUT_DIR, "secret_token.txt")
