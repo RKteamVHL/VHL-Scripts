@@ -3,6 +3,24 @@ import os
 import obonet
 import urllib
 from . import config
+DISEASE_ENTITY_TO_HPO = {
+        'asymptomatic': 'asymptomatic',
+        'adrenalpheochromocytoma': 'neuroendocrineneoplasm',
+        'cerebellarhemangioblastoma': 'hemangioblastoma',
+        'clearcellrenalcellcarcinoma': 'renalcellcarcinoma',
+        'hemangioblastoma': 'hemangioblastoma',
+        'hemangioma': 'hemangioma',
+        'neoplasmoftheliver': 'neoplasmoftheliver',
+        'neuroendocrineneoplasm': 'neuroendocrineneoplasm',
+        'pancreaticcysts': 'pancreaticcysts',
+        'pancreaticendocrinetumor': 'pancreaticendocrinetumor',
+        'pheochromocytoma': 'neuroendocrineneoplasm',
+        'renalcellcarcinoma': 'renalcellcarcinoma',
+        'renalcyst': 'renalcyst',
+        'renalneoplasm': 'renalneoplasm',
+        'retinalcapillaryhemangioma': 'hemangioblastoma',
+        'spinalhemangioblastoma': 'hemangioblastoma'
+}
 
 GENERAL_HPO_TERMS = [
     'neuroendocrine neoplasm',

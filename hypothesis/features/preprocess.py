@@ -1,6 +1,8 @@
 from typing import List
 from ..annotations.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
-from ..variant_functions import get_variant_by_caid, clinvarid_to_variant_dict, VHL_PHENOTYPES
+from ..fetching.caid_variants import get_variant_by_caid
+from ..fetching.clinvar_variants import clinvarid_to_variant_dict
+from ..variant_functions import DISEASE_ENTITY_TO_HPO
 import pandas as pd
 import numpy as np
 import re

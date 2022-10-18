@@ -2,7 +2,7 @@ from typing import List
 from ..annotations.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
 from ..fetching.clinvar_variants import clinvarid_to_variant_dict
 from ..fetching.caid_variants import get_variant_by_caid
-from ..variant_functions import VHL_PHENOTYPES
+from ..variant_functions import DISEASE_ENTITY_TO_HPO
 from .. import config
 import pandas as pd
 import numpy as np
@@ -187,7 +187,7 @@ def get_penetrance(annotation_df: pd.DataFrame):
 
 def get_missense_variants(annotation_df: pd.DataFrame):
     x_labels = ['from_aa', 'to_aa', 'pos']
-    y_labels = list(set(VHL_PHENOTYPES.values()))
+    y_labels = list(set(DISEASE_ENTITY_TO_HPO.values()))
 
     muttype_col = f'{BODY_TAGS_NAME}.MutationType'
 
@@ -217,8 +217,8 @@ def get_missense_variants(annotation_df: pd.DataFrame):
         if isinstance(cell, list):
             for ele in cell:
                 if isinstance(ele, str):
-                    if ele.casefold() in VHL_PHENOTYPES:
-                        to_return.append(VHL_PHENOTYPES[ele.casefold()])
+                    if ele.casefold() in DISEASE_ENTITY_TO_HPO:
+                        to_return.append(DISEASE_ENTITY_TO_HPO[ele.casefold()])
         else:
             to_return = []
 
