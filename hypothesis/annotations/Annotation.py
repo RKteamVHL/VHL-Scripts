@@ -205,7 +205,7 @@ class AugmentedAnnotation(HypothesisAnnotation):
     # 1.    if the tag came from the body, it will be prepended with the BODY_TAGS_NAME constant, otherwise if it comes from
     #       the text, it will be prepended with TEXT_TAGS_NAME
     # 2.    individual cells will contain lists, which won't get formatted properly if exported to a csv file
-    # It's also important to note that some data (i.e., user info) is excluded from the output csv file
+    # 3.    some data (i.e., user info) is excluded from the output csv file
     @staticmethod
     def df_from_annotations(annotations: List[AugmentedAnnotation]):
         record_list = []
@@ -227,3 +227,25 @@ class AugmentedAnnotation(HypothesisAnnotation):
         df = pd.DataFrame.from_records(record_list)
         df = df.pipe(_fix_df_nan)
         return df
+
+    @staticmethod
+    def merge_across_source(annotations: List[AugmentedAnnotation]):
+        '''
+        Takes a list of all annotations, and copies tags across annotations related through source
+        @param annotations:
+        @return: List[AugmentedAnnotation]
+        '''
+
+        source_dict = {}
+
+        for a in annotations:
+            a_source = a.target[0]['source']
+            a_list = source_dict.get(a_source, [])
+            source_dict[a_source] = a_list.append(a)
+
+        # for each unique source, find the information annotation and copy its pmid to other annotations
+        for source, a_list in source_dict.items():
+            
+
+
+
