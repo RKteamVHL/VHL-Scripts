@@ -5,6 +5,8 @@ import json
 from .fetching.hypothesis_api import get_annotations_by_group, get_annotations_from_json
 from .features.summary import get_all_statistics
 from . import config
+from .annotations.Annotation import AugmentedAnnotation
+from .features.filter import keep_only_cases
 
 if __name__ == '__main__':
     logging.basicConfig(
@@ -20,6 +22,7 @@ if __name__ == '__main__':
 
     config.USE_CACHE = args.cached
 
+
     if config.USE_CACHE:
         # load the stored annotation json file
         annotations = get_annotations_from_json(os.path.join(config.OUTPUT_DIR, config.ANNOTATION_OUTPUT))
@@ -30,6 +33,8 @@ if __name__ == '__main__':
         with open(os.path.join(config.OUTPUT_DIR, config.ANNOTATION_OUTPUT), "w") as file:
             json.dump([a.as_dict() for a in annotations], file, indent=4)
 
+    # merging article information into all other annotations
+    AugmentedAnnotation.merge_across_source(annotations)
 
     # converting to csv and computing summary
     output_df, output_stats = get_all_statistics(annotations)
@@ -38,4 +43,8 @@ if __name__ == '__main__':
 
     for stat in output_stats:
         stat.to_csv(os.path.join(config.OUTPUT_DIR, f"{stat.name}.csv"))
+
+    # keeping only CASE annotations
+    cases_df = keep_only_cases(output_df)
+    cases
 

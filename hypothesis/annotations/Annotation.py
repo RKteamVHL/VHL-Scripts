@@ -2,6 +2,7 @@
 # should not be confused with our custom Annotation class
 from __future__ import annotations
 from dataclasses import dataclass, field, asdict
+from collections import deque
 from typing import Dict, List
 import numpy as np
 import pandas as pd
@@ -237,15 +238,18 @@ class AugmentedAnnotation(HypothesisAnnotation):
         '''
 
         source_dict = {}
-
         for a in annotations:
             a_source = a.target[0]['source']
-            a_list = source_dict.get(a_source, [])
-            source_dict[a_source] = a_list.append(a)
+            a_deque = source_dict.get(a_source, deque())
+            if a.type == AnnotationType.INFORMATION:
+                a_deque.appendleft(a)
+            else:
+                a_deque.append(a)
 
         # for each unique source, find the information annotation and copy its pmid to other annotations
-        for source, a_list in source_dict.items():
-            
-
-
-
+        for source, a_deque in source_dict.items():
+            a_info = a_deque.popleft()
+            while len(a_deque>0):
+                annotation = a_deque.popleft()
+                annotation.body_tags.update(a_info.body_tags)
+                annotation.text_tags.update(a_info.text_tags)

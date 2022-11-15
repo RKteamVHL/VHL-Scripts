@@ -1,4 +1,7 @@
 import pandas as pd
+from ..annotations.Annotation import AnnotationType
 
-def filter_in_cases(df):
-	pass
+
+def keep_only_cases(df):
+	out_df = df[df['type'] == AnnotationType.CASE]
+	return out_df
