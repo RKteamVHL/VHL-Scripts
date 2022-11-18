@@ -54,12 +54,12 @@ HPO_ABBREVIATIONS.update(_abbrv)
 SO_NAME = 'SequenceOntology'
 SO_FILENAME = 'so.obo'
 SO_HREF = 'https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/Ontology_Files/so.obo'
-SO_DIR = os.path.join(config.LIB_DIR, 'so.obo.txt')
+SO_DIR = os.path.join(config.DIRS['lib'], 'so.obo.txt')
 
 HPO_NAME = 'HumanPhenotypeOntology'
 HPO_FILENAME = 'hp.obo'
 HPO_HREF = 'https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo'
-HPO_DIR = os.path.join(config.LIB_DIR, 'hp.obo.txt')
+HPO_DIR = os.path.join(config.DIRS['lib'], 'hp.obo.txt')
 
 if not config.USE_CACHE:
     h_request = urllib.request.Request(SO_HREF, method="GET")

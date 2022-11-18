@@ -6,6 +6,8 @@ from ..variant_functions import DISEASE_ENTITY_TO_HPO
 from .. import config
 import pandas as pd
 import numpy as np
+import os
+
 
 def _fix_na(df):
     return_df = df.replace(config.NULL_TERMS, [np.nan]*len(config.NULL_TERMS))
@@ -265,7 +267,7 @@ def get_annotation_summary(annotations: List[AugmentedAnnotation]):
     return out_df["count"]
 
 
-def get_all_statistics(annotations: List[AugmentedAnnotation]):
+def get_all_summaries(annotations: List[AugmentedAnnotation]):
     output_df_list = []
     statistic_fns = [
         get_missense_variants,
@@ -282,10 +284,15 @@ def get_all_statistics(annotations: List[AugmentedAnnotation]):
         df = raw_df.pipe(fn)
         df = df.dropna(axis="columns", how="all")
 
-        #df = df.reindex(sorted(df.columns), axis=1)
-
         df.name = fn.__name__.replace("get_", "")
 
         output_df_list.append(df)
+
+    # columns in alphabetical order
+    raw_df = raw_df.reindex(sorted(raw_df.columns), axis=1)
+    raw_df.to_csv(os.path.join(config.DIRS['output'], config.RAW_ANNOTATION_DF))
+
+    for stat in output_df_list:
+        stat.to_csv(os.path.join(config.DIRS['summary'], f"{stat.name}.csv"))
 
     return raw_df, output_df_list

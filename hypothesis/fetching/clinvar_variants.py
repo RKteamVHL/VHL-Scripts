@@ -10,7 +10,7 @@ csv.field_size_limit(1310720)
 
 CLINVAR_SUMMARY_URI = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 
-CLINVAR_FILE = os.path.join(config.LIB_DIR, "clinvar_vhl.tsv")
+CLINVAR_FILE = os.path.join(config.DIRS['lib'], "clinvar_vhl.tsv")
 
 
 def clinvarid_to_variant_dict():

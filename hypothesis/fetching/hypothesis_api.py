@@ -5,13 +5,14 @@ import urllib.parse
 import json
 
 from ..annotations.Annotation import AugmentedAnnotation
-from ..config import INPUT_DIR
+from ..config import DIRS
 
-TOKEN_FILE = os.path.join(INPUT_DIR, "secret_token.txt")
+
+TOKEN_FILE = os.path.join(DIRS['input'], "secret_token.txt")
 SECRET_TOKEN = ""
 
-if not os.path.isdir(INPUT_DIR):
-    os.makedirs(INPUT_DIR)
+if not os.path.isdir(DIRS['input']):
+    os.makedirs(DIRS['input'])
 
 with open(TOKEN_FILE, "r", encoding="utf-8") as file:
     SECRET_TOKEN = file.readline().strip()

@@ -1,14 +1,21 @@
 import os
 
-# constants for directories and files
+## constants for directories and files
+# base directories
+DIRS = {
+    'input': os.path.join(os.path.dirname(os.path.abspath(__file__)), "files", "input"),
+    'output': os.path.join(os.path.dirname(os.path.abspath(__file__)), "files", "output"),
+    'lib': os.path.join(os.path.dirname(os.path.abspath(__file__)), "files", "lib"),
+}
+# derrived dirs
+DIRS['summary'] = os.path.join(DIRS['output'], 'summary')
 
-INPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files", "input")
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files", "output")
-LIB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files', 'lib')
+
+# annotation file names
 ANNOTATION_OUTPUT = "hypothesis_annotations.json"
-
 PROBLEM_ANNOTATIONS = "problem_annotations.csv"
 ANNOTATION_SUMMARY = "annotation_summary.csv"
+RAW_ANNOTATION_DF = "all_annotations.csv"
 
 # constants relating to the hypothesis 'VHL Annotations' group
 GROUP_ID = "dKymJJpZ" # VHL annotations group
@@ -24,11 +31,6 @@ USE_CACHE = False
 
 
 # pre-startup code
-if not os.path.isdir(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-
-if not os.path.isdir(INPUT_DIR):
-    os.makedirs(INPUT_DIR)
-
-if not os.path.isdir(LIB_DIR):
-    os.makedirs(LIB_DIR)
+for directory_type, directory in DIRS.items():
+    if not os.path.isdir(directory):
+        os.makedirs(directory)

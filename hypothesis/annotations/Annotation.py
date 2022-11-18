@@ -229,27 +229,46 @@ class AugmentedAnnotation(HypothesisAnnotation):
         df = df.pipe(_fix_df_nan)
         return df
 
+    # NOTE: there seems to be an issue with how annotations were attached to each source; there can be multiple
+    # sources for a single PMID, where only a single INFORMATION annotation exists. This means that for some PMIDs,
+    # there will be some CASE or COHORT annotations without associated INFORMATION annotations (and therefore PMIDs).
+    # The best solution so far is to use both document titles and source to merge across annotations
     @staticmethod
-    def merge_across_source(annotations: List[AugmentedAnnotation]):
+    def merge_across_document_title_and_source(annotations: List[AugmentedAnnotation]):
         '''
-        Takes a list of all annotations, and copies tags across annotations related through source
+        Take a list of all annotations and copy tags across annotations related through their document title OR source
         @param annotations:
         @return: List[AugmentedAnnotation]
         '''
 
-        source_dict = {}
+        source_title_dict = {}
         for a in annotations:
+            # source always exists, no need to check
             a_source = a.target[0]['source']
-            a_deque = source_dict.get(a_source, deque())
-            if a.type == AnnotationType.INFORMATION:
-                a_deque.appendleft(a)
+            a_source_deque = source_title_dict.get(a_source, deque())
+            if a.type == AnnotationType.INFORMATION.name:
+                a_source_deque.appendleft(a)
             else:
-                a_deque.append(a)
+                a_source_deque.append(a)
+            source_title_dict[a_source] = a_source_deque
 
-        # for each unique source, find the information annotation and copy its pmid to other annotations
-        for source, a_deque in source_dict.items():
+            # title might not exist, needs check
+            if a.document:
+                a_title = a.document['title'][0]
+                a_title_deque = source_title_dict.get(a_title, deque())
+                if a.type == AnnotationType.INFORMATION.name:
+                    a_title_deque.appendleft(a)
+                else:
+                    a_title_deque.append(a)
+                source_title_dict[a_title] = a_title_deque
+
+        # for each unique title, find the information annotation and copy its pmid to other annotations
+        for source, a_deque in source_title_dict.items():
             a_info = a_deque.popleft()
-            while len(a_deque>0):
-                annotation = a_deque.popleft()
-                annotation.body_tags.update(a_info.body_tags)
-                annotation.text_tags.update(a_info.text_tags)
+            # all INFORMATION annotations will have been appended to the left if there was one, but some sources
+            # might not have INFORMATION so a check is still needed
+            if a_info.type == AnnotationType.INFORMATION.name:
+                while len(a_deque) > 0:
+                    annotation = a_deque.popleft()
+                    annotation.body_tags.update(a_info.body_tags)
+                    annotation.text_tags.update(a_info.text_tags)
