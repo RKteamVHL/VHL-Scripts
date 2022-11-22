@@ -4,23 +4,49 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from collections import deque
 from typing import Dict, List
+from .. import config
 import numpy as np
 import pandas as pd
 import re
 import copy
 import enum
 
-
-
 NULL_TERMS = ["unknown", "none", "", "N/A"]
 
-# BODY and TEXT need to be separated so that we can discern body tags from text tags when used later
+# BODY, TEXT, and COMPUTED need to be separated so that we can discern where the tags came from
 BODY_TAGS_NAME = "BODY"
 TEXT_TAGS_NAME = "TEXT"
+COMPUTED_TAGS_NAME = "COMPUTED"
 
-ANNOTATION_HEADERS = {
-    ""
-}
+
+# 'header' is used here to indicate that these are the string headers for the csv tabular format of the annotations
+# these were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs
+class AnnotationHeader(enum.Enum):
+    CLINVAR = (BODY_TAGS_NAME, "ClinVarID")
+    CAID = (BODY_TAGS_NAME, "CAID")
+    CIVICNAME = (BODY_TAGS_NAME, "CivicName")
+    EXPERIMENTALASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
+    UNREGISTEREDVARIANT = (BODY_TAGS_NAME, "UnregisteredVariant")
+    FAMILYPEDIGREE = (BODY_TAGS_NAME, "FamilyPedigree")
+    MUTATIONTYPE = (BODY_TAGS_NAME, "MutationType")
+    AMINOACIDCHANGE = (BODY_TAGS_NAME, "AminoAcidChange")
+    PROTEINPOSITION = (BODY_TAGS_NAME, "ProteinPosition")
+    DISEASEENTITY = (BODY_TAGS_NAME, "DiseaseEntity")
+    VARIANT = (TEXT_TAGS_NAME, "Variant")
+    ARTICLEREFERENCESEQUENCE = (TEXT_TAGS_NAME, "ArticleReferenceSequence")
+    PREVIOUSLYPUBLISHED = (TEXT_TAGS_NAME, "PreviouslyPublished")
+    PMID = (TEXT_TAGS_NAME, "PMID")
+
+    TYPE = ('type',)
+
+    def __str__(self):
+        if len(self.value) == 1:
+            return self.value[0]
+        else:
+            a_list = [x.casefold() if config.CASEFOLD_TAG_NAMES else x for x in self.value[1:]]
+            return '.'.join([self.value[0], *a_list])
+
+
 
 
 class AnnotationType(enum.IntEnum):
@@ -113,8 +139,9 @@ class AugmentedAnnotation(HypothesisAnnotation):
     body_tags: Dict[str, str] = field(default_factory=dict)
     type: str = AnnotationType.INVALID.name
 
-    def _get_tags_from_text(self):
+    def _get_tags_from_text(self, casefold_tag_names=True):
         tag_match = re.finditer(BODY_TAG_REGEX, self.text)
+        self.text_tags = {}
         if tag_match:
             # TODO: some assertion/error checking on tag_dict
             for match in tag_match:
@@ -122,6 +149,9 @@ class AugmentedAnnotation(HypothesisAnnotation):
                 tag_name = tag_dict["name"]
                 tag_value = tag_dict["body"].strip()
 
+                # if we want the case folded
+                if casefold_tag_names:
+                    tag_name = tag_name.casefold()
                 # if the tag name is already in the tag_dict, fetch its corresponding list; else, return an empty list
                 new_list = self.text_tags.get(tag_name, [])
 
@@ -133,7 +163,8 @@ class AugmentedAnnotation(HypothesisAnnotation):
         else:  # error or log something here
             pass
 
-    def _get_tags_from_tags_list(self):
+    def _get_tags_from_tags_list(self, casefold_tag_names=True):
+        self.body_tags = {}
         for tag in self.tags:
             tag_split = tag.split(":")
             tag_name = ""
@@ -143,6 +174,10 @@ class AugmentedAnnotation(HypothesisAnnotation):
             if len(tag_split) == 3:
                 tag_name = tag_split[0].strip()
                 tag_name2 = tag_split[1].strip()
+
+                # if we want the case folded
+                if casefold_tag_names:
+                    tag_name2 = tag_name2.casefold()
                 tag_value = {tag_name2: tag_split[2].strip()}
 
             # normal tags in the format TagName:TagValue
@@ -154,6 +189,10 @@ class AugmentedAnnotation(HypothesisAnnotation):
             elif len(tag_split) == 1:
                 tag_name = tag_split[0].strip()
                 tag_value = True
+
+            # if we want the case folded
+            if casefold_tag_names:
+                tag_name = tag_name.casefold()
 
             # if the tag name is already in the tag_dict, fetch its corresponding list; else, return an empty list
             new_list = self.body_tags.get(tag_name, [])
@@ -195,10 +234,10 @@ class AugmentedAnnotation(HypothesisAnnotation):
         return asdict(self)
 
     @staticmethod
-    def from_dict(d):
+    def from_dict(d, casefold_tag_names=True):
         new_annotation = AugmentedAnnotation(**copy.deepcopy(d))
-        new_annotation._get_tags_from_text()
-        new_annotation._get_tags_from_tags_list()
+        new_annotation._get_tags_from_text(casefold_tag_names)
+        new_annotation._get_tags_from_tags_list(casefold_tag_names)
         new_annotation._assign_type()
         return new_annotation
 

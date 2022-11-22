@@ -21,7 +21,6 @@ if __name__ == '__main__':
 
     config.USE_CACHE = args.cached
 
-
     if config.USE_CACHE:
         # load the stored annotation json file
         annotations = get_annotations_from_json(os.path.join(config.DIRS['output'], config.ANNOTATION_OUTPUT))

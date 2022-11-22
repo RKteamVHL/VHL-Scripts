@@ -1,5 +1,5 @@
 from typing import List
-from ..annotations.Annotation import BODY_TAGS_NAME, TEXT_TAGS_NAME, AugmentedAnnotation, AnnotationType
+from ..annotations.Annotation import AugmentedAnnotation, AnnotationType, AnnotationHeader
 from ..fetching.clinvar_variants import clinvarid_to_variant_dict
 from ..fetching.caid_variants import get_variant_by_caid
 from ..variant_functions import DISEASE_ENTITY_TO_HPO
@@ -8,10 +8,10 @@ import pandas as pd
 import numpy as np
 import os
 
-
 def _fix_na(df):
     return_df = df.replace(config.NULL_TERMS, [np.nan]*len(config.NULL_TERMS))
     return return_df
+
 
 def _fix_clinvar(clinvar_list):
     clinvar_id = None
@@ -21,6 +21,7 @@ def _fix_clinvar(clinvar_list):
                 clinvar_id = int(item)
     return clinvar_id
 
+
 def _caid_to_variant(caid):
     variant_name = None
     variant = get_variant_by_caid(caid)
@@ -28,68 +29,75 @@ def _caid_to_variant(caid):
         variant_name = variant['communityStandardTitle'][0]
     return variant_name
 
+# aliases to the header types in annotation for brevity
+_clinvar = str(AnnotationHeader.CLINVAR)
+_caid = str(AnnotationHeader.CAID)
+_civic = str(AnnotationHeader.CIVICNAME)
+_type = str(AnnotationHeader.TYPE)
+_variant = str(AnnotationHeader.VARIANT)
+_pmid = str(AnnotationHeader.PMID)
+_assay = str(AnnotationHeader.EXPERIMENTALASSAY)
+_unreg = str(AnnotationHeader.UNREGISTEREDVARIANT)
+_refseq = str(AnnotationHeader.ARTICLEREFERENCESEQUENCE)
+_ped = str(AnnotationHeader.FAMILYPEDIGREE)
+_pub = str(AnnotationHeader.PREVIOUSLYPUBLISHED)
+_mut = str(AnnotationHeader.MUTATIONTYPE)
+_aa = str(AnnotationHeader.AMINOACIDCHANGE)
+_pp = str(AnnotationHeader.PROTEINPOSITION)
+_pheno = str(AnnotationHeader.DISEASEENTITY)
 
 # paper stats
 def get_unique_clinvar_variants(annotation_df: pd.DataFrame):
-    clinvar_col = f"{BODY_TAGS_NAME}.ClinVarID"
-    caid_col = f'{BODY_TAGS_NAME}.CAID'
-    civic_col = f'{BODY_TAGS_NAME}.CivicName'
+
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+
+    clinvar_id_series = valid_df[_clinvar].apply(_fix_clinvar)
+
+    variants_df = pd.concat([valid_df[[_type, _caid, _civic]], clinvar_id_series], axis=1)
 
 
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    variants_df.loc[:, _caid] = variants_df[_caid].map(lambda x: x[0] if isinstance(x, list) else np.nan)
+    variants_df.loc[:, _civic] = variants_df[_civic].map(lambda x: x[0] if isinstance(x, list) else np.nan)
+    variants_df = variants_df.dropna(subset=[_clinvar, _caid, _civic], how='all')
 
-    clinvar_id_series = valid_df[clinvar_col].apply(_fix_clinvar)
-
-    variants_df = pd.concat([valid_df[["type", caid_col, civic_col]], clinvar_id_series], axis=1)
-
-
-    variants_df.loc[:, caid_col] = variants_df[caid_col].map(lambda x: x[0] if isinstance(x, list) else np.nan)
-    variants_df.loc[:, civic_col] = variants_df[civic_col].map(lambda x: x[0] if isinstance(x, list) else np.nan)
-    variants_df = variants_df.dropna(subset=[clinvar_col, caid_col, civic_col], how='all')
-
-    clinvar_mapped_series = variants_df[clinvar_col].map(clinvarid_to_variant_dict())
-    clinvar_mapped_series.name = "Variant"
+    clinvar_mapped_series = variants_df[_clinvar].map(clinvarid_to_variant_dict())
+    clinvar_mapped_series.name = _variant
 
     variants_df = pd.concat([variants_df, clinvar_mapped_series], axis=1)
 
-
-    counts_df = variants_df.groupby([clinvar_col, "Variant"], as_index=False).count()
+    counts_df = variants_df.groupby([_clinvar, _variant], as_index=False).count()
     return variants_df
 
 
 def get_unique_caid_variants(annotation_df: pd.DataFrame):
-    caid_col = f'{BODY_TAGS_NAME}.CAID'
-    clinvar_col = f"{BODY_TAGS_NAME}.ClinVarID"
 
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    clinvar_id_series = valid_df[clinvar_col].apply(_fix_clinvar)
-    caid_series = valid_df[caid_col].apply(_caid_to_variant)
+    clinvar_id_series = valid_df[_clinvar].apply(_fix_clinvar)
+    caid_series = valid_df[_caid].apply(_caid_to_variant)
 
-    variants_df = pd.concat([valid_df["type"], clinvar_id_series, caid_series], axis=1)
-    variants_df = variants_df.dropna(subset=[caid_col])
-
+    variants_df = pd.concat([valid_df[_type], clinvar_id_series, caid_series], axis=1)
+    variants_df = variants_df.dropna(subset=[_caid])
 
     counts_df = variants_df
     return counts_df
 
+
 def get_unique_variants(annotation_df: pd.DataFrame):
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
-    variants_df = valid_df.dropna(subset=["Variant"])
-    counts_df = variants_df.groupby('Variant', as_index=False).count()
-    counts_df = counts_df[["Variant", "type"]]
+
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    variants_df = valid_df.dropna(subset=[_variant])
+    counts_df = variants_df.groupby(_variant, as_index=False).count()
+    counts_df = counts_df[[_variant, _type]]
     return counts_df
 
 
 def get_papers(annotation_df: pd.DataFrame):
-    pmid_col = f'{TEXT_TAGS_NAME}.PMID'
-    type_col = "type"
-
-    information_df = annotation_df[annotation_df["type"] == AnnotationType.INFORMATION.name]
-    information_df = information_df.dropna(subset=[pmid_col])
-    information_df.loc[:, pmid_col] = information_df[pmid_col].map(lambda x: x[0])
-    information_df = information_df[[pmid_col, type_col]]
-    counts_df = information_df.groupby(pmid_col, as_index=False).count()
+    information_df = annotation_df[annotation_df[_type] == AnnotationType.INFORMATION.name]
+    information_df = information_df.dropna(subset=[_pmid])
+    information_df.loc[:, _pmid] = information_df[_pmid].map(lambda x: x[0])
+    information_df = information_df[[_pmid, _type]]
+    counts_df = information_df.groupby(_pmid, as_index=False).count()
     return counts_df
 
 # #Questions:
@@ -101,72 +109,67 @@ def get_papers(annotation_df: pd.DataFrame):
 #     counts_df = counts_df[["Variant", "type"]]
 #     return counts_df
 
+
 # Questions:
 # Do we count just the evidence / assay tags, or count all instances of ExperimentalAssay?
 def get_experimental_assays(annotation_df: pd.DataFrame):
-    assay_col = f'{BODY_TAGS_NAME}.ExperimentalAssay'
-    assay_df = annotation_df[annotation_df["type"].isin([AnnotationType.ASSAY.name])]
-    assay_df = assay_df.dropna(subset=[assay_col])
+    assay_df = annotation_df[annotation_df[_type].isin([AnnotationType.ASSAY.name])]
+    assay_df = assay_df.dropna(subset=[_assay])
     return assay_df
 
+
 def get_unregistered_variants(annotation_df: pd.DataFrame):
-    unreg_col = f'{BODY_TAGS_NAME}.UnregisteredVariant'
-    var_col = f'{TEXT_TAGS_NAME}.Variant'
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    valid_df = valid_df.dropna(subset=[unreg_col])
-    valid_df.loc[:, unreg_col] = valid_df[unreg_col].map(lambda x: x[0])
-    valid_df.loc[:, var_col] = valid_df[var_col].map(lambda x: x[0])
+    valid_df = valid_df.dropna(subset=[_unreg])
+    valid_df.loc[:, _unreg] = valid_df[_unreg].map(lambda x: x[0])
+    valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0])
 
 
-    counts_df = valid_df[[var_col, unreg_col, "type"]]
+    counts_df = valid_df[[_variant, _unreg, _type]]
     return counts_df
 
 #Questions:
 # right now this is only using the refseq column, which includes refseqs that have been assumed to be standard, but
 # not outrighted stated
 def get_nonstandard_refseq(annotation_df: pd.DataFrame):
-    refseq_col = f'{TEXT_TAGS_NAME}.ArticleReferenceSequence'
 
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.METHODOLOGY.name])]
-    refseq_df = valid_df.dropna(subset=[refseq_col])
-    refseq_df.loc[:, refseq_col] = refseq_df[refseq_col].map(lambda x: x[0])
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.METHODOLOGY.name])]
+    refseq_df = valid_df.dropna(subset=[_refseq])
+    refseq_df.loc[:, _refseq] = refseq_df[_refseq].map(lambda x: x[0])
 
     refseq_df.loc[:, "StandardRef"] = False
     refseq_df.loc[:, "NonStandardRef"] = False
 
-    refseq_df.loc[:, "StandardRef"] = refseq_df[refseq_col].str.contains('|'.join(config.STANDARD_REFS))
-    refseq_df.loc[:, "NonStandardRef"] = refseq_df[refseq_col].str.contains('|'.join(config.NON_STANDARD_REFS))
+    refseq_df.loc[:, "StandardRef"] = refseq_df[_refseq].str.contains('|'.join(config.STANDARD_REFS))
+    refseq_df.loc[:, "NonStandardRef"] = refseq_df[_refseq].str.contains('|'.join(config.NON_STANDARD_REFS))
 
     nonstandard_df = refseq_df
     return nonstandard_df
 
 
 def get_family_pedigree_variants(annotation_df: pd.DataFrame):
-    ped_col = f'{BODY_TAGS_NAME}.FamilyPedigree'
-    var_col = f'{TEXT_TAGS_NAME}.Variant'
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    valid_df = valid_df.dropna(subset=[ped_col])
-    valid_df.loc[:, ped_col] = valid_df[ped_col].map(lambda x: x[0])
-    valid_df.loc[:, var_col] = valid_df[var_col].map(lambda x: x[0])
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    counts_df = valid_df[[var_col, ped_col, "type"]]
+    valid_df = valid_df.dropna(subset=[_ped])
+    valid_df.loc[:, _ped] = valid_df[_ped].map(lambda x: x[0])
+    valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0])
+
+    counts_df = valid_df[[_variant, _ped, _type]]
     return counts_df
 
 def get_previously_published_variants(annotation_df: pd.DataFrame):
-    pub_col = f'{TEXT_TAGS_NAME}.PreviouslyPublished'
-    var_col = f'{TEXT_TAGS_NAME}.Variant'
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    valid_df = valid_df.dropna(subset=[pub_col])
-    valid_df.loc[:, pub_col] = valid_df[pub_col].map(lambda x: x[0])
-    valid_df.loc[:, var_col] = valid_df[var_col].map(lambda x: x[0])
+    valid_df = valid_df.dropna(subset=[_pub])
+    valid_df.loc[:, _pub] = valid_df[_pub].map(lambda x: x[0])
+    valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0])
     valid_df = valid_df.pipe(_fix_na)
-    valid_df = valid_df.dropna(subset=[pub_col])
+    valid_df = valid_df.dropna(subset=[_pub])
 
 
-    counts_df = valid_df[[var_col, pub_col, "type"]]
+    counts_df = valid_df[[_variant, _pub, _type]]
     return counts_df
 
 # harder metrics
@@ -191,28 +194,19 @@ def get_missense_variants(annotation_df: pd.DataFrame):
     x_labels = ['from_aa', 'to_aa', 'pos']
     y_labels = list(set(DISEASE_ENTITY_TO_HPO.values()))
 
-    muttype_col = f'{BODY_TAGS_NAME}.MutationType'
-
-    # features
-    aa_change_col = f'{BODY_TAGS_NAME}.AminoAcidChange'
-    codon_col = f'{BODY_TAGS_NAME}.ProteinPosition'
-
-    # labels
-    pheno_col = f'{BODY_TAGS_NAME}.DiseaseEntity'
-
-    valid_df = annotation_df[annotation_df["type"].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
+    valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
     # clean up the features
-    feature_df = valid_df[[muttype_col, aa_change_col, codon_col]].dropna().applymap(lambda x: x[0]).apply(_fix_na)
+    feature_df = valid_df[[_mut, _aa, _pp]].dropna().applymap(lambda x: x[0]).apply(_fix_na)
     feature_df = feature_df.dropna(how='any')
-    feature_df = feature_df[feature_df[muttype_col].str.contains('missense_variant')]
+    feature_df = feature_df[feature_df[_mut].str.contains('missense_variant')]
 
-    feature_df[['from_aa', 'to_aa']] = feature_df[aa_change_col].str.split('to', expand=True)
+    feature_df[['from_aa', 'to_aa']] = feature_df[_aa].str.split('to', expand=True)
     feature_df[feature_df['to_aa'] == '*'] = 'TER'
-    feature_df = feature_df.rename(columns={codon_col: 'pos'})
+    feature_df = feature_df.rename(columns={_pp: 'pos'})
 
     # clean up the labels
-    pheno_df = valid_df.loc[feature_df.index, [pheno_col]]
+    pheno_df = valid_df.loc[feature_df.index, [_pheno]]
 
     def _fix_pheno(cell):
         to_return = []
@@ -229,7 +223,7 @@ def get_missense_variants(annotation_df: pd.DataFrame):
 
         return to_return
 
-    pheno_s = pheno_df[pheno_col].map(_fix_pheno)
+    pheno_s = pheno_df[_pheno].map(_fix_pheno)
     pheno_s = pheno_s.rename('phenotype')
     # s = pheno_s.explode()
 

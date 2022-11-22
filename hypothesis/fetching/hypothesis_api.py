@@ -5,14 +5,14 @@ import urllib.parse
 import json
 
 from ..annotations.Annotation import AugmentedAnnotation
-from ..config import DIRS
+from .. import config
 
 
-TOKEN_FILE = os.path.join(DIRS['input'], "secret_token.txt")
+TOKEN_FILE = os.path.join(config.DIRS['input'], "secret_token.txt")
 SECRET_TOKEN = ""
 
-if not os.path.isdir(DIRS['input']):
-    os.makedirs(DIRS['input'])
+if not os.path.isdir(config.DIRS['input']):
+    os.makedirs(config.DIRS['input'])
 
 with open(TOKEN_FILE, "r", encoding="utf-8") as file:
     SECRET_TOKEN = file.readline().strip()
@@ -47,7 +47,7 @@ def get_annotations_by_group(group_id, search_after):
             response_dict = json.loads(response.read().decode('utf-8'))
 
             for row in response_dict['rows']:
-                new_annotation = AugmentedAnnotation.from_dict(row)
+                new_annotation = AugmentedAnnotation.from_dict(row, casefold_tag_names=config.CASEFOLD_TAG_NAMES)
                 annotations.append(new_annotation)
 
             total_annotations = response_dict['total']
@@ -60,5 +60,5 @@ def get_annotations_by_group(group_id, search_after):
 
 def get_annotations_from_json(path):
     with open(path, "r") as file:
-        annotations = [AugmentedAnnotation.from_dict(a) for a in json.load(file)]
+        annotations = [AugmentedAnnotation.from_dict(a, casefold_tag_names=config.CASEFOLD_TAG_NAMES) for a in json.load(file)]
     return annotations

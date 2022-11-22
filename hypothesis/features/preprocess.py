@@ -11,9 +11,33 @@ from ..annotations.Annotation import AnnotationType
 
 
 def unique_cases(df):
+	'''
+	Get all unique cases from input annotation df
+	@param df:
+	@return:
+	'''
 	out_df = df[df['type'] == AnnotationType.CASE]
+	# TODO: create index based on case, pmid, and kindred
 	return out_df
 
+
+def fix_df_lists(df):
+	'''
+	Fix cells that have lists in the input annotation df
+	This function replaces lists with one-hot encoded columns based on what's in the list; a separate column will be
+	created for each column in the list
+	@param df:
+	@return:
+	'''
+
+def fix_df_lists_of_dicts:
+	'''
+	Fix cells that have list of dicts in the input annotation df
+	This function replaces lists with one-hot encoded columns based on what's in the list; a separate column will be
+	created for each key in the dicts across the cells
+	@param df:
+	@return:
+	'''
 
 def preprocess_variant_annotations(annotations: List[AugmentedAnnotation]):
     annotation_df = AugmentedAnnotation.df_from_annotations(annotations)
