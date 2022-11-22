@@ -1,57 +1,35 @@
 from typing import List
 from ..annotations.Annotation import AugmentedAnnotation, AnnotationType, AnnotationHeader
-from ..fetching.clinvar_variants import clinvarid_to_variant_dict
-from ..fetching.caid_variants import get_variant_by_caid
+from ..fetching.clinvar_variants import clinvarid_to_variant_generator
 from ..variant_functions import DISEASE_ENTITY_TO_HPO
 from .. import config
 import pandas as pd
 import numpy as np
 import os
 
-def _fix_na(df):
-    return_df = df.replace(config.NULL_TERMS, [np.nan]*len(config.NULL_TERMS))
-    return return_df
-
-
-def _fix_clinvar(clinvar_list):
-    clinvar_id = None
-    if isinstance(clinvar_list, list):
-        for item in clinvar_list:
-            if str.isdigit(item):
-                clinvar_id = int(item)
-    return clinvar_id
-
-
-def _caid_to_variant(caid):
-    variant_name = None
-    variant = get_variant_by_caid(caid)
-    if variant is not None:
-        variant_name = variant['communityStandardTitle'][0]
-    return variant_name
-
 # aliases to the header types in annotation for brevity
-_clinvar = str(AnnotationHeader.CLINVAR)
-_caid = str(AnnotationHeader.CAID)
-_civic = str(AnnotationHeader.CIVICNAME)
+_clinvar = str(AnnotationHeader.CLINVAR_CLEAN)
+_caid = str(AnnotationHeader.CAID_CLEAN)
+_civic = str(AnnotationHeader.CIVIC_NAME)
 _type = str(AnnotationHeader.TYPE)
 _variant = str(AnnotationHeader.VARIANT)
 _pmid = str(AnnotationHeader.PMID)
-_assay = str(AnnotationHeader.EXPERIMENTALASSAY)
-_unreg = str(AnnotationHeader.UNREGISTEREDVARIANT)
-_refseq = str(AnnotationHeader.ARTICLEREFERENCESEQUENCE)
-_ped = str(AnnotationHeader.FAMILYPEDIGREE)
-_pub = str(AnnotationHeader.PREVIOUSLYPUBLISHED)
-_mut = str(AnnotationHeader.MUTATIONTYPE)
-_aa = str(AnnotationHeader.AMINOACIDCHANGE)
-_pp = str(AnnotationHeader.PROTEINPOSITION)
-_pheno = str(AnnotationHeader.DISEASEENTITY)
+_assay = str(AnnotationHeader.EXPERIMENTAL_ASSAY)
+_unreg = str(AnnotationHeader.UNREGISTERED_VARIANT)
+_refseq = str(AnnotationHeader.ARTICLE_REFERENCE_SEQUENCE)
+_ped = str(AnnotationHeader.FAMILY_PEDIGREE)
+_pub = str(AnnotationHeader.PREVIOUSLY_PUBLISHED)
+_mut = str(AnnotationHeader.MUTATION_TYPE)
+_aa = str(AnnotationHeader.AMINO_ACID_CHANGE)
+_pp = str(AnnotationHeader.PROTEIN_POSITION)
+_pheno = str(AnnotationHeader.DISEASE_ENTITY)
 
 # paper stats
 def get_unique_clinvar_variants(annotation_df: pd.DataFrame):
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    clinvar_id_series = valid_df[_clinvar].apply(_fix_clinvar)
+    clinvar_id_series = valid_df[_clinvar]
 
     variants_df = pd.concat([valid_df[[_type, _caid, _civic]], clinvar_id_series], axis=1)
 
@@ -60,7 +38,7 @@ def get_unique_clinvar_variants(annotation_df: pd.DataFrame):
     variants_df.loc[:, _civic] = variants_df[_civic].map(lambda x: x[0] if isinstance(x, list) else np.nan)
     variants_df = variants_df.dropna(subset=[_clinvar, _caid, _civic], how='all')
 
-    clinvar_mapped_series = variants_df[_clinvar].map(clinvarid_to_variant_dict())
+    clinvar_mapped_series = variants_df[_clinvar].map(next(clinvarid_to_variant_generator))
     clinvar_mapped_series.name = _variant
 
     variants_df = pd.concat([variants_df, clinvar_mapped_series], axis=1)
@@ -73,8 +51,8 @@ def get_unique_caid_variants(annotation_df: pd.DataFrame):
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    clinvar_id_series = valid_df[_clinvar].apply(_fix_clinvar)
-    caid_series = valid_df[_caid].apply(_caid_to_variant)
+    clinvar_id_series = valid_df[_clinvar]
+    caid_series = valid_df[_caid]
 
     variants_df = pd.concat([valid_df[_type], clinvar_id_series, caid_series], axis=1)
     variants_df = variants_df.dropna(subset=[_caid])
@@ -165,7 +143,6 @@ def get_previously_published_variants(annotation_df: pd.DataFrame):
     valid_df = valid_df.dropna(subset=[_pub])
     valid_df.loc[:, _pub] = valid_df[_pub].map(lambda x: x[0])
     valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0])
-    valid_df = valid_df.pipe(_fix_na)
     valid_df = valid_df.dropna(subset=[_pub])
 
 
@@ -197,7 +174,7 @@ def get_missense_variants(annotation_df: pd.DataFrame):
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
     # clean up the features
-    feature_df = valid_df[[_mut, _aa, _pp]].dropna().applymap(lambda x: x[0]).apply(_fix_na)
+    feature_df = valid_df[[_mut, _aa, _pp]].dropna().applymap(lambda x: x[0])
     feature_df = feature_df.dropna(how='any')
     feature_df = feature_df[feature_df[_mut].str.contains('missense_variant')]
 
@@ -252,7 +229,8 @@ def get_annotation_summary(annotations: List[AugmentedAnnotation]):
     record_list = []
     for annotation in annotations:
         record = {"type": annotation.type}
-        record.update({k: v[0] for k, v in annotation.tag_dictionary.items()})
+        record.update({k: v[0] for k, v in annotation.body_tags.items()})
+        record.update({k: v[0] for k, v in annotation.text_tags.items()})
         record_list.append(record)
 
     df = pd.DataFrame.from_records(record_list)
@@ -261,7 +239,7 @@ def get_annotation_summary(annotations: List[AugmentedAnnotation]):
     return out_df["count"]
 
 
-def get_all_summaries(annotations: List[AugmentedAnnotation]):
+def get_all_summaries(annotation_df: pd.DataFrame):
     output_df_list = []
     statistic_fns = [
         get_missense_variants,
@@ -273,20 +251,12 @@ def get_all_summaries(annotations: List[AugmentedAnnotation]):
         get_nonstandard_refseq,
         get_family_pedigree_variants
     ]
-    raw_df = AugmentedAnnotation.df_from_annotations(annotations)
     for fn in statistic_fns:
-        df = raw_df.pipe(fn)
+        df = annotation_df.pipe(fn)
         df = df.dropna(axis="columns", how="all")
 
         df.name = fn.__name__.replace("get_", "")
 
         output_df_list.append(df)
 
-    # columns in alphabetical order
-    raw_df = raw_df.reindex(sorted(raw_df.columns), axis=1)
-    raw_df.to_csv(os.path.join(config.DIRS['output'], config.RAW_ANNOTATION_DF))
-
-    for stat in output_df_list:
-        stat.to_csv(os.path.join(config.DIRS['summary'], f"{stat.name}.csv"))
-
-    return raw_df, output_df_list
+    return output_df_list

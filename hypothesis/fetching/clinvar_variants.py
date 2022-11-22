@@ -1,5 +1,4 @@
 import os
-import io
 import gzip
 import urllib.request
 import urllib.parse
@@ -13,7 +12,7 @@ CLINVAR_SUMMARY_URI = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/va
 CLINVAR_FILE = os.path.join(config.DIRS['lib'], "clinvar_vhl.tsv")
 
 
-def clinvarid_to_variant_dict():
+def clinvarid_to_variant():
     id_dict = {}
     if not config.USE_CACHE:
         fetch_clinvar_vhl_variants(CLINVAR_FILE)
@@ -22,7 +21,8 @@ def clinvarid_to_variant_dict():
         for row in reader:
             id_dict[int(row["VariationID"])] = row["Name"]
 
-    return id_dict
+    while True:
+        yield id_dict
 
 
 def fetch_clinvar_vhl_variants(fileout):
@@ -40,3 +40,5 @@ def fetch_clinvar_vhl_variants(fileout):
                     if 'VHL' in row['GeneSymbol']:
                         writer.writerow(row)
 
+
+clinvarid_to_variant_generator = clinvarid_to_variant()

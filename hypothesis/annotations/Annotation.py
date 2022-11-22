@@ -21,30 +21,53 @@ COMPUTED_TAGS_NAME = "COMPUTED"
 
 # 'header' is used here to indicate that these are the string headers for the csv tabular format of the annotations
 # these were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs
+# if a computed column is needed / being created, it should be put here
 class AnnotationHeader(enum.Enum):
+    # properties of the hypothesis annotations, not specific to the VHL annotations
+    TYPE = ('type',)
+    URI = ("uri",)
+    SOURCE = ("source",)
+    TEXT = ("text",)
+
+    # tags used for determining the annotation type
+    EVIDENCE_STATEMENT = (BODY_TAGS_NAME, "EvidenceStatement")
+    PMID = (TEXT_TAGS_NAME, "PMID")
+    GENE = (TEXT_TAGS_NAME, "Gene")
+    STANDARD_REFERENCE_SEQUENCE = (TEXT_TAGS_NAME, "StandardizedReferenceSequence")
+    ARTICLE_REFERENCE_SEQUENCE = (TEXT_TAGS_NAME, "ArticleReferenceSequence")
+    GENOTYPING_METHOD = (TEXT_TAGS_NAME, "GenotypingMethod")
+    SAMPLING_METHOD = (TEXT_TAGS_NAME, "SamplingMethod")
+    CASE_PRESENTING_HPOS = (TEXT_TAGS_NAME, "CasePresentingHPOs")
+    GROUP_PRESENTING_HPOS = (TEXT_TAGS_NAME, "GroupPresentingHPOs")
+    EXPERIMENTAL_ASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
+
+    # body tags
     CLINVAR = (BODY_TAGS_NAME, "ClinVarID")
     CAID = (BODY_TAGS_NAME, "CAID")
-    CIVICNAME = (BODY_TAGS_NAME, "CivicName")
-    EXPERIMENTALASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
-    UNREGISTEREDVARIANT = (BODY_TAGS_NAME, "UnregisteredVariant")
-    FAMILYPEDIGREE = (BODY_TAGS_NAME, "FamilyPedigree")
-    MUTATIONTYPE = (BODY_TAGS_NAME, "MutationType")
-    AMINOACIDCHANGE = (BODY_TAGS_NAME, "AminoAcidChange")
-    PROTEINPOSITION = (BODY_TAGS_NAME, "ProteinPosition")
-    DISEASEENTITY = (BODY_TAGS_NAME, "DiseaseEntity")
-    VARIANT = (TEXT_TAGS_NAME, "Variant")
-    ARTICLEREFERENCESEQUENCE = (TEXT_TAGS_NAME, "ArticleReferenceSequence")
-    PREVIOUSLYPUBLISHED = (TEXT_TAGS_NAME, "PreviouslyPublished")
-    PMID = (TEXT_TAGS_NAME, "PMID")
+    CIVIC_NAME = (BODY_TAGS_NAME, "CivicName")
+    UNREGISTERED_VARIANT = (BODY_TAGS_NAME, "UnregisteredVariant")
+    FAMILY_PEDIGREE = (BODY_TAGS_NAME, "FamilyPedigree")
+    MUTATION_TYPE = (BODY_TAGS_NAME, "MutationType")
+    AMINO_ACID_CHANGE = (BODY_TAGS_NAME, "AminoAcidChange")
+    PROTEIN_POSITION = (BODY_TAGS_NAME, "ProteinPosition")
+    DISEASE_ENTITY = (BODY_TAGS_NAME, "DiseaseEntity")
 
-    TYPE = ('type',)
+    VARIANT = (TEXT_TAGS_NAME, "Variant")
+    PREVIOUSLY_PUBLISHED = (TEXT_TAGS_NAME, "PreviouslyPublished")
+    AGE_OF_PRESENTATION = (BODY_TAGS_NAME, "AgeOfPresentation")
+
+    CLINVAR_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
+    CAID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
 
     def __str__(self):
         if len(self.value) == 1:
-            return self.value[0]
+            return self.value[0].casefold() if config.CASEFOLD_TAG_NAMES else self.value[0]
         else:
             a_list = [x.casefold() if config.CASEFOLD_TAG_NAMES else x for x in self.value[1:]]
             return '.'.join([self.value[0], *a_list])
+
+    def suffix(self):
+        return self.value[-1].casefold() if config.CASEFOLD_TAG_NAMES else self.value[-1]
 
 
 
@@ -65,31 +88,31 @@ BODY_TAG_REGEX = re.compile("^(?P<name>\w+): *(?P<body>.*)$", flags=re.MULTILINE
 # for tag lists, only mandatory tags are used to determine the annotation type
 
 EVIDENCE_TAGS = [
-    "EvidenceStatement",
+    AnnotationHeader.EVIDENCE_STATEMENT,
 ]
 
 INFORMATION_TAGS = [
-    "PMID",
-    "Gene",
-    "StandardizedReferenceSequence"
+    AnnotationHeader.PMID,
+    AnnotationHeader.GENE,
+    AnnotationHeader.STANDARD_REFERENCE_SEQUENCE
 ]
 
 METHODOLOGY_TAGS = [
-    "ArticleReferenceSequence",
-    "GenotypingMethod",
-    "SamplingMethod"
+    AnnotationHeader.ARTICLE_REFERENCE_SEQUENCE,
+    AnnotationHeader.GENOTYPING_METHOD,
+    AnnotationHeader.SAMPLING_METHOD
 ]
 
 CASE_TAGS = [
-    "CasePresentingHPOs"
+    AnnotationHeader.CASE_PRESENTING_HPOS
 ]
 
 COHORT_TAGS = [
-    "GroupPresentingHPOs"
+    AnnotationHeader.GROUP_PRESENTING_HPOS
 ]
 
 ASSAY_TAGS = [
-    "ExperimentalAssay"
+    AnnotationHeader.EXPERIMENTAL_ASSAY
 ]
 
 
@@ -206,28 +229,30 @@ class AugmentedAnnotation(HypothesisAnnotation):
     def _assign_type(self):
         if len(self.references) > 0:
             self.type = AnnotationType.REPLY.name
+
+        # key.suffix() gets the tag without the body/text prefixes
         # checking for evidence statement annotation
-        elif any([key in self.body_tags for key in EVIDENCE_TAGS]):
+        elif any([key.suffix() in self.body_tags for key in EVIDENCE_TAGS]):
             self.type = AnnotationType.EVIDENCE.name
 
         # checking for article info annotation
-        elif any([key in self.text_tags for key in INFORMATION_TAGS]):
+        elif any([key.suffix() in self.text_tags for key in INFORMATION_TAGS]):
             self.type = AnnotationType.INFORMATION.name
 
         # checking for methodology annotation
-        elif any([key in self.text_tags for key in METHODOLOGY_TAGS]):
+        elif any([key.suffix() in self.text_tags for key in METHODOLOGY_TAGS]):
             self.type = AnnotationType.METHODOLOGY.name
 
         # checking for case annotation
-        elif any([key in self.text_tags for key in CASE_TAGS]):
+        elif any([key.suffix() in self.text_tags for key in CASE_TAGS]):
             self.type = AnnotationType.CASE.name
 
         # checking for COHORT annotation
-        elif any([key in self.text_tags for key in COHORT_TAGS]):
+        elif any([key.suffix() in self.text_tags for key in COHORT_TAGS]):
             self.type = AnnotationType.COHORT.name
 
         # checking for experiment assay annotation
-        elif any([key in self.body_tags for key in ASSAY_TAGS]):
+        elif any([key.suffix() in self.body_tags for key in ASSAY_TAGS]):
             self.type = AnnotationType.ASSAY.name
 
     def as_dict(self):
@@ -252,10 +277,10 @@ class AugmentedAnnotation(HypothesisAnnotation):
         column_set = set()
         for annotation in annotations:
             record = {
-                "type": annotation.type,
-                'uri': annotation.links['html'],
-                "source": annotation.target[0]['source'],
-                "text": annotation.text
+                str(AnnotationHeader.TYPE): annotation.type,
+                str(AnnotationHeader.URI): annotation.links['html'],
+                str(AnnotationHeader.SOURCE): annotation.target[0]['source'],
+                str(AnnotationHeader.TEXT): annotation.text
             }
             record.update({f'{TEXT_TAGS_NAME}.{k}': v for k, v in annotation.text_tags.items()})
             record.update({f'{BODY_TAGS_NAME}.{k}': v for k, v in annotation.body_tags.items()})
