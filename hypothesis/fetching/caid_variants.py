@@ -20,7 +20,7 @@ def caid_to_variant():
     with open(CAID_FILE, newline='\n') as csvfile:
         reader = csv.DictReader(csvfile, delimiter='\t')
         for row in reader:
-            id_dict["caid"] = row["communitystandardtitle"]
+            id_dict[row['caid']] = row["communitystandardtitle"]
 
     while True:
         yield id_dict

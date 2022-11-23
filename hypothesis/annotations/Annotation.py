@@ -58,6 +58,8 @@ class AnnotationHeader(enum.Enum):
 
     CLINVAR_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
     CAID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
+    CLINVAR_VARIANT = (COMPUTED_TAGS_NAME, "ClinVarIDVariant")
+    CAID_VARIANT = (COMPUTED_TAGS_NAME, "CAidVariant")
 
     def __str__(self):
         if len(self.value) == 1:

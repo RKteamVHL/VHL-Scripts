@@ -37,11 +37,12 @@ if __name__ == '__main__':
 
     # creating a df from the annotations
     annotation_df = AugmentedAnnotation.df_from_annotations(annotations)
+
     # preprocessing the df
     annotation_df = preprocess(annotation_df)
 
     # getting summary dfs
-    summary_dfs = get_all_summaries(annotations)
+    summary_dfs = get_all_summaries(annotation_df)
 
     # outputting the annotation df and summary stats
     annotation_df.to_csv(os.path.join(config.DIRS['output'], config.RAW_ANNOTATION_DF))

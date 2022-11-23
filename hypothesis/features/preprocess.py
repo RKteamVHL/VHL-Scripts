@@ -1,6 +1,7 @@
 from typing import List
 from ..annotations.Annotation import AnnotationHeader
 from ..fetching.caid_variants import caid_to_variant_generator
+from ..fetching.clinvar_variants import clinvarid_to_variant_generator
 
 from .. import config
 import pandas as pd
@@ -32,18 +33,26 @@ def fix_na(df: pd.DataFrame):
 	out_df = df.pipe(_fix_na)
 	return out_df
 
-def _caid_to_variant(caid_list):
+def _caid_to_variant(caid):
+	variant_dict = next(caid_to_variant_generator)
+	variant_name = None
+	if caid in variant_dict:
+		# caid is guaranteed to be in the dict, but this checks for None
+		variant_name = variant_dict[caid]
+	return variant_name
+
+def _fix_caid(caid_list):
 	if isinstance(caid_list, list):
 		caid = caid_list[0].split(', ')[0]
 		variant_dict = next(caid_to_variant_generator)
-		variant_name = None
+		caid_clean = None
 		if caid in variant_dict:
-			variant_name = variant_dict[caid]
-		return variant_name
+			caid_clean = caid
+		return caid_clean
 
-def fix_caid(df: pd.DataFrame, replace=False):
+def caid_to_variant(df: pd.DataFrame, replace=False):
 	"""
-	Fix the caid column in the given df
+	Fix the caid column in the given df, and append two columns: the cleaned caid and the caid variant
 	@param df:
 	@param replace: if true, replaces the original caid column
 	@return:
@@ -53,16 +62,19 @@ def fix_caid(df: pd.DataFrame, replace=False):
 
 	_caid = str(AnnotationHeader.CAID)
 	_caid_clean = str(AnnotationHeader.CAID_CLEAN)
+	_caid_variant = str(AnnotationHeader.CAID_VARIANT)
 
-	caid_series = out_df[_caid].apply(_caid_to_variant)
-	caid_series.name = _caid_clean
+	caid_id_series = out_df[_caid].apply(_fix_caid)
+	caid_id_series.name = _caid_clean
+
+	caid_variant_series = caid_id_series.apply(_caid_to_variant)
+	caid_variant_series.name = _caid_variant
+
+	out_df = pd.concat([out_df, caid_id_series, caid_variant_series], axis=1)
 	if replace:
-		out_df[AnnotationHeader.CAID] = caid_series
-		out_df.rename(columns={_caid: _caid_clean}, inplace=True)
-	else:
-		out_df = pd.concat([out_df, caid_series])
-
+		out_df = out_df.drop(columns=_caid)
 	return out_df
+
 
 def _fix_clinvar(clinvar_list):
 	clinvar_id = None
@@ -72,7 +84,16 @@ def _fix_clinvar(clinvar_list):
 				clinvar_id = int(item)
 	return clinvar_id
 
-def fix_clinvar(df: pd.DataFrame, replace=False):
+
+def _clinvar_to_variant(clinvar_id):
+	variant_dict = next(clinvarid_to_variant_generator)
+	variant_name = None
+	if clinvar_id in variant_dict:
+		variant_name = variant_dict[clinvar_id]
+	return variant_name
+
+
+def clinvar_to_variant(df: pd.DataFrame, replace=False):
 	"""
 	Fix the clinvar column in the given df
 	@param df:
@@ -82,15 +103,18 @@ def fix_clinvar(df: pd.DataFrame, replace=False):
 
 	_clinvar = str(AnnotationHeader.CLINVAR)
 	_clinvar_clean = str(AnnotationHeader.CLINVAR_CLEAN)
+	_clinvar_variant = str(AnnotationHeader.CLINVAR_VARIANT)
 
 	out_df = df.copy()
 	clinvar_id_series = out_df[_clinvar].apply(_fix_clinvar)
 	clinvar_id_series.name = _clinvar_clean
+
+	clinvar_variant_series = clinvar_id_series.apply(_clinvar_to_variant)
+	clinvar_variant_series.name = _clinvar_variant
+
+	out_df = pd.concat([out_df, clinvar_id_series, clinvar_variant_series], axis=1)
 	if replace:
-		out_df[AnnotationHeader.CLINVAR] = clinvar_id_series
-		out_df.rename(columns={_clinvar: _clinvar_clean}, inplace=True)
-	else:
-		out_df = pd.concat([out_df, clinvar_id_series])
+		out_df = out_df.drop(columns=_clinvar)
 
 	return out_df
 
@@ -134,12 +158,12 @@ def fix_df_lists(df: pd.DataFrame, cols: List[str] = None):
 
 
 def preprocess(df):
-	df = df\
+	out_df = df\
 		.pipe(fix_na)\
-		.pipe(fix_clinvar)\
-		.pipe(fix_caid)
+		.pipe(clinvar_to_variant)\
+		.pipe(caid_to_variant)
 
 	# columns in alphabetical order
-	df = df.reindex(sorted(df.columns), axis=1)
+	out_df = out_df.reindex(sorted(out_df.columns), axis=1)
 
-	return df
+	return out_df
