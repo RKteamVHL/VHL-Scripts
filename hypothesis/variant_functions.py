@@ -78,26 +78,33 @@ _g = nx.compose(obonet.read_obo(SO_HREF), obonet.read_obo(HPO_HREF))
 for n, d in _g.nodes(data=True):
     d['id'] = n.casefold().strip()
     d['name'] = d['name'].casefold().strip()
-
+    d['name_spaceless'] = d['name'].replace(' ', '')
 # make a copy of merged network- node keys: term
 _h = nx.relabel_nodes(_g, {n: d['name'] for n, d in _g.nodes(data=True)})
+_h2 = nx.relabel_nodes(_g, {n: d['name_spaceless'] for n, d in _g.nodes(data=True)})
 # combine together OBO network so that node keys: id or term
-_f = nx.compose(_g, _h)
+_f1 = nx.compose(_g, _h)
+_f = nx.compose(_f1, _h2)
 # casefold and strip the keys, so the result is an agglomeration of nodes:
-# SO(term) + SO(id) + HPO(term) + HPO(id), all lowercase and stripped
+# SO(term) + SO(id) + HPO(term) + HPO(id) + HPO(no spaces), all lowercase and stripped
 
 
 OBONET = nx.DiGraph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.nodes()}))
 OBONET_UD = OBONET.to_undirected()
 
 
-def get_valid_obo(term_or_id, obo_type='name'):
-    # this function will take either a term (e.g., HP:0010797) or name (e.g., Hemangioblastoma) and return
-    # a matching HPO term or name to verify it exists
+def get_valid_obo(term_or_id):
+    """
+    Take either a term (e.g., HP:0010797) or name (e.g., Hemangioblastoma) and return
+    a matching HPO term or name to verify it exists
+    @param term_or_id: The term to match
+    @param obo_type:
+    @return:
+    """
+    # this function will
     tid = term_or_id.strip().casefold()
     if tid in OBONET:
-        node_data = OBONET.nodes[tid][obo_type]
-        return node_data
+        return OBONET.nodes[tid]
     else:
         raise ValueError(f"Could not find an OBO node for {tid}")
 

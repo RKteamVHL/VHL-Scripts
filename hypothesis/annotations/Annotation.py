@@ -19,9 +19,10 @@ TEXT_TAGS_NAME = "TEXT"
 COMPUTED_TAGS_NAME = "COMPUTED"
 
 
-# 'header' is used here to indicate that these are the string headers for the csv tabular format of the annotations
-# these were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs
-# if a computed column is needed / being created, it should be put here
+# 'header' is used here to indicate that these are the string headers for the csv tabular format of the annotations.
+# These were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs
+# if a computed column is needed / being created, it should be put here, and ONLY this enum should ever be used
+# while referencing dataframes later on
 class AnnotationHeader(enum.Enum):
     # properties of the hypothesis annotations, not specific to the VHL annotations
     TYPE = ('type',)
@@ -56,10 +57,14 @@ class AnnotationHeader(enum.Enum):
     PREVIOUSLY_PUBLISHED = (TEXT_TAGS_NAME, "PreviouslyPublished")
     AGE_OF_PRESENTATION = (BODY_TAGS_NAME, "AgeOfPresentation")
 
+    # computed columns should be put here
     CLINVAR_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
     CAID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
     CLINVAR_VARIANT = (COMPUTED_TAGS_NAME, "ClinVarIDVariant")
     CAID_VARIANT = (COMPUTED_TAGS_NAME, "CAidVariant")
+
+    AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
+    DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
 
     def __str__(self):
         if len(self.value) == 1:

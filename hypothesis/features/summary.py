@@ -1,6 +1,5 @@
 from typing import List
 from ..annotations.Annotation import AugmentedAnnotation, AnnotationType, AnnotationHeader
-from ..fetching.clinvar_variants import clinvarid_to_variant_generator
 from ..variant_functions import DISEASE_ENTITY_TO_HPO
 from .. import config
 import pandas as pd
@@ -10,6 +9,8 @@ import os
 # aliases to the header types in annotation for brevity
 _clinvar = str(AnnotationHeader.CLINVAR_CLEAN)
 _caid = str(AnnotationHeader.CAID_CLEAN)
+_clinvar_var = str(AnnotationHeader.CLINVAR_VARIANT)
+_caid_var = str(AnnotationHeader.CAID_VARIANT)
 _civic = str(AnnotationHeader.CIVIC_NAME)
 _type = str(AnnotationHeader.TYPE)
 _variant = str(AnnotationHeader.VARIANT)
@@ -29,21 +30,10 @@ def get_unique_clinvar_variants(annotation_df: pd.DataFrame):
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
-    clinvar_id_series = valid_df[_clinvar]
+    variants_df = pd.concat([valid_df[[_type, _clinvar, _clinvar_var, _caid, _caid_var, _civic]]], axis=1)
 
-    variants_df = pd.concat([valid_df[[_type, _caid, _civic]], clinvar_id_series], axis=1)
-
-
-    variants_df.loc[:, _caid] = variants_df[_caid].map(lambda x: x[0] if isinstance(x, list) else np.nan)
-    variants_df.loc[:, _civic] = variants_df[_civic].map(lambda x: x[0] if isinstance(x, list) else np.nan)
     variants_df = variants_df.dropna(subset=[_clinvar, _caid, _civic], how='all')
 
-    clinvar_mapped_series = variants_df[_clinvar].map(next(clinvarid_to_variant_generator))
-    clinvar_mapped_series.name = _variant
-
-    variants_df = pd.concat([variants_df, clinvar_mapped_series], axis=1)
-
-    counts_df = variants_df.groupby([_clinvar, _variant], as_index=False).count()
     return variants_df
 
 

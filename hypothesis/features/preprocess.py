@@ -4,8 +4,10 @@ from ..fetching.caid_variants import caid_to_variant_generator
 from ..fetching.clinvar_variants import clinvarid_to_variant_generator
 
 from .. import config
+from .. import variant_functions
 import pandas as pd
 import numpy as np
+import collections
 
 import re
 
@@ -95,7 +97,7 @@ def _clinvar_to_variant(clinvar_id):
 
 def clinvar_to_variant(df: pd.DataFrame, replace=False):
 	"""
-	Fix the clinvar column in the given df
+	Fix the clinvar column in the given df, and append two columns: the cleaned clinvar and the clinvar variant
 	@param df:
 	@param replace: if true, replaces the original clinvar column
 	@return:
@@ -119,51 +121,87 @@ def clinvar_to_variant(df: pd.DataFrame, replace=False):
 	return out_df
 
 
-def fix_singular_lists(df: pd.DataFrame, cols: List[str] = None):
+def _separate_phenotype_age_of_presentation(aop_series: pd.Series):
+
+	aop_df = aop_series.explode().apply(pd.Series).drop(columns=0).astype(float)
+	col_map = {}
+	for col in aop_df.columns:
+		valid_col = None
+		try:
+			obo = variant_functions.get_valid_obo(col)
+			valid_col = obo['name_spaceless']
+		except ValueError as e:
+			pass
+		if valid_col is not None:
+			col_map[col] = f'{str(AnnotationHeader.AGE_OF_PRESENTATION_CLEAN)}.{valid_col}'
+	invalid_cols = set(aop_df.columns) - set(col_map.keys())
+	aop_df = aop_df.drop(columns=invalid_cols).rename(columns=col_map)
+	aop_df = aop_df.groupby(aop_df.index).min()
+	return aop_df
+
+
+def add_phenotype_age_of_presentation(df: pd.DataFrame, replace=False):
 	"""
-	Fix cells that have lists in the input annotation df
-	This function operates on columns that only (should) have a single value in each column. If there are
-	@param df: Dataframe to fix
-	@param cols: Columns to operate on. If not specified, all columns will be selected
+	Adds the first age of presentation columns for each phenotype
+	@param df:
+	@param replace: if true, replaces the original ageofpresentation column
 	@return:
-
 	"""
+	out_df = df.copy()
+	aop_col = str(AnnotationHeader.AGE_OF_PRESENTATION)
 
-	if not cols:
-		cols = list(df.columns)
+	out_df = pd.concat([out_df, out_df[aop_col].pipe(_separate_phenotype_age_of_presentation)], axis=1)
 
-	for col in cols:
-		s = df[col]
-		s_unwrapped = s.apply(lambda x: x[0])
+	return out_df
 
 
-def fix_df_lists(df: pd.DataFrame, cols: List[str] = None):
+def _separate_disease_entity(disease_series: pd.Series):
+
+	disease_df = pd.get_dummies(disease_series.explode().apply(pd.Series).stack(dropna=False))
+
+	col_map = {}
+	for col in disease_df.columns:
+		valid_col = None
+		try:
+			obo = variant_functions.get_valid_obo(col)
+			valid_col = obo['name_spaceless']
+		except ValueError as e:
+			# TODO: add logging
+			pass
+		if valid_col is not None:
+			col_map[col] = f'{str(AnnotationHeader.DISEASE_ENTITY_CLEAN)}.{valid_col}'
+	invalid_cols = set(disease_df.columns) - set(col_map.keys())
+	disease_df = disease_df.drop(columns=invalid_cols).rename(columns=col_map)
+	disease_df = disease_df.loc[:, ~disease_df.columns.duplicated()].copy()
+
+	disease_df = disease_df.groupby(level=0).sum().astype(int)
+	return disease_df
+
+def add_disease_entity(df: pd.DataFrame, replace=False):
 	"""
-	Fix cells that have lists in the input annotation df
-
-	This function replaces lists with dummy encoded columns based on what's in the list; a separate column will be
-	created for each string in the list. List of dicts will create a separate column for each unique key in the column.
-	Columns that have mostly boolean or numeric values will be unchanged
-	@param df: Dataframe to fix
-	@param cols: Columns to operate on. If not specified, all columns will be fixed
+	Adds disease entity phenotypes
+	@param df:
+	@param replace: if true, replaces the original disease column
 	@return:
-
 	"""
+	out_df = df.copy()
+	disease_col = str(AnnotationHeader.DISEASE_ENTITY)
 
-	if not cols:
-		cols = list(df.columns)
+	out_df = pd.concat([out_df, out_df[disease_col].pipe(_separate_disease_entity)], axis=1)
 
-	for col in cols:
-		series = df[col]
+	return out_df
 
 
 def preprocess(df):
 	out_df = df\
 		.pipe(fix_na)\
 		.pipe(clinvar_to_variant)\
-		.pipe(caid_to_variant)
+		.pipe(caid_to_variant)\
+		.pipe(add_phenotype_age_of_presentation)\
+		.pipe(add_disease_entity)
 
 	# columns in alphabetical order
+	# counts = collections.Counter(out_df.columns)
 	out_df = out_df.reindex(sorted(out_df.columns), axis=1)
 
 	return out_df
