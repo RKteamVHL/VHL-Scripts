@@ -2,6 +2,7 @@ import networkx as nx
 import os
 import obonet
 import urllib
+import warnings
 from . import config
 DISEASE_ENTITY_TO_HPO = {
         'asymptomatic': 'asymptomatic',
@@ -93,19 +94,26 @@ OBONET = nx.DiGraph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.no
 OBONET_UD = OBONET.to_undirected()
 
 
-def get_valid_obo(term_or_id):
+def get_valid_obo(term_or_id, return_as=None):
     """
     Take either a term (e.g., HP:0010797) or name (e.g., Hemangioblastoma) and return
     a matching HPO term or name to verify it exists
     @param term_or_id: The term to match
-    @param obo_type:
+    @param return_as: can be 'id', 'name', or 'name_spaceless'. returns the attribute, rather than node
     @return:
     """
-    # this function will
-    tid = term_or_id.strip().casefold()
-    if tid in OBONET:
-        return OBONET.nodes[tid]
+    if isinstance(term_or_id, str):
+        tid = term_or_id.strip().casefold()
+        if tid in OBONET:
+            to_return = OBONET.nodes[tid]
+            if return_as == 'id':
+                to_return = to_return['id']
+            elif return_as == 'name':
+                to_return = to_return['name']
+            elif return_as == 'name_spaceless':
+                to_return = to_return['name_spaceless']
+            return to_return
+        else:
+            warnings.warn(f"Could not find an OBO node for {tid}")
     else:
-        raise ValueError(f"Could not find an OBO node for {tid}")
-
-
+        warnings.warn(f"{term_or_id} is not a string")

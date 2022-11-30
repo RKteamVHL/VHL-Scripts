@@ -28,7 +28,7 @@ STANDARD_REFS = ['NM_000551.3', 'NM_000551.4']
 
 # 'global' variables that change on runtime
 USE_CACHE = False
-CASEFOLD_TAG_NAMES = True
+CASEFOLD_TAG_NAMES = False
 
 
 # pre-startup code

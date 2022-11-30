@@ -18,10 +18,12 @@ BODY_TAGS_NAME = "BODY"
 TEXT_TAGS_NAME = "TEXT"
 COMPUTED_TAGS_NAME = "COMPUTED"
 
-
-# 'header' is used here to indicate that these are the string headers for the csv tabular format of the annotations.
-# These were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs
-# if a computed column is needed / being created, it should be put here, and ONLY this enum should ever be used
+# TODO: discuss separating annotation headers and types into separate file
+# TODO: consider listing expected cell types in this enum
+# The body and text annotation headers are taken directly from the 2022 Hypothes.is VHL Annotation Protocol, and are in
+# the same order as Table 1 in that document
+# These were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs.
+# If a computed column is needed / being created, it should be put here, and ONLY this enum should ever be used
 # while referencing dataframes later on
 class AnnotationHeader(enum.Enum):
     # properties of the hypothesis annotations, not specific to the VHL annotations
@@ -30,38 +32,100 @@ class AnnotationHeader(enum.Enum):
     SOURCE = ("source",)
     TEXT = ("text",)
 
-    # tags used for determining the annotation type
-    EVIDENCE_STATEMENT = (BODY_TAGS_NAME, "EvidenceStatement")
+    ## article information
     PMID = (TEXT_TAGS_NAME, "PMID")
     GENE = (TEXT_TAGS_NAME, "Gene")
-    STANDARD_REFERENCE_SEQUENCE = (TEXT_TAGS_NAME, "StandardizedReferenceSequence")
+    STANDARDIZED_REFERENCE_SEQUENCE = (TEXT_TAGS_NAME, "StandardizedReferenceSequence")
+
+    ## methodology
     ARTICLE_REFERENCE_SEQUENCE = (TEXT_TAGS_NAME, "ArticleReferenceSequence")
     GENOTYPING_METHOD = (TEXT_TAGS_NAME, "GenotypingMethod")
     SAMPLING_METHOD = (TEXT_TAGS_NAME, "SamplingMethod")
+
+    ## case-individual
+    PATIENT_ID = (TEXT_TAGS_NAME, "PatientID")
+    DISEASE_ASSERTION = (TEXT_TAGS_NAME, "DiseaseAssertion")
+    FAMILY_INFO = (TEXT_TAGS_NAME, "FamilyInfo")
     CASE_PRESENTING_HPOS = (TEXT_TAGS_NAME, "CasePresentingHPOs")
-    GROUP_PRESENTING_HPOS = (TEXT_TAGS_NAME, "GroupPresentingHPOs")
-    EXPERIMENTAL_ASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
-
-    # body tags
-    CLINVAR = (BODY_TAGS_NAME, "ClinVarID")
-    CAID = (BODY_TAGS_NAME, "CAID")
-    CIVIC_NAME = (BODY_TAGS_NAME, "CivicName")
-    UNREGISTERED_VARIANT = (BODY_TAGS_NAME, "UnregisteredVariant")
-    FAMILY_PEDIGREE = (BODY_TAGS_NAME, "FamilyPedigree")
-    MUTATION_TYPE = (BODY_TAGS_NAME, "MutationType")
-    AMINO_ACID_CHANGE = (BODY_TAGS_NAME, "AminoAcidChange")
-    PROTEIN_POSITION = (BODY_TAGS_NAME, "ProteinPosition")
-    DISEASE_ENTITY = (BODY_TAGS_NAME, "DiseaseEntity")
-
-    VARIANT = (TEXT_TAGS_NAME, "Variant")
+    CASE_HPO_FREE_TEXT = (TEXT_TAGS_NAME, "CaseHPOFreeText")
+    CASE_NOT_HPOS = (TEXT_TAGS_NAME, "CaseNotHPOs")
+    CASE_NOT_HPO_FREE_TEXT = (TEXT_TAGS_NAME, "CaseNotHPOFreeText")
+    CASE_PREVIOUS_TESTING = (TEXT_TAGS_NAME, "CasePreviousTesting")
     PREVIOUSLY_PUBLISHED = (TEXT_TAGS_NAME, "PreviouslyPublished")
-    AGE_OF_PRESENTATION = (BODY_TAGS_NAME, "AgeOfPresentation")
+    SUPPLEMENTAL_DATA = (TEXT_TAGS_NAME, "SupplementalData")
+    VARIANT = (TEXT_TAGS_NAME, "Variant")
+    LEGACY_VARIANT = (TEXT_TAGS_NAME, "LegacyVariant")
+    CASE_PROBLEM_VARIANT_FREE_TEXT = (TEXT_TAGS_NAME, "CaseProblemVariantFreeText")
+    CLINVAR_ID = (BODY_TAGS_NAME, "ClinVarID")  # NOTE: there is also a text tag for ClinVarID
+    CA_ID = (BODY_TAGS_NAME, "CAID")    # NOTE: there is also a text tag for CAID
+    GNOMAD = (TEXT_TAGS_NAME, "gnomAD")
+    VARIANT_EVIDENCE = (TEXT_TAGS_NAME, "VariantEvidence")
+    MUTATION_TYPE = (BODY_TAGS_NAME, "MutationType")    # NOTE: there is also a text tag for mutation type
+    CIVIC_NAME = (BODY_TAGS_NAME, "CivicName")  # NOTE: there is also a text tag for civic name
+    MULTIPLE_GENE_VARIANTS = (BODY_TAGS_NAME, "MultipleGeneVariants")   # NOTE: there is also a text tag for civic name
 
-    # computed columns should be put here
-    CLINVAR_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
-    CAID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
-    CLINVAR_VARIANT = (COMPUTED_TAGS_NAME, "ClinVarIDVariant")
-    CAID_VARIANT = (COMPUTED_TAGS_NAME, "CAidVariant")
+    ## group report- some of the group annotation columns are also in case reports
+    GROUP_ID = (TEXT_TAGS_NAME, "GroupID")
+    KINDRED_ID = (TEXT_TAGS_NAME, "KindredID")
+    GROUP_SIZE = (TEXT_TAGS_NAME, "GroupSize")
+    GROUP_NUMBER_MALES = (TEXT_TAGS_NAME, "GroupNumberMales")
+    GROUP_NUMBER_FEMALES = (TEXT_TAGS_NAME, "GroupNumberFemales")
+    GROUP_NUMBER_ETHNICITY = (TEXT_TAGS_NAME, "GroupNumberEthnicity")
+    GROUP_AGE_RANGE = (TEXT_TAGS_NAME, "GroupAgeRange")
+    GROUP_INFO = (TEXT_TAGS_NAME, "GroupInfo")
+    GROUP_PRESENTING_HPOS = (TEXT_TAGS_NAME, "GroupPresentingHPOs")
+    GROUP_HPO_FREE_TEXT = (TEXT_TAGS_NAME, "GroupHPOFreeText")
+    GROUP_NOT_HPOS = (TEXT_TAGS_NAME, "GroupNotHPOs")
+    GROUP_NOT_HPO_FREE_TEXT = (TEXT_TAGS_NAME, "GroupNotHPOFreeText")
+    GROUP_PREVIOUS_TESTING = (TEXT_TAGS_NAME, "GroupPreviousTesting")
+
+    ## case-report annotation tags
+    # inheritance pattern
+    INHERITANCE_PATTERN = (BODY_TAGS_NAME, "InheritancePattern")
+    # disease entity
+    DISEASE_ENTITY = (BODY_TAGS_NAME, "DiseaseEntity")
+    # age of presentation
+    AGE_OF_PRESENTATION = (BODY_TAGS_NAME, "AgeOfPresentation")
+    # mutation
+    MUTATION = (BODY_TAGS_NAME, "Mutation")
+    # variant standardization
+    REF_SEQ = (BODY_TAGS_NAME, "RefSeq")
+    ASSUMED_REF_SEQ = (BODY_TAGS_NAME, "AssumedRefSeq")
+    PROBLEM_VARIANT = (BODY_TAGS_NAME, "ProblemVariant")
+    # variant
+    CDNA_POSITION = (BODY_TAGS_NAME, "cDNAposition")
+    PROTEIN_POSITION = (BODY_TAGS_NAME, "ProteinPosition")
+    AMINO_ACID_CHANGE = (BODY_TAGS_NAME, "AminoAcidChange")
+    UNREGISTERED_VARIANT = (BODY_TAGS_NAME, "UnregisteredVariant")
+    MULTIPLE_VHL_VARIANTS = (BODY_TAGS_NAME, "MultipleVHLVariants")
+    # mutation type, civic name, already covered above
+    # previous testing
+    PREVIOUS_TESTING = (BODY_TAGS_NAME, "PreviousTesting")
+    # family information
+    FAMILY_PEDIGREE = (BODY_TAGS_NAME, "FamilyPedigree")
+    FAMILIAL = (BODY_TAGS_NAME, "Familial")
+    NON_FAMILIAL = (BODY_TAGS_NAME, "NonFamilial")
+    NO_FAMILY_INFO = (BODY_TAGS_NAME, "NoFamilyInfo")
+    DE_NOVO_COMFIRMED = (BODY_TAGS_NAME, "deNovoConfirmed")
+    COMPOUND_HETEROZYGOUS = (BODY_TAGS_NAME, "CompoundHeterozygous")
+    FAMILY_COHORT = (BODY_TAGS_NAME, "FamilyCohort")
+    # supplemental data covered above
+
+    ## experimental assay
+    EXPERIMENTAL_ASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
+    # clinvar and caid are already covered above
+    # NOTE: CAiD in the document is inconsistently capitalized
+
+    ## Evidence statement
+    EVIDENCE_STATEMENT = (BODY_TAGS_NAME, "EvidenceStatement")
+    # clinvarid, caid, civicname, and problem variant are all listed above
+
+    ## computed columns
+    # any columns, new or derrived from the above, should be put here
+    CLINVAR_ID_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
+    CA_ID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
+    CLINVAR_ID_VARIANT = (COMPUTED_TAGS_NAME, "ClinVarIDVariant")
+    CA_ID_VARIANT = (COMPUTED_TAGS_NAME, "CAidVariant")
 
     AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
     DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
@@ -101,7 +165,7 @@ EVIDENCE_TAGS = [
 INFORMATION_TAGS = [
     AnnotationHeader.PMID,
     AnnotationHeader.GENE,
-    AnnotationHeader.STANDARD_REFERENCE_SEQUENCE
+    AnnotationHeader.STANDARDIZED_REFERENCE_SEQUENCE
 ]
 
 METHODOLOGY_TAGS = [

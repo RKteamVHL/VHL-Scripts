@@ -7,10 +7,10 @@ import numpy as np
 import os
 
 # aliases to the header types in annotation for brevity
-_clinvar = str(AnnotationHeader.CLINVAR_CLEAN)
-_caid = str(AnnotationHeader.CAID_CLEAN)
-_clinvar_var = str(AnnotationHeader.CLINVAR_VARIANT)
-_caid_var = str(AnnotationHeader.CAID_VARIANT)
+_clinvar = str(AnnotationHeader.CLINVAR_ID_CLEAN)
+_caid = str(AnnotationHeader.CA_ID_CLEAN)
+_clinvar_var = str(AnnotationHeader.CLINVAR_ID_VARIANT)
+_caid_var = str(AnnotationHeader.CA_ID_VARIANT)
 _civic = str(AnnotationHeader.CIVIC_NAME)
 _type = str(AnnotationHeader.TYPE)
 _variant = str(AnnotationHeader.VARIANT)
