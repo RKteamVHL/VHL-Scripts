@@ -4,24 +4,19 @@ import obonet
 import urllib
 import warnings
 from . import config
-DISEASE_ENTITY_TO_HPO = {
-        'asymptomatic': 'asymptomatic',
-        'adrenalpheochromocytoma': 'neuroendocrineneoplasm',
-        'cerebellarhemangioblastoma': 'hemangioblastoma',
-        'clearcellrenalcellcarcinoma': 'renalcellcarcinoma',
-        'hemangioblastoma': 'hemangioblastoma',
-        'hemangioma': 'hemangioma',
-        'neoplasmoftheliver': 'neoplasmoftheliver',
-        'neuroendocrineneoplasm': 'neuroendocrineneoplasm',
-        'pancreaticcysts': 'pancreaticcysts',
-        'pancreaticendocrinetumor': 'pancreaticendocrinetumor',
-        'pheochromocytoma': 'neuroendocrineneoplasm',
-        'renalcellcarcinoma': 'renalcellcarcinoma',
-        'renalcyst': 'renalcyst',
-        'renalneoplasm': 'renalneoplasm',
-        'retinalcapillaryhemangioma': 'hemangioblastoma',
-        'spinalhemangioblastoma': 'hemangioblastoma'
+
+
+# sources: https://www.ncbi.nlm.nih.gov/protein/4507891, https://www.uniprot.org/uniprot/P40337,
+# https://www.ebi.ac.uk/interpro/protein/UniProt/P40337/
+VHL_FUNCTIONAL_REGIONS = {
+    "tumour_suppression": set(range(64, 204)),
+    "⍺-Domain": set(range(156, 205)),
+    "β-Domain": set(range(63, 144)),
+    "GXEEX8": set(range(14, 54)),
+    "HIF1_alpha_binding": set([67, 69, 75, 77, 78, 79, 88, 91, 98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 115, 117]),
+    "ElonginB_ElonginC_binding": set([79, 153, 159, 161, 162, 163, 165, 166, 174, 177, 178, 184])
 }
+VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
 
 GENERAL_HPO_TERMS = [
     'neuroendocrine neoplasm',
@@ -34,6 +29,22 @@ GENERAL_HPO_TERMS = [
     # 'abnormality of the epididymis',
     # 'abnormality of the ovary',
     # 'endolymphatic sac tumor'
+]
+
+GENERAL_SO_TERMS = [
+	'deletion',
+	'exon_loss_variant',
+	'missense_variant',
+	'stop_gained',
+	'utr_variant',
+	'inframe_indel',
+	'delins',
+	'frameshift_variant',
+	'splice_site_variant',
+    'start_lost',
+    'synonymous_variant',
+    'intron_variant',
+    'stop_lost'
 ]
 
 HPO_ABBREVIATIONS = {
@@ -50,6 +61,11 @@ HPO_ABBREVIATIONS = {
 }
 _abbrv = {v: k for k, v in HPO_ABBREVIATIONS.items()}
 HPO_ABBREVIATIONS.update(_abbrv)
+
+SO_TERM_TYPES = {
+    'truncating': ['stop_gained', 'deletion', 'exon_loss_variant', 'start_lost', 'frameshift_variant'],
+    'non-truncating': ['missense_variant', 'inframe_indel'],
+}
 
 ## Phenotype and Sequency Ontology Utilities
 SO_NAME = 'SequenceOntology'
@@ -117,3 +133,44 @@ def get_valid_obo(term_or_id, return_as=None):
             warnings.warn(f"Could not find an OBO node for {tid}")
     else:
         warnings.warn(f"{term_or_id} is not a string")
+
+def generalized_so_terms(so_type):
+    '''Given a node, find its general so_type
+    '''
+
+    general_so = None
+
+    valid_so = get_valid_obo(so_type)
+    for successor in nx.bfs_successors(OBONET, valid_so):
+        try:
+            i = GENERAL_SO_TERMS.index(successor[0])
+            general_so = GENERAL_SO_TERMS[i]
+            break
+        except ValueError as e:
+            pass
+
+    if general_so is None:
+        raise ValueError(f"Could not find a generalized term for {valid_so}")
+
+    return general_so
+
+def generalized_vhl_phenotype(phenotype, use_abbreviation=True):
+    '''Given a node, find its general disease type
+    '''
+    general_pheno = None
+
+    valid_hpo = get_valid_obo(phenotype)
+    for successor in nx.bfs_successors(OBONET, valid_hpo):
+        try:
+            i = GENERAL_HPO_NODES.index(successor[0])
+            general_pheno = GENERAL_HPO_NODES[i]
+            break
+        except ValueError as e:
+            pass
+
+    if general_pheno is None:
+        raise ValueError(f"Could not find a generalized term for {valid_hpo}")
+
+    if use_abbreviation:
+        general_pheno = HPO_ABBREVIATIONS[general_pheno]
+    return general_pheno

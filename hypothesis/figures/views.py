@@ -115,33 +115,6 @@ def regions(df):
     plot_clustered_stacked(all_phen_dfs, ["⍺-Domain", 'β-Domain', 'Outside of ⍺-Domain and β-Domain'])
     return combined_df
 
-
-def domains_adjusted(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["domain"]]]
-    pheno_domains = pd.DataFrame(columns=COMPUTED_COLUMNS["domain"], index=COMPUTED_COLUMNS["generalized_phenotype"])
-
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
-        phen_agg = df[df[col] >= 1].sum()
-        pheno_domains.loc[col] = phen_agg[COMPUTED_COLUMNS["domain"]]
-
-    pheno_domains = pheno_domains.rename_axis("Phenotype", axis=0).rename_axis("Domain", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_domains = pheno_domains.sort_index()
-
-    pheno_domains["region.β-Domain"] = pheno_domains["region.β-Domain"] * (vf.CDS_LEN / vf.BETA_LEN)
-    pheno_domains["region.⍺-Domain"] = pheno_domains["region.⍺-Domain"] * (vf.CDS_LEN / vf.ALPHA_LEN)
-    pheno_domains["region.Outside of ⍺-Domain and β-Domain"] = pheno_domains[
-                                                                   "region.Outside of ⍺-Domain and β-Domain"] * (
-                                                                           vf.CDS_LEN / (
-                                                                               1 - vf.ALPHA_LEN + vf.BETA_LEN))
-
-    ax = pheno_domains.plot(kind="bar", legend=True, figsize=(10, 6))
-    ax.figure.subplots_adjust(left=0.1, bottom=0.4)
-    plt.ylabel("Number of Occurences, adjusted by domain lengths")
-
-    return pheno_domains
-
-
 def mutant_type_counts(df):
     df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["generalized_mutant_type"]]]
     pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["generalized_mutant_type"],
@@ -345,46 +318,6 @@ def codon_blosum90_histogram(df):
     _plot_codon(codon)
     return codon
 
-
-
-def ratio_of_phenotypes(df, generalized=True):
-    type_ = "phenotype"
-    if generalized:
-        type_ = "generalized_" + type_
-    phens = df[COMPUTED_COLUMNS[type_]].fillna(0)
-    phens_counts = phens.agg("sum").sort_values()
-
-    phens_ratio = phens_counts.rename_axis("Phenotype").rename("Share of Observations").rename(
-        lambda x: x.split(".")[1])
-
-    fig = plt.figure(figsize=(8, 6))
-    fig.subplots_adjust(bottom=0.4)
-    ax = phens_ratio.plot.bar()
-    ax.set_xlabel(phens_ratio.axes[0].name)
-    ax.set_ylabel(phens_ratio.name)
-    for p in ax.patches:
-        # ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-        ax.annotate(str(int(p.get_height())), (p.get_x() + p.get_width() / 2., p.get_height()), ha='center',
-                    va='center', xytext=(0, 10), textcoords='offset points')
-
-    # plt.close(fig)
-    #
-    # phens_ratio = phens_ratio / phens_counts.sum()
-    #
-    # fig = plt.figure(figsize=(8, 6))
-    # fig.subplots_adjust(bottom=0.4)
-    # ax = phens_ratio.plot.bar()
-    # ax.set_xlabel(phens_ratio.axes[0].name)
-    # ax.set_ylabel(phens_ratio.name)
-    # for p in ax.patches:
-    #     # ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    #     ax.annotate(np.round(p.get_height(),decimals=2), (p.get_x() + p.get_width() / 2., p.get_height()), ha='center',
-    #             va='center', xytext=(0, 10), textcoords='offset points')
-    # plt.savefig(os.path.join(STATS_DIR, f'{type_}ratio.pdf'))
-    # plt.close(fig)
-    return phens_ratio
-
-
 def penetrance(df):
 
     df = df.dropna(subset=COMPUTED_COLUMNS["age"])
@@ -450,42 +383,6 @@ def phenotype_correlation_ratio(df):
     return pheno_pheno
 
 
-def phenotype_codon_heatmap(df):
-    codon_df = df[df["codon_start"] >= 1]
-    codon_df = codon_df.dropna(subset=['generalized_mutant_type.missense_variant'])
-    codon_df = codon_df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["codon"]]]
-    codon_df = codon_df.groupby("codon_start").sum()
-    codon_df = codon_df.transpose()
-
-    order = codon_df.sum().sort_values(ascending=False).index
-    codon_df = codon_df[order]
-    # codon_df = codon_df.iloc[:, 0:TAKE_TOP]
-
-    ax = sns.heatmap(codon_df.astype(float))
-
-    return codon_df
-
-
-def phenotype_aachange_heatmap(df):
-    missense_df = df[df["codon_start"] >= 1]
-    missense_df = missense_df.dropna(subset=['generalized_mutant_type.missense_variant'])
-
-    missense_df = missense_df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["aa_change"]]]
-    aachange_df = pd.DataFrame(index=COMPUTED_COLUMNS["generalized_phenotype"], columns=COMPUTED_COLUMNS["aa_change"])
-
-    for phen in aachange_df.index:
-        aachange_df.loc[phen] = missense_df.dropna(subset=[phen]).sum()[COMPUTED_COLUMNS["aa_change"]]
-
-    order = aachange_df.sum().sort_values(ascending=False).index
-    aachange_df = aachange_df[order]
-    # aachange_df = aachange_df.iloc[:, 0:TAKE_TOP]
-
-    # aachange_df = aachange_df.loc[:, (aachange_df.sum() >= 5)]
-    ax = sns.heatmap(aachange_df.astype(float))
-
-    return aachange_df
-
-
 def plot_clustered_stacked(dfall, labels=None, title="multiple stacked bar plot", H="/", **kwargs):
     """Given a list of dataframes, with identical columns and index, create a clustered stacked bar plot.
     labels is a list of the names of the dataframe, used for the legend
@@ -549,60 +446,6 @@ def autolabel(ax, rects, xpos='center', as_percentage=False):
         ax.text(rect.get_x() + rect.get_width() * offset[xpos], 1.01 * height,
                 text, ha=ha[xpos], va='bottom')
 
-
-def plot_cluster_property(df, figure_path, property_name, cluster_column="cluster_labels", use_mean=False,
-                          save_csv=False, ratio_type='ratio_of_total'):
-    df_sums = df.sum().sort_values()
-    if not os.path.isdir(figure_path):
-        os.makedirs(figure_path)
-
-    if use_mean:
-        df_means = df.groupby(cluster_column).mean()
-        df_means = df_means[df_sums.index.to_list()].rename(columns=lambda x: x.split(".")[1] if "." in x else x)
-        df_stds = df.groupby(cluster_column).std()
-        df_stds = df_stds[df_sums.index.to_list()].rename(columns=lambda x: x.split(".")[1] if "." in x else x)
-        df_means.plot(kind="bar", yerr=df_stds, figsize=(12, 8))
-        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_means.pdf'))
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_means.eps'), format='eps')
-        plt.close('all')
-
-    else:
-        df_counts = df.groupby(cluster_column).sum()
-        df_counts = df_counts[df_sums.index.to_list()].rename(columns=lambda x: x.split(".")[1] if "." in x else x)
-        ax = df_counts.plot(kind="bar", figsize=(12, 8))
-        if save_csv:
-            df_counts.to_csv(os.path.join(figure_path, f'clustered_{property_name}_counts.csv'))
-
-        ax.set_xlabel("Cluster", rotation=0)
-        ax.set_ylabel("Number of Observations")
-        autolabel(ax, ax.patches)
-        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_counts.pdf'))
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_counts.eps'), format='eps')
-        plt.close('all')
-
-        if ratio_type == "within":
-            df_sums = df_counts.sum(axis=1)
-            df_ratio = df_counts.divide(df_sums, axis='index')
-        elif ratio_type == "across":
-            df_sums = df_counts.sum()
-            df_ratio = df_counts.divide(df_sums)
-        elif ratio_type == "ratio_of_total":
-            df_sums = df.groupby(cluster_column).count()
-            df_sums = df_sums.rename(columns=lambda x: x.split(".")[1] if "." in x else x)
-            df_ratio = df_counts.divide(df_sums, axis='index')
-            df_ratio = df_ratio[df_counts.columns]
-        ax = df_ratio.plot(kind="bar", figsize=(12, 8))
-        if save_csv:
-            df_ratio.to_csv(os.path.join(figure_path, f'clustered_{property_name}_ratios.csv'))
-        ax.set_xlabel("Cluster", rotation=0)
-        ax.set_ylabel("Ratio of Observations")
-        autolabel(ax, ax.patches, as_percentage=True)
-
-        # plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.pdf'))
-        plt.savefig(os.path.join(figure_path, f'clustered_{property_name}_ratios.eps'), format='eps')
-        plt.close('all')
-
-
 def create_descriptive_figures(directory, dfs):
     for df_type, df_out in dfs.items():
         fns = [
@@ -616,14 +459,11 @@ def create_descriptive_figures(directory, dfs):
             codon_histogram,
             codon_blosum62_histogram,
             codon_blosum90_histogram,
-            ratio_of_phenotypes,
             phenotype_correlation_counts,
             phenotype_correlation_ratio,
             penetrance,
             grouped_mutant_type_ratios,
             grouped_mutant_type_counts,
-            phenotype_codon_heatmap,
-            phenotype_aachange_heatmap
         ]
 
         for fn in fns:
@@ -645,79 +485,3 @@ def create_descriptive_figures(directory, dfs):
             # plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
             plt.savefig(os.path.join(fig_path, f'{stats_name}.eps'), format='eps')
             dataframe.to_csv(os.path.join(data_path, f'{stats_name}.csv'))
-
-def create_cluster_figures(directory, dfs):
-    for df_type, df_out in dfs.items():
-
-        clustered = dataframe_snf(df_out).fillna(0)
-
-        create_cluster_summaries(directory, clustered, df_type)
-        create_cluster_phenotype_summaries(directory, clustered, df_type)
-
-def create_cluster_summaries(directory, df, analysis_type):
-    base_path = os.path.join(directory, analysis_type, "cluster")
-    if not os.path.isdir(base_path):
-        os.makedirs(base_path)
-
-    for clust_type in ["cluster_labels_best", "cluster_labels_second"]:
-        fig_path = os.path.join(base_path, clust_type)
-        if not os.path.isdir(fig_path):
-            os.makedirs(fig_path)
-
-        properties = ["generalized_phenotype", "grouped_mutation_type", "domain", "aa_change"]
-        for prop in properties:
-            prop_df = df.set_index(clust_type)[COMPUTED_COLUMNS[prop]].fillna(0)
-            plot_cluster_property(prop_df, cluster_column=clust_type, figure_path=fig_path, property_name=prop,
-                                  save_csv=True)
-
-        prop = "age"
-        prop_df = df.set_index(clust_type)[COMPUTED_COLUMNS[prop]]
-        plot_cluster_property(prop_df, cluster_column=clust_type, figure_path=fig_path, property_name=prop,
-                              use_mean=True)
-        df["codon_start"] = df["codon_start"].astype(int)
-        codon = df.set_index("codon_start")
-
-
-        codon = codon[codon['generalized_mutant_type.missense_variant'] != 0]
-        # codon = codon.dropna(subset=['generalized_mutant_type.missense_variant'])
-        codon = pd.get_dummies(codon[codon.index.notnull()][clust_type]).sort_index()
-        codon = codon.groupby(codon.index).sum()
-        codons = pd.DataFrame(index=set(range(0, 214)), columns=codon.columns)
-        codons[:] = 0
-        codons.loc[set(codon.index)] = codon
-        axs = codons.plot(kind="bar", xticks=[], subplots=True, figsize=(12, 10), title=["" for v in codon.columns])
-        # for ax in axs:
-        #     ax.set_xticks(DOMAIN_TICKS)
-        # plt.savefig(os.path.join(fig_path, f'clustered_codon_start.pdf'))
-        plt.savefig(os.path.join(fig_path, f'clustered_codon_start.eps'), format='eps')
-
-        df.to_csv(os.path.join(fig_path, f"clustered_out.tsv"), sep='\t')
-        plt.close('all')
-
-
-def create_cluster_phenotype_summaries(directory, df, analysis_type):
-    base_path = os.path.join(directory, analysis_type, "cluster")
-    for clust_type in ["cluster_labels_best", "cluster_labels_second"]:
-        fig_path = os.path.join(base_path, clust_type)
-        if not os.path.isdir(fig_path):
-            os.makedirs(fig_path)
-
-        df = df.set_index(clust_type)
-        for phenotype in COMPUTED_COLUMNS["generalized_phenotype"]:
-            fig_path_pheno = os.path.join(fig_path, phenotype)
-
-            df_phen = df[df[phenotype] >= 1]
-            properties = ["grouped_mutation_type", "domain", "aa_change"]
-            for prop in properties:
-                prop_df = df_phen[COMPUTED_COLUMNS[prop]].fillna(0)
-                plot_cluster_property(prop_df, cluster_column=clust_type, figure_path=fig_path_pheno,
-                                      property_name=prop, ratio_type="across")
-
-            prop_df = df_phen[phenotype].fillna(0)
-            df_counts = prop_df.groupby(clust_type).sum()
-            df_ratio = df_counts.divide(df_counts.sum())
-            ax = df_ratio.plot(kind="bar", figsize=(12, 8))
-            autolabel(ax, ax.patches)
-            plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.eps'), format='eps')
-            # plt.savefig(os.path.join(fig_path, f'clustered_phenotype_ratios.pdf'))
-            plt.close('all')

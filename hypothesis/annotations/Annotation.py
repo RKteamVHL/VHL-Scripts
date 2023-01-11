@@ -130,6 +130,9 @@ class AnnotationHeader(enum.Enum):
     AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
     DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
 
+    GENERALIZED_PHENOTYPE = (COMPUTED_TAGS_NAME, "GeneralizedPhenotype")
+    GENERALIZED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GeneralizedMutationType")
+
     def __str__(self):
         if len(self.value) == 1:
             return self.value[0].casefold() if config.CASEFOLD_TAG_NAMES else self.value[0]

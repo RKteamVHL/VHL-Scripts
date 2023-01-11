@@ -49,5 +49,12 @@ if __name__ == '__main__':
     for stat in summary_dfs:
         stat.to_csv(os.path.join(config.DIRS['summary'], f"{stat.name}.csv"))
 
+    # do clustering
+
+    # do plotting
+
+    # do stats
+
+
 
 
