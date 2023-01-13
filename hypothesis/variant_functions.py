@@ -2,7 +2,7 @@ import networkx as nx
 import os
 import obonet
 import urllib
-import warnings
+import logging
 from . import config
 
 
@@ -18,7 +18,7 @@ VHL_FUNCTIONAL_REGIONS = {
 }
 VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
 
-GENERAL_HPO_TERMS = [
+GROUPED_HPO_TERMS = [
     'neuroendocrine neoplasm',
     'renal cell carcinoma',
     'hemangioblastoma',
@@ -130,9 +130,9 @@ def get_valid_obo(term_or_id, return_as=None):
                 to_return = to_return['name_spaceless']
             return to_return
         else:
-            warnings.warn(f"Could not find an OBO node for {tid}")
+            logging.warning(f"Could not find an OBO node for {tid}")
     else:
-        warnings.warn(f"{term_or_id} is not a string")
+        logging.warning(f"{term_or_id} is not a string")
 
 def generalized_so_terms(so_type):
     '''Given a node, find its general so_type
@@ -150,26 +150,33 @@ def generalized_so_terms(so_type):
             pass
 
     if general_so is None:
-        raise ValueError(f"Could not find a generalized term for {valid_so}")
+        logging.warning(f"Could not find a generalized term for {valid_so}")
 
     return general_so
 
-def generalized_vhl_phenotype(phenotype, use_abbreviation=True):
+
+# TODO: this will break if 'return_as' is ever added as a command-line argument
+GENERAL_HPO_NODES = [get_valid_obo(term, return_as=config.OBO_RETURN_TYPE) for term in GROUPED_HPO_TERMS]
+
+
+def grouped_vhl_phenotype(phenotype, return_as=None, use_abbreviation=False):
     '''Given a node, find its general disease type
     '''
     general_pheno = None
 
-    valid_hpo = get_valid_obo(phenotype)
-    for successor in nx.bfs_successors(OBONET, valid_hpo):
-        try:
-            i = GENERAL_HPO_NODES.index(successor[0])
-            general_pheno = GENERAL_HPO_NODES[i]
-            break
-        except ValueError as e:
-            pass
+    valid_hpo = get_valid_obo(phenotype, return_as=return_as)
+    # we do not need to log if valid_hpo is None, since get_valid_obo already does that
+    if valid_hpo is not None:
+        for successor in nx.bfs_successors(OBONET, valid_hpo):
+            try:
+                i = GENERAL_HPO_NODES.index(successor[0])
+                general_pheno = GENERAL_HPO_NODES[i]
+                break
+            except ValueError as e:
+                pass
 
     if general_pheno is None:
-        raise ValueError(f"Could not find a generalized term for {valid_hpo}")
+        logging.warning(f"Could not find a generalized term for {valid_hpo}")
 
     if use_abbreviation:
         general_pheno = HPO_ABBREVIATIONS[general_pheno]

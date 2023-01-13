@@ -1,6 +1,6 @@
 from typing import List
 from ..annotations.Annotation import AugmentedAnnotation, AnnotationType, AnnotationHeader
-from ..variant_functions import DISEASE_ENTITY_TO_HPO
+from ..variant_functions import GROUPED_HPO_TERMS, grouped_vhl_phenotype
 from .. import config
 import pandas as pd
 import numpy as np
@@ -103,7 +103,8 @@ def get_unregistered_variants(annotation_df: pd.DataFrame):
 def get_nonstandard_refseq(annotation_df: pd.DataFrame):
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.METHODOLOGY.name])]
-    refseq_df = valid_df.dropna(subset=[_refseq])
+    refseq_df = valid_df.dropna(subset=[_refseq]).copy()    # copying this df fixes a later SettingWithCopyWarning
+
     refseq_df.loc[:, _refseq] = refseq_df[_refseq].map(lambda x: x[0])
 
     refseq_df.loc[:, "StandardRef"] = False
@@ -132,7 +133,7 @@ def get_previously_published_variants(annotation_df: pd.DataFrame):
 
     valid_df = valid_df.dropna(subset=[_pub])
     valid_df.loc[:, _pub] = valid_df[_pub].map(lambda x: x[0])
-    valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0])
+    valid_df.loc[:, _variant] = valid_df[_variant].map(lambda x: x[0] if isinstance(x, list) else x)
     valid_df = valid_df.dropna(subset=[_pub])
 
 
@@ -159,7 +160,7 @@ def get_penetrance(annotation_df: pd.DataFrame):
 
 def get_missense_variants(annotation_df: pd.DataFrame):
     x_labels = ['from_aa', 'to_aa', 'pos']
-    y_labels = list(set(DISEASE_ENTITY_TO_HPO.values()))
+    y_labels = GROUPED_HPO_TERMS
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
@@ -180,8 +181,9 @@ def get_missense_variants(annotation_df: pd.DataFrame):
         if isinstance(cell, list):
             for ele in cell:
                 if isinstance(ele, str):
-                    if ele.casefold() in DISEASE_ENTITY_TO_HPO:
-                        to_return.append(DISEASE_ENTITY_TO_HPO[ele.casefold()])
+                    term_name = grouped_vhl_phenotype(ele.casefold(), return_as=config.OBO_RETURN_TYPE)
+                    if term_name in GROUPED_HPO_TERMS:
+                        to_return.append(term_name)
         else:
             to_return = []
 

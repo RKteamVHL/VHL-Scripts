@@ -16,6 +16,8 @@ from ..annotations.Annotation import AnnotationType
 
 # TODO: this file will become very large, and should probably separated into a python module at some point
 # TODO: describe some of the pandas magic
+
+
 def unique_cases(df: pd.DataFrame):
 	"""
 	Get all unique cases from input annotation df
@@ -37,8 +39,7 @@ def fix_na(df: pd.DataFrame):
 
 
 def fix_obos(series: pd.Series):
-	out_series = series.apply(variant_functions.get_valid_obo, return_as='name_spaceless')
-	pass
+	out_series = series.apply(variant_functions.get_valid_obo, return_as=config.OBO_RETURN_TYPE)
 	return out_series
 
 
@@ -159,6 +160,9 @@ def add_phenotype_age_of_presentation(df: pd.DataFrame, replace=False):
 	aop_df = aop_df.rename(columns=col_map)
 	out_df = pd.concat([out_df, aop_df], axis=1)
 
+	if replace:
+		out_df = out_df.drop(columns=aop_col)
+
 	return out_df
 
 
@@ -185,6 +189,61 @@ def add_disease_entity(df: pd.DataFrame, replace=False):
 
 	out_df = pd.concat([out_df, disease_df], axis=1)
 
+	if replace:
+		out_df = out_df.drop(columns=disease_col)
+
+	return out_df
+
+
+def add_generalized_disease_entity(df: pd.DataFrame):
+	"""
+	Adds VHL-generalized disease entity phenotypes
+	This has to be run after add_disease_entity()
+	@param df:
+	@return:
+	"""
+	out_df = df.copy()
+	clean_disease_colname = str(AnnotationHeader.DISEASE_ENTITY_CLEAN)
+	# find all columns that start with clean_disease_col
+	colname_series = out_df.columns
+	disease_colnames = colname_series[colname_series.str.startswith(clean_disease_colname)]
+	clean_disease_columns = out_df[disease_colnames]
+
+	clean_vhl_columns = clean_disease_columns.rename(lambda x: variant_functions.grouped_vhl_phenotype(x.split('.')[-1],
+	                                                                return_as=config.OBO_RETURN_TYPE), axis='columns')
+
+	clean_grouped_columns = clean_vhl_columns.groupby(by=clean_vhl_columns.columns, axis='columns').sum()
+	clean_grouped_columns[clean_grouped_columns >= 1] = 1
+	clean_grouped_columns = clean_grouped_columns.rename(lambda x: f'{AnnotationHeader.GENERALIZED_VHL_DISEASE_ENTITY}.{x}', axis=1)
+
+	out_df[clean_grouped_columns.columns] = clean_grouped_columns
+
+	return out_df
+
+
+def add_generalized_phenotyp_age_of_presentation(df: pd.DataFrame):
+	"""
+	Adds VHL-generalized phenotypes to age of presentation
+	This has to be run after add_phenotype_age_of_presentation()
+	@param df:
+	@return:
+	"""
+	out_df = df.copy()
+	clean_aop_colname = str(AnnotationHeader.AGE_OF_PRESENTATION_CLEAN)
+	# find all columns that start with clean_aop_colname
+	colname_series = out_df.columns
+	aop_colnames = colname_series[colname_series.str.startswith(clean_aop_colname)]
+	clean_aop_columns = out_df[aop_colnames]
+
+	clean_vhl_columns = clean_aop_columns.rename(lambda x: variant_functions.grouped_vhl_phenotype(x.split('.')[-1],
+                                                                   return_as=config.OBO_RETURN_TYPE), axis='columns')
+
+	# min implies first age of presentation
+	clean_grouped_columns = clean_vhl_columns.groupby(by=clean_vhl_columns.columns, axis='columns').min()
+	clean_grouped_columns = clean_grouped_columns.rename(lambda x: f'{AnnotationHeader.GENERALIZED_VHL_AGE_OF_PRESENTATION}.{x}', axis=1)
+
+	out_df[clean_grouped_columns.columns] = clean_grouped_columns
+
 	return out_df
 
 
@@ -194,7 +253,9 @@ def preprocess(df):
 		.pipe(clinvar_to_variant)\
 		.pipe(caid_to_variant)\
 		.pipe(add_phenotype_age_of_presentation)\
-		.pipe(add_disease_entity)
+		.pipe(add_disease_entity)\
+		.pipe(add_generalized_disease_entity)\
+		.pipe(add_generalized_phenotyp_age_of_presentation)
 
 	# columns in alphabetical order
 	out_df = out_df.reindex(sorted(out_df.columns), axis=1)

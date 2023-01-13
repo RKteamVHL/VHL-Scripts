@@ -26,9 +26,13 @@ NULL_TERMS = ['n/a', 'N/A', 'NA']
 NON_STANDARD_REFS = ['NM_000551.2', 'AF010238.1']
 STANDARD_REFS = ['NM_000551.3', 'NM_000551.4']
 
+# constant for determining what gets returned by HPO/SO
+OBO_RETURN_TYPE = 'name_spaceless'
+
 # 'global' variables that change on runtime
 USE_CACHE = False
 CASEFOLD_TAG_NAMES = False
+
 
 
 # pre-startup code

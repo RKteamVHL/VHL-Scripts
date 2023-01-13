@@ -13,20 +13,26 @@ import enum
 
 NULL_TERMS = ["unknown", "none", "", "N/A"]
 
-# BODY, TEXT, and COMPUTED need to be separated so that we can discern where the tags came from
+# BODY, TEXT, and COMPUTED need to be separated so that we can discern where the tags came from. It might make sense to
+# separate these even more in the future
 BODY_TAGS_NAME = "BODY"
 TEXT_TAGS_NAME = "TEXT"
 COMPUTED_TAGS_NAME = "COMPUTED"
 
 # TODO: discuss separating annotation headers and types into separate file
 # TODO: consider listing expected cell types in this enum
-# The body and text annotation headers are taken directly from the 2022 Hypothes.is VHL Annotation Protocol, and are in
-# the same order as Table 1 in that document
-# These were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs.
-# If a computed column is needed / being created, it should be put here, and ONLY this enum should ever be used
-# while referencing dataframes later on
+
+
 class AnnotationHeader(enum.Enum):
-    # properties of the hypothesis annotations, not specific to the VHL annotations
+    """
+    The body and text annotation headers are taken directly from the 2022 Hypothes.is VHL Annotation Protocol, and are in
+    the same order as Table 1 in that document
+    These were made an enum (as compared to a dict or list) for re-usability and type-hinting in IDEs.
+    If a computed column is needed / being created, it should be put here, and ONLY this enum should ever be used
+    while referencing columns dataframes later on
+    """
+
+    ## properties of the hypothesis annotations, not specific to the VHL annotations
     TYPE = ('type',)
     URI = ("uri",)
     SOURCE = ("source",)
@@ -114,7 +120,7 @@ class AnnotationHeader(enum.Enum):
     ## experimental assay
     EXPERIMENTAL_ASSAY = (BODY_TAGS_NAME, "ExperimentalAssay")
     # clinvar and caid are already covered above
-    # NOTE: CAiD in the document is inconsistently capitalized
+    # TODO: CAiD in the document is inconsistently capitalized
 
     ## Evidence statement
     EVIDENCE_STATEMENT = (BODY_TAGS_NAME, "EvidenceStatement")
@@ -130,20 +136,22 @@ class AnnotationHeader(enum.Enum):
     AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
     DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
 
-    GENERALIZED_PHENOTYPE = (COMPUTED_TAGS_NAME, "GeneralizedPhenotype")
+    GENERALIZED_VHL_AGE_OF_PRESENTATION = (COMPUTED_TAGS_NAME, "GeneralizedVHLAgeOfPresentation")
+    GENERALIZED_VHL_DISEASE_ENTITY = (COMPUTED_TAGS_NAME, "GeneralizedVHLDiseaseEntity")
     GENERALIZED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GeneralizedMutationType")
 
     def __str__(self):
+        """
+        Function called when converting this enum to a sting (i.e., when called with str()).
+        This functionality HAS to be included in a method rather than a constant,
+        because the need for capitalization is determined at runtime (via config.CASEFOLD_TAG_NAMES)
+        """
+        # if the enum tuple only has one string i.e.,  type, uri, source, text
         if len(self.value) == 1:
             return self.value[0].casefold() if config.CASEFOLD_TAG_NAMES else self.value[0]
         else:
             a_list = [x.casefold() if config.CASEFOLD_TAG_NAMES else x for x in self.value[1:]]
             return '.'.join([self.value[0], *a_list])
-
-    def suffix(self):
-        return self.value[-1].casefold() if config.CASEFOLD_TAG_NAMES else self.value[-1]
-
-
 
 
 class AnnotationType(enum.IntEnum):
@@ -303,30 +311,29 @@ class AugmentedAnnotation(HypothesisAnnotation):
     def _assign_type(self):
         if len(self.references) > 0:
             self.type = AnnotationType.REPLY.name
-
-        # key.suffix() gets the tag without the body/text prefixes
+        # TODO: refactor code duplication
         # checking for evidence statement annotation
-        elif any([key.suffix() in self.body_tags for key in EVIDENCE_TAGS]):
+        elif any([str(key).split('.')[-1] in self.body_tags for key in EVIDENCE_TAGS]):
             self.type = AnnotationType.EVIDENCE.name
 
         # checking for article info annotation
-        elif any([key.suffix() in self.text_tags for key in INFORMATION_TAGS]):
+        elif any([str(key).split('.')[-1] in self.text_tags for key in INFORMATION_TAGS]):
             self.type = AnnotationType.INFORMATION.name
 
         # checking for methodology annotation
-        elif any([key.suffix() in self.text_tags for key in METHODOLOGY_TAGS]):
+        elif any([str(key).split('.')[-1] in self.text_tags for key in METHODOLOGY_TAGS]):
             self.type = AnnotationType.METHODOLOGY.name
 
         # checking for case annotation
-        elif any([key.suffix() in self.text_tags for key in CASE_TAGS]):
+        elif any([str(key).split('.')[-1] in self.text_tags for key in CASE_TAGS]):
             self.type = AnnotationType.CASE.name
 
         # checking for COHORT annotation
-        elif any([key.suffix() in self.text_tags for key in COHORT_TAGS]):
+        elif any([str(key).split('.')[-1] in self.text_tags for key in COHORT_TAGS]):
             self.type = AnnotationType.COHORT.name
 
         # checking for experiment assay annotation
-        elif any([key.suffix() in self.body_tags for key in ASSAY_TAGS]):
+        elif any([str(key).split('.')[-1] in self.body_tags for key in ASSAY_TAGS]):
             self.type = AnnotationType.ASSAY.name
 
     def as_dict(self):
@@ -340,13 +347,15 @@ class AugmentedAnnotation(HypothesisAnnotation):
         new_annotation._assign_type()
         return new_annotation
 
-    # this function returns a dataframe with a couple of caveats:
-    # 1.    if the tag came from the body, it will be prepended with the BODY_TAGS_NAME constant, otherwise if it comes from
-    #       the text, it will be prepended with TEXT_TAGS_NAME
-    # 2.    individual cells will contain lists, which won't get formatted properly if exported to a csv file
-    # 3.    some data (i.e., user info) is excluded from the output csv file
     @staticmethod
     def df_from_annotations(annotations: List[AugmentedAnnotation]):
+        """
+        this static function returns a dataframe with a couple of caveats:
+        1.    if the tag came from the body, it will be prepended with the BODY_TAGS_NAME constant,
+              otherwise if it comes from the text, it will be prepended with TEXT_TAGS_NAME
+        2.    individual cells will contain lists, which won't get formatted properly if exported to a csv file
+        3.    some data (i.e., user info) is excluded from the output csv file
+        """
         record_list = []
         column_set = set()
         for annotation in annotations:
