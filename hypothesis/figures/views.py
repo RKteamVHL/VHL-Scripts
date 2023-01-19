@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from cycler import cycler
+from ..annotations.Annotation import AnnotationHeader
 
 from .. import variant_functions as vf
-from .kimstudents_dataframe_clustering import *
+
 
 
 DOMAIN_TICKS = [1, 62, 154, 192, 204, 213]
@@ -21,41 +22,86 @@ mpl.rcParams['axes.prop_cycle'] = cycler(color=COLOR20)
 # TAKE_TOP = -1
 
 
-def regions_alpha_beta(df):
-    ab_cols = ['region.⍺-Domain', 'region.β-Domain', 'region.Outside of ⍺-Domain and β-Domain']
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *ab_cols]]
-    pheno_domains = pd.DataFrame(columns=ab_cols, index=COMPUTED_COLUMNS["generalized_phenotype"])
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
-        phen_agg = df[df[col] >= 1].sum()
-        pheno_domains.loc[col] = phen_agg[ab_cols]
+def _vhl_disease_colnames(df: pd.DataFrame, generalized=True):
+    header = AnnotationHeader.GENERALIZED_VHL_DISEASE_ENTITY if generalized else AnnotationHeader.DISEASE_ENTITY_CLEAN
+    return list(df.columns[df.columns.str.startswith(str(header))])
 
-    pheno_domains = pheno_domains.rename_axis("Phenotype", axis=0).rename_axis("Region", axis=1).rename(
-        lambda x: x.split(".")[1])
+
+def _vhl_aop_colnames(df: pd.DataFrame, generalized=True):
+    header = AnnotationHeader.GENERALIZED_VHL_AGE_OF_PRESENTATION if generalized else AnnotationHeader.AGE_OF_PRESENTATION_CLEAN
+    return list(df.columns[df.columns.str.startswith(str(header))])
+
+
+def _vhl_muttype_colnames(df: pd.DataFrame, generalized=True):
+    header = AnnotationHeader.GENERALIZED_MUTATION_TYPE if generalized else AnnotationHeader.MUTATION_TYPE_CLEAN
+    return list(df.columns[df.columns.str.startswith(str(header))])
+
+
+def _vhl_grouped_muttype_colnames(df: pd.DataFrame):
+    header = AnnotationHeader.GROUPED_MUTATION_TYPE
+    return list(df.columns[df.columns.str.startswith(str(header))])
+
+
+def penetrance(df: pd.DataFrame):
+    out_df = df.copy()
+
+    aop_cols = _vhl_aop_colnames(df)
+
+    out_df = out_df[aop_cols].dropna(how='all')
+
+    min_age = 0
+    max_age = (out_df.max()).max()
+
+    aop_df = pd.DataFrame(index=np.arange(min_age, max_age+1), dtype=int)
+    for col in out_df.columns:
+        counts = out_df[col].value_counts().astype(int)
+        counts.name = col
+
+        aop_df = pd.concat([aop_df, counts], axis=1)
+
+    aop_df = aop_df.fillna(0)
+    pdf_aop_df = aop_df / aop_df.sum()
+    cdf_aop_df = pdf_aop_df.cumsum()
+
+    fig = plt.figure(figsize=(8, 6))
+
+    ax = plt.step(cdf_aop_df.index.to_numpy(), cdf_aop_df.to_numpy())
+
+    plt.xlabel("Age (Years)")
+    plt.ylabel("Cumulative Distribution")
+    plt.legend(ax, [f"{ind.split('.')[-1]} (N={int(val)})" for ind, val in aop_df.sum().items()])
+
+    return aop_df
+
+
+def regions(df, columns):
+    df = df[[*_vhl_disease_colnames(df), *columns]]
+    pheno_domains = pd.DataFrame(columns=columns, index=_vhl_disease_colnames(df))
+    for col in _vhl_disease_colnames(df):
+        phen_agg = df[df[col] >= 1].sum()
+        pheno_domains.loc[col] = phen_agg[columns]
+
+    pheno_domains = pheno_domains.rename_axis("Phenotype", axis=0).rename_axis("Region", axis=1)
+    pheno_domains = pheno_domains.rename(lambda x: x.split(".")[-1]).rename(lambda x: x.split(".")[-1], axis=1)
     pheno_domains = pheno_domains.sort_index()
 
     ax = pheno_domains.plot(kind="bar", legend=True, figsize=(10, 6), color=DOMAIN_COLORS[0::2])
     ax.figure.subplots_adjust(left=0.1, bottom=0.4)
-    plt.ylabel("Number of Occurences")
+    plt.ylabel("Number of Occurrences")
 
     return pheno_domains
+
+
+def regions_alpha_beta(df):
+    ab_cols = [f'{str(AnnotationHeader.FUNCTIONAL_REGION)}.{x}'
+               for x in ['⍺-Domain', 'β-Domain', 'Outside of ⍺-Domain and β-Domain']]
+    return regions(df, ab_cols)
 
 
 def regions_elongin_hifa(df):
-    ehif_cols = ['region.ElonginB_ElonginC_binding', 'region.HIF1_alpha_binding', 'region.GXEEX8']
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *ehif_cols]]
-    pheno_domains = pd.DataFrame(columns=ehif_cols, index=COMPUTED_COLUMNS["generalized_phenotype"])
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
-        phen_agg = df[df[col] >= 1].sum()
-        pheno_domains.loc[col] = phen_agg[ehif_cols]
-
-    pheno_domains = pheno_domains.rename_axis("Phenotype", axis=0).rename_axis("Region", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_domains = pheno_domains.sort_index()
-
-    ax = pheno_domains.plot(kind="bar", legend=True, figsize=(10, 6), color=DOMAIN_COLORS[1::2])
-    ax.figure.subplots_adjust(left=0.1, bottom=0.4)
-    plt.ylabel("Number of Occurences")
-    return pheno_domains
+    ehif_cols = [f'{str(AnnotationHeader.FUNCTIONAL_REGION)}.{x}'
+               for x in ['ElonginB_ElonginC_binding', 'HIF1_alpha_binding', 'GXEEX8']]
+    return regions(df, ehif_cols)
 
 
 def missense_regions_alpha_beta(df):
@@ -69,64 +115,23 @@ def missense_regions(df):
     return regions(df)
 
 
-def regions(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["region"]]]
-    df = df.sort_index()
+def mutant_type(df, as_ratio=False):
+    mutant_colnames = _vhl_muttype_colnames(df)
+    disease_colnames = _vhl_disease_colnames(df)
+    df = df[[*disease_colnames, *mutant_colnames]]
+    pheno_muttypes = pd.DataFrame(columns=mutant_colnames,
+                                  index=disease_colnames)
 
-    alpha_cols = ["ElonginB_ElonginC_binding", "⍺-Domain"]
-    beta_cols = ["HIF1_alpha_binding", "β-Domain"]
-    cds_cols = ["GXEEX8", "Outside of ⍺-Domain and β-Domain"]
-
-    pheno_alpha = pd.DataFrame(columns=alpha_cols, index=COMPUTED_COLUMNS["generalized_phenotype"])
-    pheno_beta = pd.DataFrame(columns=beta_cols, index=COMPUTED_COLUMNS["generalized_phenotype"])
-    pheno_cds = pd.DataFrame(columns=cds_cols, index=COMPUTED_COLUMNS["generalized_phenotype"])
-
-    for row in COMPUTED_COLUMNS["generalized_phenotype"]:
-        df_phen = df[df[row] >= 1]
-
-        pheno_alpha.loc[row, "⍺-Domain"] = len(
-            df_phen[(df_phen['region.⍺-Domain'] >= 1) & (df_phen['region.ElonginB_ElonginC_binding'].isna())])
-
-        pheno_alpha.loc[row, "ElonginB_ElonginC_binding"] = len(
-            df_phen[(df_phen['region.⍺-Domain'] >= 1) & (df_phen['region.ElonginB_ElonginC_binding'] >= 1)])
-
-        pheno_beta.loc[row, "β-Domain"] = len(
-            df_phen[(df_phen['region.β-Domain'] >= 1) & (df_phen['region.HIF1_alpha_binding'].isna())])
-
-        pheno_beta.loc[row, "HIF1_alpha_binding"] = len(
-            df_phen[(df_phen['region.β-Domain'] >= 1) & (df_phen['region.HIF1_alpha_binding'] >= 1)])
-
-        pheno_cds.loc[row, "Outside of ⍺-Domain and β-Domain"] = len(
-            df_phen[(df_phen['region.Outside of ⍺-Domain and β-Domain'] >= 1) & (df_phen['region.GXEEX8'].isna())])
-
-        pheno_cds.loc[row, "GXEEX8"] = len(
-            df_phen[(df_phen['region.Outside of ⍺-Domain and β-Domain'] >= 1) & (df_phen['region.GXEEX8'] >= 1)])
-
-    all_phen_dfs = [pheno_alpha, pheno_beta, pheno_cds]
-    for i in range(len(all_phen_dfs)):
-        all_phen_dfs[i] = all_phen_dfs[i].rename_axis("Phenotype", axis=0).rename_axis("Region", axis=1).rename(
-            lambda x: x.split(".")[1])
-
-    combined_df = pheno_alpha.join(pheno_beta).join(pheno_cds)
-
-    order = combined_df.sum().sort_values(ascending=False).index
-    combined_df = combined_df[order]
-
-    plot_clustered_stacked(all_phen_dfs, ["⍺-Domain", 'β-Domain', 'Outside of ⍺-Domain and β-Domain'])
-    return combined_df
-
-def mutant_type_counts(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["generalized_mutant_type"]]]
-    pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["generalized_mutant_type"],
-                                  index=COMPUTED_COLUMNS["generalized_phenotype"])
-
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
+    for col in disease_colnames:
         phen_agg = df[df[col] >= 1].sum()
-        pheno_muttypes.loc[col] = phen_agg[COMPUTED_COLUMNS["generalized_mutant_type"]]
+        pheno_muttypes.loc[col] = phen_agg[mutant_colnames]
 
     pheno_muttypes = pheno_muttypes.rename_axis("Phenotype", axis=0).rename_axis("Mutant Type", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[1])
+        lambda x: x.split(".")[-1])
+    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[-1])
+
+    if as_ratio:
+        pheno_muttypes = pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
 
     ax = pheno_muttypes.plot(kind="bar", legend=True, figsize=(12, 6), fontsize=8)
     ax.legend(ncol=2)
@@ -135,46 +140,33 @@ def mutant_type_counts(df):
     plt.ylabel("Number of Occurences")
 
     return pheno_muttypes
+
+
+def mutant_type_counts(df):
+    return mutant_type(df, as_ratio=False)
 
 
 def mutant_type_ratios(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["generalized_mutant_type"]]]
-    pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["generalized_mutant_type"],
-                                  index=COMPUTED_COLUMNS["generalized_phenotype"])
+    return mutant_type(df, as_ratio=True)
 
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
+
+def grouped_mutant_type(df, as_ratio=False):
+    dis_colnames = _vhl_disease_colnames(df)
+    mut_colnames = _vhl_grouped_muttype_colnames(df)
+    df = df[[*dis_colnames, *mut_colnames]]
+    pheno_muttypes = pd.DataFrame(columns=mut_colnames,
+                                  index=dis_colnames)
+
+    for col in dis_colnames:
         phen_agg = df[df[col] >= 1].sum()
-        pheno_muttypes.loc[col] = phen_agg[COMPUTED_COLUMNS["generalized_mutant_type"]]
+        pheno_muttypes.loc[col] = phen_agg[mut_colnames]
 
     pheno_muttypes = pheno_muttypes.rename_axis("Phenotype", axis=0).rename_axis("Mutant Type", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[1])
+        lambda x: x.split(".")[-1])
+    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[-1])
 
-    pheno_muttypes = pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
-
-    ax = pheno_muttypes.plot(kind="bar", legend=True, figsize=(12, 6), fontsize=8)
-    ax.legend(ncol=2)
-    ax.figure.subplots_adjust(left=0.1, bottom=0.35)
-
-    plt.ylabel("Number of Occurences")
-
-    return pheno_muttypes
-
-
-def grouped_mutant_type_ratios(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["grouped_mutation_type"]]]
-    pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["grouped_mutation_type"],
-                                  index=COMPUTED_COLUMNS["generalized_phenotype"])
-
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
-        phen_agg = df[df[col] >= 1].sum()
-        pheno_muttypes.loc[col] = phen_agg[COMPUTED_COLUMNS["grouped_mutation_type"]]
-
-    pheno_muttypes = pheno_muttypes.rename_axis("Phenotype", axis=0).rename_axis("Mutant Type", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[1])
-
-    pheno_muttypes = pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
+    if as_ratio:
+        pheno_muttypes =  pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
 
     ax = pheno_muttypes.plot(kind="bar", legend=True, figsize=(12, 6), fontsize=8)
     ax.legend(ncol=2)
@@ -185,42 +177,23 @@ def grouped_mutant_type_ratios(df):
     plt.ylabel("Ratios of Mutation Types")
 
     return pheno_muttypes
+
+def grouped_mutant_type_ratios(df):
+    return grouped_mutant_type(df, as_ratio=True)
 
 
 def grouped_mutant_type_counts(df):
-    df = df[[*COMPUTED_COLUMNS["generalized_phenotype"], *COMPUTED_COLUMNS["grouped_mutation_type"]]]
-    pheno_muttypes = pd.DataFrame(columns=COMPUTED_COLUMNS["grouped_mutation_type"],
-                                  index=COMPUTED_COLUMNS["generalized_phenotype"])
-
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
-        phen_agg = df[df[col] >= 1].sum()
-        pheno_muttypes.loc[col] = phen_agg[COMPUTED_COLUMNS["grouped_mutation_type"]]
-
-    pheno_muttypes = pheno_muttypes.rename_axis("Phenotype", axis=0).rename_axis("Mutant Type", axis=1).rename(
-        lambda x: x.split(".")[1])
-    pheno_muttypes = pheno_muttypes.sort_index().rename(columns=lambda x: x.split(".")[1])
-
-    # pheno_muttypes =  pheno_muttypes.loc[:, :].div(pheno_muttypes.sum(axis=1), axis=0)
-
-    ax = pheno_muttypes.plot(kind="bar", legend=True, figsize=(12, 6), fontsize=8)
-    ax.legend(ncol=2)
-    ax.figure.subplots_adjust(left=0.1, bottom=0.35)
-
-    autolabel(ax, ax.patches)
-
-    plt.ylabel("Ratios of Mutation Types")
-
-    return pheno_muttypes
+    return grouped_mutant_type(df, as_ratio=False)
 
 
 def codon_phenotype_subplots(df):
-    df = df.set_index("codon_start")
+    df = df.set_index(str(AnnotationHeader.PROTEIN_POSITION_CLEAN))
     df = df[df.index.notnull()]
-
-    phens = df[COMPUTED_COLUMNS["generalized_phenotype"]]
+    pheno_colnames = _vhl_disease_colnames(df)
+    phens = df[pheno_colnames]
 
     codon = phens.groupby(phens.index).agg("sum")
-    codon = codon.rename_axis("Codon Position").rename(columns=lambda x: x.split(".")[1])
+    codon = codon.rename_axis("Codon Position").rename(columns=lambda x: x.split(".")[-1])
 
     combined = codon.sum(axis=1)
 
@@ -279,8 +252,9 @@ def _plot_codon(combined):
     plt.ylabel('# of Mutations')
     plt.xlabel('Codon Position')
 
+
 def codon_histogram(df):
-    df = df.set_index("codon_start")
+    df = df.set_index(str(AnnotationHeader.PROTEIN_POSITION_CLEAN))
     df = df[df.index.notnull()]
     df["default_score"] = 1
 
@@ -294,7 +268,7 @@ def codon_histogram(df):
 
 
 def codon_blosum62_histogram(df):
-    df = df.set_index("codon_start")
+    df = df.set_index(str(AnnotationHeader.PROTEIN_POSITION_CLEAN))
     df = df[df.index.notnull()]
 
     codon_blosum = df["blosum62_score"]
@@ -307,7 +281,7 @@ def codon_blosum62_histogram(df):
     return codon
 
 def codon_blosum90_histogram(df):
-    df = df.set_index("codon_start")
+    df = df.set_index(str(AnnotationHeader.PROTEIN_POSITION_CLEAN))
     df = df[df.index.notnull()]
 
     codon_blosum = df["blosum90_score"]
@@ -318,48 +292,20 @@ def codon_blosum90_histogram(df):
     _plot_codon(codon)
     return codon
 
-def penetrance(df):
-
-    df = df.dropna(subset=COMPUTED_COLUMNS["age"])
-
-    summed_phenos = df[COMPUTED_COLUMNS["generalized_phenotype"]].sum(axis=1)
-    iso_ind = summed_phenos[summed_phenos == 1].index
-
-    df = df.loc[iso_ind]
-
-    df = df.set_index("evaluated_age").sort_index()
-    iso_df = df[COMPUTED_COLUMNS["generalized_phenotype"]].fillna(0).rename(columns=lambda x: x.split(".")[1])
-    iso_df.index = iso_df.index.astype(int)
-
-    sorted = iso_df.sum().sort_values(ascending=False)
-    sorted_filtered = sorted[sorted != 0]
-    iso_sorted = iso_df[sorted_filtered.index]
-    pdf = iso_sorted / iso_sorted.sum()
-    cdf = pdf.cumsum()
-
-    fig = plt.figure(figsize=(8, 6))
-
-    ax = plt.step(cdf.index.to_numpy(), cdf.to_numpy())
-
-    plt.xlabel("Age (Years)")
-    plt.ylabel("Cumulative Distribution")
-    plt.legend(ax, [f"{ind} (N={int(val)})" for ind, val in sorted_filtered.iteritems()])
-
-    return iso_sorted
-
 
 def _phenotype_correlation(df):
-    pheno_pheno = pd.DataFrame(columns=COMPUTED_COLUMNS["generalized_phenotype"],
-                               index=COMPUTED_COLUMNS["generalized_phenotype"])
+    pheno_colnames = _vhl_disease_colnames(df)
+    pheno_pheno = pd.DataFrame(columns=pheno_colnames,
+                               index=pheno_colnames)
 
-    for col in COMPUTED_COLUMNS["generalized_phenotype"]:
+    for col in pheno_colnames:
         phen_agg = df[df[col] >= 1].sum()
         pheno_pheno.loc[col] = phen_agg
 
     pheno_pheno = pheno_pheno.reindex(pheno_pheno.sum().sort_values(ascending=False).index)
     pheno_pheno = pheno_pheno[pheno_pheno.index.to_list()]
 
-    pheno_pheno = pheno_pheno.rename(index=lambda x: x.split(".")[1]).rename(columns=lambda x: x.split(".")[1])
+    pheno_pheno = pheno_pheno.rename(index=lambda x: x.split(".")[-1]).rename(columns=lambda x: x.split(".")[-1])
 
     return pheno_pheno
 
@@ -446,19 +392,19 @@ def autolabel(ax, rects, xpos='center', as_percentage=False):
         ax.text(rect.get_x() + rect.get_width() * offset[xpos], 1.01 * height,
                 text, ha=ha[xpos], va='bottom')
 
+
 def create_descriptive_figures(directory, dfs):
     for df_type, df_out in dfs.items():
         fns = [
             regions_alpha_beta,
             regions_elongin_hifa,
-            regions,
             # missense_domains,
             mutant_type_counts,
             mutant_type_ratios,
             codon_phenotype_subplots,
             codon_histogram,
-            codon_blosum62_histogram,
-            codon_blosum90_histogram,
+            # codon_blosum62_histogram,
+            # codon_blosum90_histogram,
             phenotype_correlation_counts,
             phenotype_correlation_ratio,
             penetrance,

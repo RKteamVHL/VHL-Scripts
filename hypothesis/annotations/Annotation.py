@@ -128,17 +128,26 @@ class AnnotationHeader(enum.Enum):
 
     ## computed columns
     # any columns, new or derrived from the above, should be put here
+    PMID_CLEAN = (COMPUTED_TAGS_NAME, "PMID")
     CLINVAR_ID_CLEAN = (COMPUTED_TAGS_NAME, "ClinVarID")
     CA_ID_CLEAN = (COMPUTED_TAGS_NAME, "CAid")
     CLINVAR_ID_VARIANT = (COMPUTED_TAGS_NAME, "ClinVarIDVariant")
     CA_ID_VARIANT = (COMPUTED_TAGS_NAME, "CAidVariant")
 
+    PROTEIN_POSITION_CLEAN = (COMPUTED_TAGS_NAME, "ProteinPosition")
+    CDNA_POSITION_CLEAN = (COMPUTED_TAGS_NAME, "cDNAposition")
+
     AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
     DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
+    KINDRED_ID_CLEAN = (COMPUTED_TAGS_NAME, "KindredID")
+    MUTATION_TYPE_CLEAN = (COMPUTED_TAGS_NAME, "MutationType")
 
     GENERALIZED_VHL_AGE_OF_PRESENTATION = (COMPUTED_TAGS_NAME, "GeneralizedVHLAgeOfPresentation")
     GENERALIZED_VHL_DISEASE_ENTITY = (COMPUTED_TAGS_NAME, "GeneralizedVHLDiseaseEntity")
     GENERALIZED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GeneralizedMutationType")
+    GROUPED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GroupedMutationType")
+
+    FUNCTIONAL_REGION = (COMPUTED_TAGS_NAME, "FunctionalRegion")
 
     def __str__(self):
         """

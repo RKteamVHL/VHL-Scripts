@@ -5,20 +5,20 @@ import urllib
 import logging
 from . import config
 
-
 # sources: https://www.ncbi.nlm.nih.gov/protein/4507891, https://www.uniprot.org/uniprot/P40337,
 # https://www.ebi.ac.uk/interpro/protein/UniProt/P40337/
 VHL_FUNCTIONAL_REGIONS = {
     "tumour_suppression": set(range(64, 204)),
-    "⍺-Domain": set(range(156, 205)),
-    "β-Domain": set(range(63, 144)),
+    "⍺-Domain": set(range(156, 205)),  # PF17211
+    "β-Domain": set(range(63, 144)),  # PF01847
     "GXEEX8": set(range(14, 54)),
-    "HIF1_alpha_binding": set([67, 69, 75, 77, 78, 79, 88, 91, 98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 115, 117]),
-    "ElonginB_ElonginC_binding": set([79, 153, 159, 161, 162, 163, 165, 166, 174, 177, 178, 184])
+    "HIF1_alpha_binding": {67, 69, 75, 77, 78, 79, 88, 91, 98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 115, 117},
+    "ElonginB_ElonginC_binding": {79, 153, 159, 161, 162, 163, 165, 166, 174, 177, 178, 184}
 }
-VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
+VHL_FUNCTIONAL_REGIONS['Outside of ⍺-Domain and β-Domain'] = set(range(1, 214)) - (
+            VHL_FUNCTIONAL_REGIONS['⍺-Domain'] | VHL_FUNCTIONAL_REGIONS['β-Domain'])
 
-GROUPED_HPO_TERMS = [
+GENERAL_HPO_TERMS = [
     'neuroendocrine neoplasm',
     'renal cell carcinoma',
     'hemangioblastoma',
@@ -32,15 +32,15 @@ GROUPED_HPO_TERMS = [
 ]
 
 GENERAL_SO_TERMS = [
-	'deletion',
-	'exon_loss_variant',
-	'missense_variant',
-	'stop_gained',
-	'utr_variant',
-	'inframe_indel',
-	'delins',
-	'frameshift_variant',
-	'splice_site_variant',
+    'deletion',
+    'exon_loss_variant',
+    'missense_variant',
+    'stop_gained',
+    'utr_variant',
+    'inframe_indel',
+    'delins',
+    'frameshift_variant',
+    'splice_site_variant',
     'start_lost',
     'synonymous_variant',
     'intron_variant',
@@ -105,10 +105,7 @@ _f = nx.compose(_f1, _h2)
 # casefold and strip the keys, so the result is an agglomeration of nodes:
 # SO(term) + SO(id) + HPO(term) + HPO(id) + HPO(no spaces), all lowercase and stripped
 
-
 OBONET = nx.DiGraph(nx.relabel_nodes(_f, {n: n.casefold().strip() for n in _f.nodes()}))
-OBONET_UD = OBONET.to_undirected()
-
 
 def get_valid_obo(term_or_id, return_as=None):
     """
@@ -134,50 +131,42 @@ def get_valid_obo(term_or_id, return_as=None):
     else:
         logging.warning(f"{term_or_id} is not a string")
 
-def generalized_so_terms(so_type):
-    '''Given a node, find its general so_type
-    '''
 
-    general_so = None
-
-    valid_so = get_valid_obo(so_type)
-    for successor in nx.bfs_successors(OBONET, valid_so):
-        try:
-            i = GENERAL_SO_TERMS.index(successor[0])
-            general_so = GENERAL_SO_TERMS[i]
-            break
-        except ValueError as e:
-            pass
-
-    if general_so is None:
-        logging.warning(f"Could not find a generalized term for {valid_so}")
-
-    return general_so
+# TODO: this will break if 'return_as' is ever added as a command-line argument. error-checking may also be redundant
+GENERAL_HPO_NODES = [get_valid_obo(term, return_as=config.OBO_RETURN_TYPE) for term in GENERAL_HPO_TERMS]
+GENERAL_SO_NODES = [get_valid_obo(term, return_as=config.OBO_RETURN_TYPE) for term in GENERAL_SO_TERMS]
 
 
-# TODO: this will break if 'return_as' is ever added as a command-line argument
-GENERAL_HPO_NODES = [get_valid_obo(term, return_as=config.OBO_RETURN_TYPE) for term in GROUPED_HPO_TERMS]
+def generalized_obo(term, general_nodes, return_as=None, use_abbreviation=False):
+    general_obo = None
 
-
-def grouped_vhl_phenotype(phenotype, return_as=None, use_abbreviation=False):
-    '''Given a node, find its general disease type
-    '''
-    general_pheno = None
-
-    valid_hpo = get_valid_obo(phenotype, return_as=return_as)
-    # we do not need to log if valid_hpo is None, since get_valid_obo already does that
-    if valid_hpo is not None:
-        for successor in nx.bfs_successors(OBONET, valid_hpo):
+    valid_obo = get_valid_obo(term, return_as=return_as)
+    # we do not need to log if valid_obo is None, since get_valid_obo already does that
+    if valid_obo is not None:
+        for successor in nx.bfs_successors(OBONET, valid_obo):
             try:
-                i = GENERAL_HPO_NODES.index(successor[0])
-                general_pheno = GENERAL_HPO_NODES[i]
+                i = general_nodes.index(successor[0])
+                general_obo = general_nodes[i]
                 break
             except ValueError as e:
                 pass
 
-    if general_pheno is None:
-        logging.warning(f"Could not find a generalized term for {valid_hpo}")
+    if general_obo is None:
+        logging.warning(f"Could not find a generalized term for {valid_obo}")
 
     if use_abbreviation:
-        general_pheno = HPO_ABBREVIATIONS[general_pheno]
-    return general_pheno
+        general_obo = HPO_ABBREVIATIONS[general_obo]
+
+    return general_obo
+
+
+def generalized_so_terms(so_type, **kwargs):
+    """Given a node, find its general so_type
+    """
+    return generalized_obo(so_type, GENERAL_SO_NODES, **kwargs)
+
+
+def generalized_vhl_phenotype(phenotype, **kwargs):
+    """Given a node, find its general disease type
+    """
+    return generalized_obo(phenotype, GENERAL_HPO_NODES, **kwargs)

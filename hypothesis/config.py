@@ -16,6 +16,7 @@ ANNOTATION_OUTPUT = "hypothesis_annotations.json"
 PROBLEM_ANNOTATIONS = "problem_annotations.csv"
 ANNOTATION_SUMMARY = "annotation_summary.csv"
 RAW_ANNOTATION_DF = "all_annotations.csv"
+CASE_ANNOTATION_DF = "case_annotations.csv"
 
 # constants relating to the hypothesis 'VHL Annotations' group
 GROUP_ID = "dKymJJpZ" # VHL annotations group

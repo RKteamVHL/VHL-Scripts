@@ -1,6 +1,6 @@
 from typing import List
 from ..annotations.Annotation import AugmentedAnnotation, AnnotationType, AnnotationHeader
-from ..variant_functions import GROUPED_HPO_TERMS, grouped_vhl_phenotype
+from ..variant_functions import GENERAL_HPO_TERMS, generalized_vhl_phenotype
 from .. import config
 import pandas as pd
 import numpy as np
@@ -160,7 +160,7 @@ def get_penetrance(annotation_df: pd.DataFrame):
 
 def get_missense_variants(annotation_df: pd.DataFrame):
     x_labels = ['from_aa', 'to_aa', 'pos']
-    y_labels = GROUPED_HPO_TERMS
+    y_labels = GENERAL_HPO_TERMS
 
     valid_df = annotation_df[annotation_df[_type].isin([AnnotationType.COHORT.name, AnnotationType.CASE.name])]
 
@@ -181,8 +181,8 @@ def get_missense_variants(annotation_df: pd.DataFrame):
         if isinstance(cell, list):
             for ele in cell:
                 if isinstance(ele, str):
-                    term_name = grouped_vhl_phenotype(ele.casefold(), return_as=config.OBO_RETURN_TYPE)
-                    if term_name in GROUPED_HPO_TERMS:
+                    term_name = generalized_vhl_phenotype(ele.casefold(), return_as=config.OBO_RETURN_TYPE)
+                    if term_name in GENERAL_HPO_TERMS:
                         to_return.append(term_name)
         else:
             to_return = []
