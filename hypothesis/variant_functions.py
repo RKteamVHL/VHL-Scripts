@@ -22,6 +22,8 @@ GENERAL_HPO_TERMS = [
     'neuroendocrine neoplasm',
     'renal cell carcinoma',
     'hemangioblastoma',
+    'cerebellar hemangioblastoma',
+    'spinal hemangioblastoma',
     'retinal capillary hemangioma',
     'pancreatic endocrine tumor',
     'abnormality of the kidney',
@@ -48,7 +50,9 @@ GENERAL_SO_TERMS = [
 ]
 
 HPO_ABBREVIATIONS = {
-    'hemangioblastoma': 'CHB',
+    'hemangioblastoma': 'HB',
+    'cerebellar hemangioblastoma': 'CHB',
+    'spinal hemangioblastoma': 'SHB',
     'renal cell carcinoma': 'RCC',
     'retinal capillary hemangioma': 'RA',
     'neuroendocrine neoplasm': 'PPGL',
