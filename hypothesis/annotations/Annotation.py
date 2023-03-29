@@ -136,6 +136,7 @@ class AnnotationHeader(enum.Enum):
 
     PROTEIN_POSITION_CLEAN = (COMPUTED_TAGS_NAME, "ProteinPosition")
     CDNA_POSITION_CLEAN = (COMPUTED_TAGS_NAME, "cDNAposition")
+    CIVIC_NAME_CLEAN = (COMPUTED_TAGS_NAME, "CivicName")
 
     AGE_OF_PRESENTATION_CLEAN = (COMPUTED_TAGS_NAME, "AgeOfPresentation")
     DISEASE_ENTITY_CLEAN = (COMPUTED_TAGS_NAME, "DiseaseEntity")
@@ -145,6 +146,7 @@ class AnnotationHeader(enum.Enum):
     GENERALIZED_VHL_AGE_OF_PRESENTATION = (COMPUTED_TAGS_NAME, "GeneralizedVHLAgeOfPresentation")
     GENERALIZED_VHL_DISEASE_ENTITY = (COMPUTED_TAGS_NAME, "GeneralizedVHLDiseaseEntity")
     GENERALIZED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GeneralizedMutationType")
+    EXON_DELETION_TERM = (COMPUTED_TAGS_NAME, "ExonDeletionTerms")
     GROUPED_MUTATION_TYPE = (COMPUTED_TAGS_NAME, "GroupedMutationType")
 
     FUNCTIONAL_REGION = (COMPUTED_TAGS_NAME, "FunctionalRegion")

@@ -37,6 +37,11 @@ def _vhl_muttype_colnames(df: pd.DataFrame, generalized=True):
     return list(df.columns[df.columns.str.startswith(str(header))])
 
 
+def _vhl_exondel_muttype_colnames(df: pd.DataFrame):
+    header = AnnotationHeader.EXON_DELETION_TERM
+    return list(df.columns[df.columns.str.startswith(str(header))])
+
+
 def _vhl_grouped_muttype_colnames(df: pd.DataFrame):
     header = AnnotationHeader.GROUPED_MUTATION_TYPE
     return list(df.columns[df.columns.str.startswith(str(header))])
@@ -115,8 +120,12 @@ def missense_regions(df):
     return regions(df)
 
 
-def mutant_type(df, as_ratio=False):
-    mutant_colnames = _vhl_muttype_colnames(df)
+def mutant_type(df, as_ratio=False, exondel=False):
+    if exondel:
+        mutant_colnames = _vhl_exondel_muttype_colnames(df) 
+    else:
+        mutant_colnames = _vhl_muttype_colnames(df)
+
     disease_colnames = _vhl_disease_colnames(df)
     df = df[[*disease_colnames, *mutant_colnames]]
     pheno_muttypes = pd.DataFrame(columns=mutant_colnames,
@@ -148,6 +157,14 @@ def mutant_type_counts(df):
 
 def mutant_type_ratios(df):
     return mutant_type(df, as_ratio=True)
+
+
+def mutant_type_exondel_counts(df):
+    return mutant_type(df, as_ratio=False, exondel=True)
+
+
+def mutant_type_exondel_ratios(df):
+    return mutant_type(df, as_ratio=True, exondel=True)
 
 
 def grouped_mutant_type(df, as_ratio=False):
@@ -401,6 +418,8 @@ def create_descriptive_figures(directory, dfs):
             # missense_domains,
             mutant_type_counts,
             mutant_type_ratios,
+            mutant_type_exondel_counts,
+            mutant_type_exondel_ratios,
             codon_phenotype_subplots,
             codon_histogram,
             # codon_blosum62_histogram,

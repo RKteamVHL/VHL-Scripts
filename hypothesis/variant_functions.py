@@ -49,6 +49,15 @@ GENERAL_SO_TERMS = [
     'stop_lost'
 ]
 
+EXON_DELETION_TERMS = [
+    'Exon1Deletion',
+    'Exon2Deletion',
+    'Exon3Deletion',
+    'Exon1-2Deletion',
+    'Exon2-3Deletion',
+    'Exon1-3Deletion',
+]
+
 HPO_ABBREVIATIONS = {
     'hemangioblastoma': 'HB',
     'cerebellar hemangioblastoma': 'CHB',

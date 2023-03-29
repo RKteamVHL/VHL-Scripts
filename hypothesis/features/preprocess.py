@@ -355,6 +355,37 @@ def add_generalized_mutation_type(df: pd.DataFrame):
     return df
 
 
+def clean_civic_name_column(df: pd.DataFrame):
+    """
+    Adds a cleaned civic name column to the dataframe
+    @param df:
+    @return:
+    """
+    civic_name_col = str(AnnotationHeader.CIVIC_NAME)
+    civic_name_string = df[civic_name_col].explode()
+    cleaned_civic_name = civic_name_string.groupby(by=civic_name_string.index).first()
+    df[str(AnnotationHeader.CIVIC_NAME_CLEAN)] = cleaned_civic_name
+
+    return df
+
+
+def add_exon_deletion_columns(df: pd.DataFrame):
+    """
+    Adds a column corresponding to each exon deletion type, with values as 1 if the variant is of this type.
+    This has to be run after clean_civic_name_column()
+    @param df:
+    @return:
+    """
+    civic_name = df[str(AnnotationHeader.CIVIC_NAME_CLEAN)]
+    
+    for exon_deletion_type in variant_functions.EXON_DELETION_TERMS:
+        rows_with_deletion = civic_name.eq(exon_deletion_type)
+        df.loc[:, f'{str(AnnotationHeader.EXON_DELETION_TERM)}.{exon_deletion_type}'] = 0
+        df.loc[rows_with_deletion, f'{str(AnnotationHeader.EXON_DELETION_TERM)}.{exon_deletion_type}'] = 1
+        
+    return df
+
+
 def add_grouped_mutation_type(df: pd.DataFrame):
     """
     Adds truncating/non-truncating columns
@@ -389,6 +420,8 @@ def preprocess(df):
         .pipe(clean_protein_position)
         .pipe(add_region_columns)
         .pipe(add_generalized_mutation_type)
+        .pipe(clean_civic_name_column)
+        .pipe(add_exon_deletion_columns)
         .pipe(add_grouped_mutation_type)
 
     )
