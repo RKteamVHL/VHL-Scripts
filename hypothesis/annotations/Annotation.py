@@ -174,7 +174,7 @@ class AnnotationType(enum.IntEnum):
     ASSAY = enum.auto()
 
 
-BODY_TAG_REGEX = re.compile("^(?P<name>\w+): *(?P<body>.*)$", flags=re.MULTILINE)
+BODY_TAG_REGEX = re.compile(r"^(?P<name>\w+): *(?P<body>.*)$", flags=re.MULTILINE)
 
 # for tag lists, only mandatory tags are used to determine the annotation type
 
@@ -210,7 +210,7 @@ ASSAY_TAGS = [
 def _fix_df_nan(df: pd.DataFrame):
     out_df = df
     for term in NULL_TERMS:
-        out_df = out_df.replace(term, np.NaN)
+        out_df = out_df.replace(term, np.nan)
     return out_df
 
 @dataclass

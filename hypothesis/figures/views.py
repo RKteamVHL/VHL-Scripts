@@ -299,7 +299,8 @@ def _phenotype_correlation(df):
                                index=pheno_colnames)
 
     for col in pheno_colnames:
-        phen_agg = df[df[col] >= 1].sum()
+        df_with_pheno = df[df[col] >= 1][pheno_colnames]
+        phen_agg = df_with_pheno.sum()
         pheno_pheno.loc[col] = phen_agg
 
     pheno_pheno = pheno_pheno.reindex(pheno_pheno.sum().sort_values(ascending=False).index)
@@ -429,5 +430,5 @@ def create_descriptive_figures(directory, dfs):
                 os.makedirs(data_path)
 
             # plt.savefig(os.path.join(fig_path, f'{stats_name}.pdf'))
-            plt.savefig(os.path.join(fig_path, f'{stats_name}.eps'), format='eps')
+            plt.savefig(os.path.join(fig_path, f'{stats_name}.svg'), format='svg')
             dataframe.to_csv(os.path.join(data_path, f'{stats_name}.csv'))
